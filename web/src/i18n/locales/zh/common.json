@@ -2258,7 +2258,15 @@
         "accent": "强调"
       }
     },
-    "themeIntensity": "主题强度：{{pct}}%"
+    "themeIntensity": "主题强度：{{pct}}%",
+    "homeShape": "主星系轮廓",
+    "homeShapes": {
+      "octagon": "八边形",
+      "rounded": "圆角",
+      "shield": "盾牌",
+      "fortress": "堡垒",
+      "hexagon": "六边形"
+    }
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

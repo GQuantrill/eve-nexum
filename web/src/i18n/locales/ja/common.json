@@ -2258,7 +2258,15 @@
         "accent": "アクセント"
       }
     },
-    "themeIntensity": "テーマの強さ：{{pct}}%"
+    "themeIntensity": "テーマの強さ：{{pct}}%",
+    "homeShape": "ホーム星系の枠",
+    "homeShapes": {
+      "octagon": "八角形",
+      "rounded": "角丸",
+      "shield": "盾",
+      "fortress": "要塞",
+      "hexagon": "六角形"
+    }
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

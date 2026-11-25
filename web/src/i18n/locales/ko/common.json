@@ -2258,7 +2258,15 @@
         "accent": "포인트"
       }
     },
-    "themeIntensity": "테마 강도: {{pct}}%"
+    "themeIntensity": "테마 강도: {{pct}}%",
+    "homeShape": "홈 시스템 외곽선",
+    "homeShapes": {
+      "octagon": "팔각형",
+      "rounded": "둥근 모서리",
+      "shield": "방패",
+      "fortress": "요새",
+      "hexagon": "육각형"
+    }
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

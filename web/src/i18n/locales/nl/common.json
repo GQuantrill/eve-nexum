@@ -2258,7 +2258,15 @@
         "accent": "Accent"
       }
     },
-    "themeIntensity": "Thema-intensiteit: {{pct}}%"
+    "themeIntensity": "Thema-intensiteit: {{pct}}%",
+    "homeShape": "Omtrek van thuissysteem",
+    "homeShapes": {
+      "octagon": "Achthoek",
+      "rounded": "Afgerond",
+      "shield": "Schild",
+      "fortress": "Vesting",
+      "hexagon": "Zeshoek"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

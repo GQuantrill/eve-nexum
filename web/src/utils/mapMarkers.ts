@@ -5,6 +5,7 @@
 export const HOME_COLOR_KEY  = 'nexum.map.homeColor';
 export const HERE_COLOR_KEY  = 'nexum.map.hereColor';
 export const HERE_PULSE_KEY  = 'nexum.map.herePulse';
+export const HOME_SHAPE_KEY  = 'nexum.map.homeShape';
 
 export const HOME_COLOR_DEFAULT = '#f0c040'; // --warning-gold
 export const HERE_COLOR_DEFAULT = '#3ddc84'; // --success
@@ -12,6 +13,19 @@ export const HERE_COLOR_DEFAULT = '#3ddc84'; // --success
 export type HerePulse = 'off' | 'subtle' | 'normal' | 'strong';
 export const HERE_PULSES: HerePulse[] = ['off', 'subtle', 'normal', 'strong'];
 export const HERE_PULSE_DEFAULT: HerePulse = 'normal';
+
+/** The outline drawn round the home system (styles/system-node.css). */
+export type HomeShape = 'octagon' | 'rounded' | 'shield' | 'fortress' | 'hexagon';
+export const HOME_SHAPES: HomeShape[] = ['octagon', 'rounded', 'shield', 'fortress', 'hexagon'];
+export const HOME_SHAPE_DEFAULT: HomeShape = 'octagon';
+
+export function normaliseHomeShape(v: unknown): HomeShape {
+  return HOME_SHAPES.includes(v as HomeShape) ? (v as HomeShape) : HOME_SHAPE_DEFAULT;
+}
+
+export function applyHomeShape(v: unknown): void {
+  document.documentElement.dataset.homeShape = normaliseHomeShape(v);
+}
 
 // How far the ring travels (px) and how strong it starts (%). 'off' keeps a
 // still ring so the node is still marked.

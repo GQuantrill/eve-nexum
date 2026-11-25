@@ -2282,7 +2282,15 @@
         "accent": "Акцент"
       }
     },
-    "themeIntensity": "Насыщенность темы: {{pct}}%"
+    "themeIntensity": "Насыщенность темы: {{pct}}%",
+    "homeShape": "Контур домашней системы",
+    "homeShapes": {
+      "octagon": "Восьмиугольник",
+      "rounded": "Скруглённый",
+      "shield": "Щит",
+      "fortress": "Крепость",
+      "hexagon": "Шестиугольник"
+    }
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

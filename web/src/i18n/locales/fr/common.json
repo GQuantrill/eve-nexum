@@ -2258,7 +2258,15 @@
         "accent": "Accent"
       }
     },
-    "themeIntensity": "Intensité du thème : {{pct}} %"
+    "themeIntensity": "Intensité du thème : {{pct}} %",
+    "homeShape": "Contour du système d'origine",
+    "homeShapes": {
+      "octagon": "Octogone",
+      "rounded": "Arrondi",
+      "shield": "Bouclier",
+      "fortress": "Forteresse",
+      "hexagon": "Hexagone"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

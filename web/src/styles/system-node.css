@@ -1477,6 +1477,48 @@ div.system-node__easy-handle {
   }
 }
 
+/* The pilot's choice of home outline (utils/mapMarkers.ts HOME_SHAPES), set as
+   data-home-shape on <html>; octagon is the default above. Shapes that need
+   more room than the node's box (the shield's point, the fortress's
+   battlements, the hexagon's sides) grow outward, so the content never sits
+   outside the fill. The inner polygon is the edge's fill, 2px in. */
+:root[data-home-shape='rounded'] .system-node__home-shape {
+  & > span        { clip-path: inset(0 round 9px); }
+  & > span::after { clip-path: inset(0 round 7px); }
+}
+
+:root[data-home-shape='shield'] .system-node__home-shape {
+  inset: -1.5px -1.5px -22px;
+  & > span {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 24px),
+                       50% 100%, 0 calc(100% - 24px), 0 10px);
+  }
+  & > span::after {
+    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 23px),
+                       50% 100%, 0 calc(100% - 23px), 0 9px);
+  }
+}
+
+:root[data-home-shape='fortress'] .system-node__home-shape {
+  inset: -10px -1.5px -1.5px;
+  & > span::after { clip-path: polygon(0 0, calc(14.29% + -3.43px) 0, calc(14.29% + -3.43px) 8px, calc(28.57% + 1.14px) 8px, calc(28.57% + 1.14px) 0, calc(42.86% + -2.29px) 0, calc(42.86% + -2.29px) 8px, calc(57.14% + 2.29px) 8px, calc(57.14% + 2.29px) 0, calc(71.43% + -1.14px) 0, calc(71.43% + -1.14px) 8px, calc(85.71% + 3.43px) 8px, calc(85.71% + 3.43px) 0, 100% 0, 100% 100%, 0 100%); }
+  & > span {
+    clip-path: polygon(0 0, 14.28% 0, 14.28% 8px, 28.57% 8px, 28.57% 0, 42.86% 0, 42.86% 8px,
+                       57.14% 8px, 57.14% 0, 71.43% 0, 71.43% 8px, 85.71% 8px, 85.71% 0,
+                       100% 0, 100% 100%, 0 100%);
+  }
+}
+
+:root[data-home-shape='hexagon'] .system-node__home-shape {
+  inset: -1.5px -12px;
+  & > span {
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+  }
+  & > span::after {
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
+  }
+}
+
 .system-node[data-home='true'][data-heat]::before { display: none; }
 .system-node--sov-hostile .system-node__home-shape {
   filter: drop-shadow(0 0 4px var(--cv-stand-hostile));

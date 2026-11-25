@@ -2258,7 +2258,15 @@
         "accent": "Akzent"
       }
     },
-    "themeIntensity": "Farbintensität: {{pct}} %"
+    "themeIntensity": "Farbintensität: {{pct}} %",
+    "homeShape": "Umriss des Heimatsystems",
+    "homeShapes": {
+      "octagon": "Achteck",
+      "rounded": "Abgerundet",
+      "shield": "Schild",
+      "fortress": "Festung",
+      "hexagon": "Sechseck"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

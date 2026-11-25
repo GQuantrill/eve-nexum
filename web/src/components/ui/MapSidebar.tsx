@@ -56,7 +56,7 @@ import {
 } from '../../utils/mapBackground';
 import { resolveColorHex } from '../../utils/cssVar';
 import { ThemePicker } from './ThemePicker';
-import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
+import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor, HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT, HOME_SHAPES, normaliseHomeShape } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
 // state syncs cross-device via users.ui_settings. Used by the Activity
@@ -1024,6 +1024,7 @@ export function MapSidebar() {
       toast.error(t(err instanceof BgImageError && err.reason === "tooBig" ? "mapSidebar.bgImageTooBig" : "mapSidebar.bgImageFailed"));
     });
   };
+  const [homeShape, setHomeShape] = useUserSetting<string>(HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT);
   const [herePulse, setHerePulse] = useUserSetting<string>(HERE_PULSE_KEY, HERE_PULSE_DEFAULT);
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
@@ -2286,6 +2287,11 @@ export function MapSidebar() {
                       </div>
                     );
                   })}
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label" htmlFor="home-shape">{t("mapSidebar.homeShape")}</label>
+                    <Select id="home-shape" value={normaliseHomeShape(homeShape)} onChange={(v) => setHomeShape(v)}
+                      options={HOME_SHAPES.map((sh) => ({ value: sh, label: t(`mapSidebar.homeShapes.${sh}`) }))} />
+                  </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
                     <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
