@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Registro de auditoría",
       "flags": "Plantillas",
-      "defaults": "Diseño por defecto"
+      "defaults": "Diseño por defecto",
+      "backgrounds": "Fondos"
     },
     "access": {
       "title": "Acceso de inicio de sesión",
@@ -444,6 +445,27 @@
       "saved": "Guardado",
       "loadFailed": "No se pudieron cargar los ajustes.",
       "saveFailed": "No se pudieron guardar los ajustes."
+    },
+    "backgrounds": {
+      "title": "Fondos del mapa",
+      "noOrg": "Los fondos del mapa son para instalaciones de corporación y alianza.",
+      "loadFailed": "No se pudieron cargar los fondos.",
+      "saveFailed": "No se pudo guardar el cambio.",
+      "tooBig": "La imagen es demasiado grande (20 MB como máximo).",
+      "unreadable": "No se pudo usar la imagen. Prueba PNG, JPEG o WebP.",
+      "hintCorp": "Hasta {{max}} imágenes que los miembros de tu corporación pueden mostrar detrás del mapa. Los miembros ven la predeterminada salvo que elijan otra, o ninguna, en sus ajustes.",
+      "hintAlliance": "Hasta {{max}} imágenes que los miembros de tu alianza pueden mostrar detrás del mapa. Los miembros ven la predeterminada salvo que elijan otra, o ninguna, en sus ajustes.",
+      "hintMembers": "Las imágenes se reducen antes de subirlas. La imagen propia de un piloto en su dispositivo tiene prioridad.",
+      "namePlaceholder": "Nombre (opcional)",
+      "name": "Nombre",
+      "makeDefault": "Hacer predeterminada",
+      "unsetDefault": "Sin predeterminada",
+      "remove": "Quitar",
+      "default": "Predeterminada",
+      "noDefault": "Sin predeterminada: los miembros no ven ninguna imagen salvo que elijan una.",
+      "add": "Añadir imagen…",
+      "working": "Procesando…",
+      "count": "{{n}} de {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "Rellenar",
       "contain": "Ajustar",
       "tile": "Mosaico"
-    }
+    },
+    "orgBg": "Fondo de corp/alianza",
+    "orgBgDefaultNamed": "Predeterminado ({{name}})",
+    "orgBgDefaultNone": "Predeterminado (ninguno)",
+    "orgBgNone": "Ninguno",
+    "orgBgUnnamed": "Imagen {{n}}",
+    "orgBgOverridden": "Se muestra tu propia imagen de abajo en su lugar. Quítala para ver esta."
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

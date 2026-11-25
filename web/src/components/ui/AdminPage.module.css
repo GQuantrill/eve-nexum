@@ -706,3 +706,52 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Map backgrounds tab ── */
+.bgGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-12, 12px);
+  margin: 12px 0;
+}
+.bgCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-panel);
+}
+.bgCardDefault { border-color: var(--border-accent-strong); }
+.bgThumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--surface-sunken);
+}
+.bgName {
+  background: var(--surface-well);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  padding: 4px 6px;
+  font-size: calc(13px * var(--font-scale, 1));
+}
+.bgActions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bgBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--border-accent-strong);
+  color: var(--text-bright);
+  font-size: calc(12px * var(--font-scale, 1));
+}

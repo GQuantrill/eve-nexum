@@ -114,7 +114,8 @@
       "discord": "Discord",
       "audit": "Auditlogboek",
       "flags": "Markeringsvoorinstellingen",
-      "defaults": "Standaardindeling"
+      "defaults": "Standaardindeling",
+      "backgrounds": "Achtergronden"
     },
     "access": {
       "title": "Inlogtoegang",
@@ -444,6 +445,27 @@
       "saved": "Opgeslagen",
       "loadFailed": "Kon de standaardwaarden niet laden.",
       "saveFailed": "Kon de standaardwaarden niet opslaan."
+    },
+    "backgrounds": {
+      "title": "Kaartachtergronden",
+      "noOrg": "Kaartachtergronden zijn er voor corporation- en alliance-installaties.",
+      "loadFailed": "De achtergronden konden niet worden geladen.",
+      "saveFailed": "Die wijziging kon niet worden opgeslagen.",
+      "tooBig": "Die afbeelding is te groot (maximaal 20 MB).",
+      "unreadable": "Die afbeelding kon niet worden gebruikt. Probeer PNG, JPEG of WebP.",
+      "hintCorp": "Tot {{max}} afbeeldingen die leden van je corporation achter de kaart kunnen tonen. Leden zien de standaard, tenzij ze in hun instellingen een andere of geen kiezen.",
+      "hintAlliance": "Tot {{max}} afbeeldingen die leden van je alliance achter de kaart kunnen tonen. Leden zien de standaard, tenzij ze in hun instellingen een andere of geen kiezen.",
+      "hintMembers": "Afbeeldingen worden vóór het uploaden verkleind. Een eigen afbeelding van een piloot op zijn apparaat gaat voor.",
+      "namePlaceholder": "Naam (optioneel)",
+      "name": "Naam",
+      "makeDefault": "Als standaard",
+      "unsetDefault": "Geen standaard",
+      "remove": "Verwijderen",
+      "default": "Standaard",
+      "noDefault": "Geen standaard: leden zien geen afbeelding, tenzij ze er een kiezen.",
+      "add": "Afbeelding toevoegen…",
+      "working": "Bezig…",
+      "count": "{{n}} van {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "Vullen",
       "contain": "Passend",
       "tile": "Tegels"
-    }
+    },
+    "orgBg": "Corp-/alliance-achtergrond",
+    "orgBgDefaultNamed": "Standaard ({{name}})",
+    "orgBgDefaultNone": "Standaard (geen)",
+    "orgBgNone": "Geen",
+    "orgBgUnnamed": "Afbeelding {{n}}",
+    "orgBgOverridden": "Je eigen afbeelding hieronder wordt in plaats daarvan getoond. Verwijder die om deze te zien."
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

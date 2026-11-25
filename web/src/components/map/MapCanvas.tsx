@@ -86,7 +86,7 @@ import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import {
   MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
-  useMapBgImage, bgImageStyle,
+  useMapBgImage, bgImageStyle, useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
 } from '../../utils/mapBackground';
 import { safeColor } from '../../utils/mapMarkers';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
@@ -212,7 +212,10 @@ export function MapCanvas() {
   const gridColor            = safeColor(gridColorSetting,
     gridLines ? GRID_COLOR_AUTO.lines : gridDots ? GRID_COLOR_AUTO.snapDots : GRID_COLOR_AUTO.dots);
   const bgImage              = useMapBgImage();
-  const bgImageLayer         = bgImageStyle(bgImage, bgColor);
+  const orgBackgrounds       = useOrgBackgrounds();
+  const [bgChoice]           = useUserSetting<string>(BG_CHOICE_KEY, BG_CHOICE_DEFAULT);
+  const bgImageLayer         = bgImageStyle(bgImage, bgColor,
+    shownBackground(bgImage.url, bgChoice, orgBackgrounds.backgrounds));
   const showMinimap          = useMapStore((s) => s.showMinimap);
   const [minimapPosition]    = useMinimapPosition();
   // React Flow's <Controls> usually sits bottom-left. When the user docks

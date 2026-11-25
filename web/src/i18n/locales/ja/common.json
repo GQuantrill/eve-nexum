@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "監査ログ",
       "flags": "フラグプリセット",
-      "defaults": "既定レイアウト"
+      "defaults": "既定レイアウト",
+      "backgrounds": "背景"
     },
     "access": {
       "title": "ログインアクセス",
@@ -444,6 +445,27 @@
       "saved": "保存しました",
       "loadFailed": "既定値を読み込めませんでした。",
       "saveFailed": "既定値を保存できませんでした。"
+    },
+    "backgrounds": {
+      "title": "マップ背景",
+      "noOrg": "マップ背景はコーポレーションとアライアンスの導入でのみ使えます。",
+      "loadFailed": "背景を読み込めませんでした。",
+      "saveFailed": "変更を保存できませんでした。",
+      "tooBig": "画像が大きすぎます（最大 20 MB）。",
+      "unreadable": "この画像は使えませんでした。PNG、JPEG、WebP をお試しください。",
+      "hintCorp": "コーポレーションのメンバーがマップの後ろに表示できる画像を最大 {{max}} 枚まで。メンバーが設定で別の画像かなしを選ばない限り、デフォルトが表示されます。",
+      "hintAlliance": "アライアンスのメンバーがマップの後ろに表示できる画像を最大 {{max}} 枚まで。メンバーが設定で別の画像かなしを選ばない限り、デフォルトが表示されます。",
+      "hintMembers": "画像はアップロード前に縮小されます。パイロットが自分の端末で設定した画像が優先されます。",
+      "namePlaceholder": "名前（任意）",
+      "name": "名前",
+      "makeDefault": "デフォルトにする",
+      "unsetDefault": "デフォルトなし",
+      "remove": "削除",
+      "default": "デフォルト",
+      "noDefault": "デフォルトなし：メンバーが選ばない限り画像は表示されません。",
+      "add": "画像を追加…",
+      "working": "処理中…",
+      "count": "{{n}} / {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "塗りつぶし",
       "contain": "全体を表示",
       "tile": "タイル"
-    }
+    },
+    "orgBg": "コーポ/アライアンスの背景",
+    "orgBgDefaultNamed": "デフォルト（{{name}}）",
+    "orgBgDefaultNone": "デフォルト（なし）",
+    "orgBgNone": "なし",
+    "orgBgUnnamed": "画像 {{n}}",
+    "orgBgOverridden": "代わりに下の自分の画像が表示されています。これを表示するには自分の画像を削除してください。"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

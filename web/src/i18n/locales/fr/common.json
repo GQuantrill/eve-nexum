@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Journal d'audit",
       "flags": "Modèles",
-      "defaults": "Disposition par défaut"
+      "defaults": "Disposition par défaut",
+      "backgrounds": "Fonds"
     },
     "access": {
       "title": "Accès de connexion",
@@ -444,6 +445,27 @@
       "saved": "Enregistré",
       "loadFailed": "Impossible de charger les valeurs par défaut.",
       "saveFailed": "Impossible d'enregistrer les valeurs par défaut."
+    },
+    "backgrounds": {
+      "title": "Fonds de carte",
+      "noOrg": "Les fonds de carte sont réservés aux installations de corporation et d'alliance.",
+      "loadFailed": "Impossible de charger les fonds.",
+      "saveFailed": "Impossible d'enregistrer ce changement.",
+      "tooBig": "Cette image est trop lourde (20 Mo maximum).",
+      "unreadable": "Impossible d'utiliser cette image. Essayez PNG, JPEG ou WebP.",
+      "hintCorp": "Jusqu'à {{max}} images que les membres de votre corporation peuvent afficher derrière la carte. Les membres voient celle par défaut, sauf s'ils en choisissent une autre ou aucune dans leurs paramètres.",
+      "hintAlliance": "Jusqu'à {{max}} images que les membres de votre alliance peuvent afficher derrière la carte. Les membres voient celle par défaut, sauf s'ils en choisissent une autre ou aucune dans leurs paramètres.",
+      "hintMembers": "Les images sont réduites avant l'envoi. L'image personnelle d'un pilote sur son appareil passe avant.",
+      "namePlaceholder": "Nom (facultatif)",
+      "name": "Nom",
+      "makeDefault": "Par défaut",
+      "unsetDefault": "Aucune par défaut",
+      "remove": "Retirer",
+      "default": "Par défaut",
+      "noDefault": "Aucune par défaut : les membres ne voient aucune image sauf s'ils en choisissent une.",
+      "add": "Ajouter une image…",
+      "working": "En cours…",
+      "count": "{{n}} sur {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "Remplir",
       "contain": "Ajuster",
       "tile": "Mosaïque"
-    }
+    },
+    "orgBg": "Fond corp/alliance",
+    "orgBgDefaultNamed": "Par défaut ({{name}})",
+    "orgBgDefaultNone": "Par défaut (aucun)",
+    "orgBgNone": "Aucun",
+    "orgBgUnnamed": "Image {{n}}",
+    "orgBgOverridden": "Votre image personnelle ci-dessous est affichée à la place. Retirez-la pour voir celle-ci."
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

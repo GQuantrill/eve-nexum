@@ -6,7 +6,13 @@
 // kept in IndexedDB as a data: URL -- data: because the site's CSP already
 // allows data: images, so self-hosters' nginx needs no change. Fit and darken
 // stay on the device with it.
+//
+// On a corp or alliance install an admin can also offer up to five pictures
+// (server/src/services/orgBackgrounds.ts), one the default. A pilot sees the
+// default, or picks another or none (BG_CHOICE_KEY, synced); their own picture
+// on this device overrides all of that.
 import { useSyncExternalStore } from 'react';
+import { api, apiUrl } from '../api/client';
 
 export const MAP_BG_COLOR_KEY = 'nexum.map.bgColor';
 export const MAP_BG_COLOR_DEFAULT = '#0b0e16'; // --surface-sunken
@@ -114,24 +120,50 @@ export class BgImageError extends Error {
   constructor(readonly reason: 'tooBig' | 'unreadable') { super(reason); }
 }
 
-/** Scale the picked file down, keep it on this device and show it. */
-export async function setBgImage(file: File): Promise<void> {
+async function readPicture(file: File): Promise<ImageBitmap> {
   if (file.size > BG_IMAGE_MAX_BYTES) throw new BgImageError('tooBig');
-  let bmp: ImageBitmap;
-  try { bmp = await createImageBitmap(file); } catch { throw new BgImageError('unreadable'); }
-  const scale = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+  try { return await createImageBitmap(file); } catch { throw new BgImageError('unreadable'); }
+}
+
+/** `bmp` at most `maxSide` a side, as a data: URL. WebP keeps transparency and
+ *  is small; a browser that can't write it hands back PNG, so JPEG there. */
+function encode(bmp: ImageBitmap, maxSide: number, quality: number): string {
+  const scale = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(bmp.width * scale));
   canvas.height = Math.max(1, Math.round(bmp.height * scale));
   canvas.getContext('2d')?.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-  bmp.close();
-  // WebP keeps transparency and is small; a browser that can't write it
-  // hands back PNG, so fall back to JPEG there.
-  let url = canvas.toDataURL('image/webp', 0.9);
-  if (!url.startsWith('data:image/webp')) url = canvas.toDataURL('image/jpeg', 0.9);
+  let url = canvas.toDataURL('image/webp', quality);
+  if (!url.startsWith('data:image/webp')) url = canvas.toDataURL('image/jpeg', quality);
   if (!url.startsWith('data:image/')) throw new BgImageError('unreadable');
+  return url;
+}
+
+/** Scale the picked file down, keep it on this device and show it. */
+export async function setBgImage(file: File): Promise<void> {
+  const bmp = await readPicture(file);
+  let url: string;
+  try { url = encode(bmp, MAX_SIDE, 0.9); } finally { bmp.close(); }
   await idb('readwrite', (s) => s.put(url, IMAGE_ID));
   set({ url });
+}
+
+/** Upload cap for an org picture (server/src/services/orgBackgrounds.ts). */
+const ORG_MAX_BYTES = 700 * 1024;
+
+/** An admin's picture for the org, scaled and compressed until it fits the
+ *  upload cap: base64, without the data: prefix. */
+export async function encodeOrgBackground(file: File): Promise<string> {
+  const bmp = await readPicture(file);
+  try {
+    for (const [side, q] of [[2560, 0.85], [2560, 0.7], [1920, 0.75], [1920, 0.6], [1280, 0.6]] as const) {
+      const b64 = encode(bmp, side, q).split(',')[1] ?? '';
+      if (b64.length * 0.75 <= ORG_MAX_BYTES) return b64;
+    }
+  } finally {
+    bmp.close();
+  }
+  throw new BgImageError('tooBig');
 }
 
 export async function clearBgImage(): Promise<void> {
@@ -139,12 +171,60 @@ export async function clearBgImage(): Promise<void> {
   await idb('readwrite', (s) => s.delete(IMAGE_ID)).catch(() => {});
 }
 
+// ── The org's pictures ──────────────────────────────────────────────────────
+
+/** Which of the org's pictures a pilot shows: theirs to choose. */
+export const BG_CHOICE_KEY = 'nexum.map.bgChoice';
+/** 'default' = whatever the admin made the default; 'none' = no picture. */
+export const BG_CHOICE_DEFAULT = 'default';
+
+export interface OrgBackground { id: string; name: string; isDefault: boolean }
+export interface OrgBackgrounds { enabled: boolean; backgrounds: OrgBackground[] }
+
+const NO_ORG: OrgBackgrounds = { enabled: false, backgrounds: [] };
+let org: OrgBackgrounds = NO_ORG;
+let orgLoad: Promise<void> | null = null;
+const orgListeners = new Set<() => void>();
+
+/** Fetch the org's list again (after an admin changed it). */
+export function reloadOrgBackgrounds(): Promise<void> {
+  orgLoad = api<OrgBackgrounds>('/api/backgrounds')
+    .then((r) => { org = r && Array.isArray(r.backgrounds) ? r : NO_ORG; })
+    .catch(() => { org = NO_ORG; })
+    .then(() => { orgListeners.forEach((l) => l()); });
+  return orgLoad;
+}
+
+function subscribeOrg(cb: () => void): () => void {
+  orgListeners.add(cb);
+  if (!orgLoad) void reloadOrgBackgrounds();
+  return () => { orgListeners.delete(cb); };
+}
+
+/** The pictures the pilot's admin offers ({ enabled: false } on a solo install). */
+export function useOrgBackgrounds(): OrgBackgrounds {
+  return useSyncExternalStore(subscribeOrg, () => org, () => org);
+}
+
+export function orgBackgroundUrl(id: string): string {
+  return apiUrl(`/api/backgrounds/${encodeURIComponent(id)}`);
+}
+
+/** The picture to show: the pilot's own, else their pick of the org's (or the
+ *  org's default), else none. */
+export function shownBackground(own: string | null, choice: unknown, list: OrgBackground[]): string | null {
+  if (own) return own;
+  if (choice === 'none') return null;
+  const picked = list.find((b) => b.id === choice) ?? list.find((b) => b.isDefault);
+  return picked ? orgBackgroundUrl(picked.id) : null;
+}
+
 /** CSS for the picture layer: the background colour over it at `dim`. */
-export function bgImageStyle(img: BgImageState, color: string): React.CSSProperties | null {
-  if (!img.url) return null;
+export function bgImageStyle(img: BgImageState, color: string, url: string | null = img.url): React.CSSProperties | null {
+  if (!url) return null;
   const veil = `color-mix(in srgb, ${color} ${img.dim}%, transparent)`;
   return {
-    backgroundImage: `linear-gradient(${veil}, ${veil}), url("${img.url}")`,
+    backgroundImage: `linear-gradient(${veil}, ${veil}), url("${url}")`,
     backgroundSize: img.fit === 'tile' ? 'auto, auto' : `auto, ${img.fit}`,
     backgroundRepeat: img.fit === 'tile' ? 'repeat' : 'no-repeat',
     backgroundPosition: 'center',

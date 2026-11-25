@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Audit-Log",
       "flags": "Flaggen-Vorlagen",
-      "defaults": "Standard-Layout"
+      "defaults": "Standard-Layout",
+      "backgrounds": "Hintergründe"
     },
     "access": {
       "title": "Anmeldezugang",
@@ -444,6 +445,27 @@
       "saved": "Gespeichert",
       "loadFailed": "Standards konnten nicht geladen werden.",
       "saveFailed": "Standards konnten nicht gespeichert werden."
+    },
+    "backgrounds": {
+      "title": "Kartenhintergründe",
+      "noOrg": "Kartenhintergründe gibt es für Corporation- und Allianz-Installationen.",
+      "loadFailed": "Die Hintergründe konnten nicht geladen werden.",
+      "saveFailed": "Die Änderung konnte nicht gespeichert werden.",
+      "tooBig": "Das Bild ist zu groß (höchstens 20 MB).",
+      "unreadable": "Das Bild konnte nicht verwendet werden. Versuche PNG, JPEG oder WebP.",
+      "hintCorp": "Bis zu {{max}} Bilder, die Mitglieder deiner Corporation hinter der Karte anzeigen können. Mitglieder sehen den Standard, sofern sie in ihren Einstellungen kein anderes oder keines wählen.",
+      "hintAlliance": "Bis zu {{max}} Bilder, die Mitglieder deiner Allianz hinter der Karte anzeigen können. Mitglieder sehen den Standard, sofern sie in ihren Einstellungen kein anderes oder keines wählen.",
+      "hintMembers": "Bilder werden vor dem Hochladen verkleinert. Ein eigenes Bild eines Piloten auf seinem Gerät hat Vorrang.",
+      "namePlaceholder": "Name (optional)",
+      "name": "Name",
+      "makeDefault": "Als Standard",
+      "unsetDefault": "Kein Standard",
+      "remove": "Entfernen",
+      "default": "Standard",
+      "noDefault": "Kein Standard: Mitglieder sehen kein Bild, außer sie wählen eines.",
+      "add": "Bild hinzufügen…",
+      "working": "Wird bearbeitet…",
+      "count": "{{n}} von {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "Füllen",
       "contain": "Einpassen",
       "tile": "Kacheln"
-    }
+    },
+    "orgBg": "Corp-/Allianz-Hintergrund",
+    "orgBgDefaultNamed": "Standard ({{name}})",
+    "orgBgDefaultNone": "Standard (keiner)",
+    "orgBgNone": "Keiner",
+    "orgBgUnnamed": "Bild {{n}}",
+    "orgBgOverridden": "Stattdessen wird dein eigenes Bild unten angezeigt. Entferne es, um dieses zu sehen."
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

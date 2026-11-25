@@ -26,6 +26,7 @@ import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '../../ico
 import { createPortal } from 'react-dom';
 import styles from './AdminPage.module.css';
 import { useScopeHeld } from '../../hooks/useScopeHeld';
+import { encodeOrgBackground, reloadOrgBackgrounds, BgImageError } from '../../utils/mapBackground';
 import { promptForScope } from '../../utils/scopePrompt';
 import { useScopePickerStore } from '../../store/scopePickerStore';
 import { saveFile } from '../../utils/saveFile';
@@ -67,7 +68,7 @@ function RolesInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord' | 'flags' | 'defaults';
+type Tab = 'users' | 'access' | 'maps' | 'reports' | 'audit' | 'discord' | 'flags' | 'defaults' | 'backgrounds';
 
 const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'users',   path: '/admin/users'   },
@@ -77,6 +78,7 @@ const ALL_TABS: { key: Tab; path: string }[] = [
   { key: 'discord', path: '/admin/discord' },
   { key: 'flags',   path: '/admin/flags'   },
   { key: 'defaults', path: '/admin/defaults' },
+  { key: 'backgrounds', path: '/admin/backgrounds' },
   { key: 'audit',   path: '/admin/audit'   },
 ];
 
@@ -122,6 +124,7 @@ export function AdminPage() {
         {tab === 'discord' && isAdmin       && <DiscordTab />}
         {tab === 'flags'   && isAdmin       && <FlagPresetsTab />}
         {tab === 'defaults' && isAdmin      && <UiDefaultsTab />}
+        {tab === 'backgrounds' && isAdmin   && <BackgroundsTab />}
         {tab === 'audit'   && isAdmin       && <AuditTab />}
       </main>
     </div>
@@ -136,6 +139,7 @@ function pathToTab(path: string, isAdmin: boolean, canSeeReports: boolean): Tab 
   if (path.startsWith('/admin/discord')) return isAdmin       ? 'discord' : fallback;
   if (path.startsWith('/admin/flags'))   return isAdmin       ? 'flags'   : fallback;
   if (path.startsWith('/admin/defaults')) return isAdmin     ? 'defaults' : fallback;
+  if (path.startsWith('/admin/backgrounds')) return isAdmin  ? 'backgrounds' : fallback;
   if (path.startsWith('/admin/audit'))   return isAdmin       ? 'audit'   : fallback;
   return fallback;
 }
@@ -1218,6 +1222,118 @@ function UiDefaultsTab() {
             </button>
           )}
           {saved && <span className={styles.dcSaved}>{t('admin.defaults.saved')}</span>}
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ── Map backgrounds tab ─────────────────────────────────────────────────────
+// Up to five pictures members can show behind the map, one the default
+// (server/src/services/orgBackgrounds.ts). Corp and alliance installs only.
+
+interface OrgBg { id: string; name: string; isDefault: boolean }
+interface BackgroundsPayload { scope: 'corp' | 'alliance' | null; backgrounds: OrgBg[]; max: number }
+
+function BackgroundsTab() {
+  const { t } = useTranslation();
+  const [data, setData]   = useState<BackgroundsPayload | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy]   = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const load = useCallback(async () => {
+    try { setData(await api<BackgroundsPayload>('/api/admin/backgrounds')); }
+    catch { setError(t('admin.backgrounds.loadFailed')); }
+  }, [t]);
+
+  useEffect(() => {
+    // Deliberate: seeds this tab from the server on mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void load();
+  }, [load]);
+
+  const title = <h2 className={styles.pgSectionTitle}>{t('admin.backgrounds.title')}</h2>;
+  if (!data && error) return (<>{title}<div className={styles.pgError}>{error}</div></>);
+  if (!data)          return (<>{title}<div className={styles.pgLoading}>{t('admin.loading')}</div></>);
+  if (data.scope == null) return (<>{title}<div className={styles.pgEmpty}>{t('admin.backgrounds.noOrg')}</div></>);
+
+  // Every change reloads this list and the member-side one, so the admin's own
+  // map shows it straight away.
+  const run = async (fn: () => Promise<unknown>, failKey = 'admin.backgrounds.saveFailed') => {
+    setBusy(true); setError(null);
+    try { await fn(); }
+    catch (err) {
+      setError(t(err instanceof BgImageError && err.reason === 'tooBig' ? 'admin.backgrounds.tooBig'
+        : err instanceof BgImageError ? 'admin.backgrounds.unreadable' : failKey));
+    }
+    finally { await load(); void reloadOrgBackgrounds(); setBusy(false); }
+  };
+  const upload = (file: File | undefined) => {
+    if (!file) return;
+    const name = file.name.replace(/\.[^.]+$/, '').slice(0, 40);
+    void run(async () => {
+      const b64 = await encodeOrgBackground(file);
+      await api('/api/admin/backgrounds', { method: 'POST', body: JSON.stringify({ data: b64, name }) });
+    });
+  };
+  const full = data.backgrounds.length >= data.max;
+
+  return (
+    <>
+      {title}
+      <section className={styles.dcSection}>
+        <p className={styles.dcHint}>
+          {t(data.scope === 'alliance' ? 'admin.backgrounds.hintAlliance' : 'admin.backgrounds.hintCorp', { max: data.max })}
+        </p>
+        <p className={styles.dcHint}>{t('admin.backgrounds.hintMembers')}</p>
+
+        <div className={styles.bgGrid}>
+          {data.backgrounds.map((b) => (
+            <div key={b.id} className={[styles.bgCard, b.isDefault && styles.bgCardDefault].filter(Boolean).join(' ')}>
+              <img className={styles.bgThumb} src={apiUrl(`/api/admin/backgrounds/${b.id}/image`)} alt="" />
+              <input
+                className={styles.bgName}
+                defaultValue={b.name}
+                maxLength={40}
+                placeholder={t('admin.backgrounds.namePlaceholder')}
+                aria-label={t('admin.backgrounds.name')}
+                onBlur={(e) => {
+                  const name = e.target.value.trim();
+                  if (name !== b.name) void run(() => api(`/api/admin/backgrounds/${b.id}`, { method: 'PATCH', body: JSON.stringify({ name }) }));
+                }}
+              />
+              <div className={styles.bgActions}>
+                {b.isDefault
+                  ? <button type="button" className="btn btn--ghost" disabled={busy}
+                      onClick={() => void run(() => api('/api/admin/backgrounds/default', { method: 'PUT', body: JSON.stringify({ id: null }) }))}>
+                      {t('admin.backgrounds.unsetDefault')}
+                    </button>
+                  : <button type="button" className="btn btn--ghost" disabled={busy}
+                      onClick={() => void run(() => api('/api/admin/backgrounds/default', { method: 'PUT', body: JSON.stringify({ id: b.id }) }))}>
+                      {t('admin.backgrounds.makeDefault')}
+                    </button>}
+                <button type="button" className="btn btn--ghost" disabled={busy}
+                  onClick={() => void run(() => api(`/api/admin/backgrounds/${b.id}`, { method: 'DELETE' }))}>
+                  {t('admin.backgrounds.remove')}
+                </button>
+              </div>
+              {b.isDefault && <span className={styles.bgBadge}>{t('admin.backgrounds.default')}</span>}
+            </div>
+          ))}
+        </div>
+        {data.backgrounds.length > 0 && !data.backgrounds.some((b) => b.isDefault) && (
+          <p className={styles.dcHint}>{t('admin.backgrounds.noDefault')}</p>
+        )}
+
+        {error && <div className={styles.pgError}>{error}</div>}
+        <div className={styles.dcActions}>
+          <button className="btn btn--primary" disabled={busy || full} onClick={() => fileRef.current?.click()}>
+            {busy ? t('admin.backgrounds.working') : t('admin.backgrounds.add')}
+          </button>
+          <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden
+            onChange={(e) => { upload(e.target.files?.[0]); e.target.value = ''; }} />
+          <span className={styles.dcHint}>{t('admin.backgrounds.count', { n: data.backgrounds.length, max: data.max })}</span>
         </div>
       </section>
     </>

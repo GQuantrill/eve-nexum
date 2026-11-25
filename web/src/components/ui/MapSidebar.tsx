@@ -52,6 +52,7 @@ import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import {
   MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
   BG_FITS, useMapBgImage, setBgImage, clearBgImage, setBgFit, setBgDim, BgImageError, type BgFit,
+  useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
 } from '../../utils/mapBackground';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
@@ -1009,6 +1010,11 @@ export function MapSidebar() {
   const [gridColor, setGridColor] = useUserSetting<string>(GRID_COLOR_KEY, "");
   const [showGrid, setShowGrid] = useUserSetting<boolean>(SHOW_GRID_KEY, true);
   const bgImage = useMapBgImage();
+  const orgBackgrounds = useOrgBackgrounds();
+  const [bgChoice, setBgChoice] = useUserSetting<string>(BG_CHOICE_KEY, BG_CHOICE_DEFAULT);
+  const anyBgShown = !!shownBackground(bgImage.url, bgChoice, orgBackgrounds.backgrounds);
+  const orgBgName = (b: { name: string }, i: number) => b.name || t("mapSidebar.orgBgUnnamed", { n: i + 1 });
+  const orgDefaultBg = orgBackgrounds.backgrounds.findIndex((b) => b.isDefault);
   const bgFileRef = useRef<HTMLInputElement>(null);
   const pickBgImage = (file: File | undefined) => {
     if (!file) return;
@@ -2277,6 +2283,23 @@ export function MapSidebar() {
                       {showGrid ? t("actions.on") : t("actions.off")}
                     </button>
                   </div>
+                  {orgBackgrounds.backgrounds.length > 0 && (
+                    <>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="org-bg">{t("mapSidebar.orgBg")}</label>
+                        <Select id="org-bg"
+                          value={bgChoice === "none" || orgBackgrounds.backgrounds.some((b) => b.id === bgChoice) ? bgChoice : "default"}
+                          onChange={(v) => setBgChoice(v)} options={[
+                            { value: "default", label: orgDefaultBg >= 0
+                              ? t("mapSidebar.orgBgDefaultNamed", { name: orgBgName(orgBackgrounds.backgrounds[orgDefaultBg], orgDefaultBg) })
+                              : t("mapSidebar.orgBgDefaultNone") },
+                            ...orgBackgrounds.backgrounds.map((b, i) => ({ value: b.id, label: orgBgName(b, i) })),
+                            { value: "none", label: t("mapSidebar.orgBgNone") },
+                          ]} />
+                      </div>
+                      {bgImage.url && <p className="map-sidebar__help">{t("mapSidebar.orgBgOverridden")}</p>}
+                    </>
+                  )}
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label">{t("mapSidebar.bgImage")}</label>
                     <div className="map-sidebar__color">
@@ -2293,7 +2316,7 @@ export function MapSidebar() {
                     </div>
                   </div>
                   <p className="map-sidebar__help">{t("mapSidebar.bgImageHint")}</p>
-                  {bgImage.url && (
+                  {anyBgShown && (
                     <>
                       <div className="map-sidebar__row">
                         <label className="map-sidebar__label" htmlFor="bg-fit">{t("mapSidebar.bgImageFit")}</label>

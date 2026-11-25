@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "감사 로그",
       "flags": "플래그 프리셋",
-      "defaults": "기본 레이아웃"
+      "defaults": "기본 레이아웃",
+      "backgrounds": "배경"
     },
     "access": {
       "title": "로그인 접근",
@@ -444,6 +445,27 @@
       "saved": "저장됨",
       "loadFailed": "기본값을 불러오지 못했습니다.",
       "saveFailed": "기본값을 저장하지 못했습니다."
+    },
+    "backgrounds": {
+      "title": "지도 배경",
+      "noOrg": "지도 배경은 코퍼레이션 및 얼라이언스 설치용입니다.",
+      "loadFailed": "배경을 불러오지 못했습니다.",
+      "saveFailed": "변경 사항을 저장하지 못했습니다.",
+      "tooBig": "이미지가 너무 큽니다(최대 20MB).",
+      "unreadable": "이미지를 사용할 수 없습니다. PNG, JPEG 또는 WebP를 사용해 보세요.",
+      "hintCorp": "코퍼레이션 멤버가 지도 뒤에 표시할 수 있는 이미지를 최대 {{max}}개까지 설정합니다. 멤버가 설정에서 다른 이미지나 없음을 고르지 않으면 기본 이미지가 보입니다.",
+      "hintAlliance": "얼라이언스 멤버가 지도 뒤에 표시할 수 있는 이미지를 최대 {{max}}개까지 설정합니다. 멤버가 설정에서 다른 이미지나 없음을 고르지 않으면 기본 이미지가 보입니다.",
+      "hintMembers": "이미지는 업로드 전에 축소됩니다. 파일럿이 자기 기기에 설정한 이미지가 우선합니다.",
+      "namePlaceholder": "이름(선택)",
+      "name": "이름",
+      "makeDefault": "기본으로 설정",
+      "unsetDefault": "기본 없음",
+      "remove": "제거",
+      "default": "기본",
+      "noDefault": "기본 없음: 멤버가 직접 고르지 않으면 이미지가 보이지 않습니다.",
+      "add": "이미지 추가…",
+      "working": "처리 중…",
+      "count": "{{n}} / {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "채우기",
       "contain": "맞추기",
       "tile": "바둑판"
-    }
+    },
+    "orgBg": "코프/얼라이언스 배경",
+    "orgBgDefaultNamed": "기본({{name}})",
+    "orgBgDefaultNone": "기본(없음)",
+    "orgBgNone": "없음",
+    "orgBgUnnamed": "이미지 {{n}}",
+    "orgBgOverridden": "아래의 내 이미지가 대신 표시됩니다. 이 배경을 보려면 내 이미지를 제거하세요."
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

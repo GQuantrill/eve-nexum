@@ -114,7 +114,8 @@
       "discord": "Discord",
       "audit": "Audit log",
       "flags": "Flag presets",
-      "defaults": "Default layout"
+      "defaults": "Default layout",
+      "backgrounds": "Backgrounds"
     },
     "access": {
       "title": "Login access",
@@ -444,6 +445,27 @@
       "saved": "Saved",
       "loadFailed": "Couldn't load the defaults.",
       "saveFailed": "Couldn't save the defaults."
+    },
+    "backgrounds": {
+      "title": "Map backgrounds",
+      "noOrg": "Map backgrounds are for corporation and alliance installs.",
+      "loadFailed": "Couldn't load the backgrounds.",
+      "saveFailed": "Couldn't save that change.",
+      "tooBig": "That picture is too big (20 MB at most).",
+      "unreadable": "Couldn't use that picture. Try a PNG, JPEG or WebP.",
+      "hintCorp": "Up to {{max}} pictures members of your corporation can show behind the map. Members see the default unless they pick another one, or none, in their settings.",
+      "hintAlliance": "Up to {{max}} pictures members of your alliance can show behind the map. Members see the default unless they pick another one, or none, in their settings.",
+      "hintMembers": "Pictures are scaled down before upload. A pilot's own picture on their device takes priority over these.",
+      "namePlaceholder": "Name (optional)",
+      "name": "Name",
+      "makeDefault": "Make default",
+      "unsetDefault": "No default",
+      "remove": "Remove",
+      "default": "Default",
+      "noDefault": "No default: members see no picture unless they pick one.",
+      "add": "Add picture…",
+      "working": "Working…",
+      "count": "{{n}} of {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "Fill",
       "contain": "Fit",
       "tile": "Tile"
-    }
+    },
+    "orgBg": "Corp/alliance background",
+    "orgBgDefaultNamed": "Default ({{name}})",
+    "orgBgDefaultNone": "Default (none)",
+    "orgBgNone": "None",
+    "orgBgUnnamed": "Picture {{n}}",
+    "orgBgOverridden": "Your own picture below is shown instead. Remove it to see this one."
   },
   "mass": {
     "billionKg": "{{value}} B kg",

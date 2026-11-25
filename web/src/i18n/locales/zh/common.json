@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "审计日志",
       "flags": "标记预设",
-      "defaults": "默认布局"
+      "defaults": "默认布局",
+      "backgrounds": "背景"
     },
     "access": {
       "title": "登录访问",
@@ -444,6 +445,27 @@
       "saved": "已保存",
       "loadFailed": "无法加载默认值。",
       "saveFailed": "无法保存默认值。"
+    },
+    "backgrounds": {
+      "title": "地图背景",
+      "noOrg": "地图背景仅适用于军团和联盟部署。",
+      "loadFailed": "无法加载背景。",
+      "saveFailed": "无法保存该更改。",
+      "tooBig": "图片太大（最大 20 MB）。",
+      "unreadable": "无法使用该图片。请尝试 PNG、JPEG 或 WebP。",
+      "hintCorp": "最多 {{max}} 张图片，供你的军团成员显示在地图后面。成员默认看到默认图片，除非他们在设置中选择其他图片或不显示。",
+      "hintAlliance": "最多 {{max}} 张图片，供你的联盟成员显示在地图后面。成员默认看到默认图片，除非他们在设置中选择其他图片或不显示。",
+      "hintMembers": "图片在上传前会被缩小。飞行员在自己设备上设置的图片优先。",
+      "namePlaceholder": "名称（可选）",
+      "name": "名称",
+      "makeDefault": "设为默认",
+      "unsetDefault": "取消默认",
+      "remove": "移除",
+      "default": "默认",
+      "noDefault": "没有默认：成员不会看到图片，除非自己选择。",
+      "add": "添加图片…",
+      "working": "处理中…",
+      "count": "{{n}} / {{max}}"
     }
   },
   "anomType": {
@@ -2199,7 +2221,13 @@
       "cover": "填充",
       "contain": "适应",
       "tile": "平铺"
-    }
+    },
+    "orgBg": "军团/联盟背景",
+    "orgBgDefaultNamed": "默认（{{name}}）",
+    "orgBgDefaultNone": "默认（无）",
+    "orgBgNone": "无",
+    "orgBgUnnamed": "图片 {{n}}",
+    "orgBgOverridden": "当前显示的是下方你自己的图片。移除它即可看到这张。"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",
