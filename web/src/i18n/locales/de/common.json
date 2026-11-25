@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "Standard (keiner)",
     "orgBgNone": "Keiner",
     "orgBgUnnamed": "Bild {{n}}",
-    "orgBgOverridden": "Stattdessen wird dein eigenes Bild unten angezeigt. Entferne es, um dieses zu sehen."
+    "orgBgOverridden": "Stattdessen wird dein eigenes Bild unten angezeigt. Entferne es, um dieses zu sehen.",
+    "theme": "Farbschema",
+    "themes": {
+      "nexum": "Nexum (Standard)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

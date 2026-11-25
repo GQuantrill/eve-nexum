@@ -13,3 +13,27 @@ export function cssVarToHex(value: string | null | undefined): string {
   const resolved = getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
   return resolved || value;
 }
+
+/** Any CSS colour, var() and color-mix() included, as #rrggbb: what the page
+ *  would paint. For <input type="color">, which only takes hex. Falls back to
+ *  `fallback` outside a browser or if the colour can't be read. */
+export function resolveColorHex(color: string, fallback = '#000000'): string {
+  try {
+    const el = document.createElement('span');
+    el.style.color = color;
+    el.style.display = 'none';
+    document.body.appendChild(el);
+    const computed = getComputedStyle(el).color;
+    el.remove();
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return fallback;
+    ctx.fillStyle = computed;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`;
+  } catch {
+    return fallback;
+  }
+}

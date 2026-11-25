@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "默认（无）",
     "orgBgNone": "无",
     "orgBgUnnamed": "图片 {{n}}",
-    "orgBgOverridden": "当前显示的是下方你自己的图片。移除它即可看到这张。"
+    "orgBgOverridden": "当前显示的是下方你自己的图片。移除它即可看到这张。",
+    "theme": "主题",
+    "themes": {
+      "nexum": "Nexum（默认）",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

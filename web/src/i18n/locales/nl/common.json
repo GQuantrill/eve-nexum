@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "Standaard (geen)",
     "orgBgNone": "Geen",
     "orgBgUnnamed": "Afbeelding {{n}}",
-    "orgBgOverridden": "Je eigen afbeelding hieronder wordt in plaats daarvan getoond. Verwijder die om deze te zien."
+    "orgBgOverridden": "Je eigen afbeelding hieronder wordt in plaats daarvan getoond. Verwijder die om deze te zien.",
+    "theme": "Kleurenthema",
+    "themes": {
+      "nexum": "Nexum (standaard)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

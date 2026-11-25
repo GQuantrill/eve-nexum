@@ -50,10 +50,12 @@ import { LINK_SIG_IDS_KEY, CONN_INFO_KEY, type ConnInfoMode } from '../../utils/
 import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
 import {
-  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
+  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, MAP_BG_THEME, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
   BG_FITS, useMapBgImage, setBgImage, clearBgImage, setBgFit, setBgDim, BgImageError, type BgFit,
   useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
 } from '../../utils/mapBackground';
+import { resolveColorHex } from '../../utils/cssVar';
+import { THEMES, THEME_KEY, THEME_DEFAULT, normaliseTheme } from '../../utils/themes';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
@@ -963,7 +965,7 @@ export function MapSidebar() {
     }
     try {
       const blob = await toBlob(target, {
-        backgroundColor: safeColor(mapBgColor, MAP_BG_COLOR_DEFAULT),
+        backgroundColor: resolveColorHex(safeColor(mapBgColor, MAP_BG_THEME), '#0b0e16'),
         pixelRatio: 2,
         filter: (node) => {
           // Skip ReactFlow's own controls / minimap / attribution from the export
@@ -1006,6 +1008,7 @@ export function MapSidebar() {
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [homeColor, setHomeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);
   const [hereColor, setHereColor] = useUserSetting<string>(HERE_COLOR_KEY, HERE_COLOR_DEFAULT);
+  const [theme, setTheme] = useUserSetting<string>(THEME_KEY, THEME_DEFAULT);
   const [mapBgColor, setMapBgColor] = useUserSetting<string>(MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT);
   const [gridColor, setGridColor] = useUserSetting<string>(GRID_COLOR_KEY, "");
   const [showGrid, setShowGrid] = useUserSetting<boolean>(SHOW_GRID_KEY, true);
@@ -2253,6 +2256,23 @@ export function MapSidebar() {
 
               {settingsTab === "appearance" && (
                 <>
+                  <div className="map-sidebar__field">
+                    <span className="map-sidebar__label">{t("mapSidebar.theme")}</span>
+                    <div className="theme-picker" role="radiogroup" aria-label={t("mapSidebar.theme")}>
+                      {THEMES.map((th) => (
+                        <button key={th.id} type="button" role="radio" aria-checked={normaliseTheme(theme) === th.id}
+                          className={`theme-picker__row${normaliseTheme(theme) === th.id ? " theme-picker__row--on" : ""}`}
+                          onClick={() => setTheme(th.id)}>
+                          <span className="theme-picker__swatches" aria-hidden="true">
+                            {[th.seeds.primary, th.seeds.highlight, th.seeds.bg, th.seeds.accent].map((c, i) => (
+                              <span key={i} className="theme-picker__swatch" style={{ background: c }} />
+                            ))}
+                          </span>
+                          {t(`mapSidebar.themes.${th.id}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
                     <Select id="color-vision" value={colorVision} onChange={(v) => setColorVision(v)} options={[
@@ -2289,11 +2309,13 @@ export function MapSidebar() {
                       options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
                   </div>
                   {([
-                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_COLOR_DEFAULT, MAP_BG_COLOR_DEFAULT],
+                    // '' follows the theme; Reset goes back to that.
+                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_THEME, MAP_BG_COLOR_DEFAULT],
                     // Grid: '' follows the grid style's own colour; Reset goes back to that.
                     ["grid-color", "mapSidebar.gridColor", gridColor, setGridColor, GRID_COLOR_AUTO.lines, ""],
                   ] as const).map(([id, label, value, set, def, reset]) => {
-                    const color = safeColor(value, def);
+                    // Unset follows the theme: show what the theme paints.
+                    const color = resolveColorHex(safeColor(value, def), '#0b0e16');
                     return (
                       <div key={id} className="map-sidebar__row">
                         <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>

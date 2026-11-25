@@ -1,0 +1,99 @@
+/* ============================================================
+   Colour themes (utils/themes.ts). A theme is four seed colours:
+
+     --th-primary    tints windows, panels and borders
+     --th-highlight  buttons, links, selection, focus
+     --th-bg         the darkest background
+     --th-accent     the small coloured marks (active tab, focus)
+
+   Every UI chrome token in tokens.css is worked out from them below,
+   so a preset is four colours, not forty. The default theme (Nexum)
+   sets no data-theme and keeps tokens.css exactly as it is.
+
+   Deliberately NOT themed: map semantics (--cv-* class, security,
+   intel, standings, connections, status), labels, danger / success /
+   warning, icons and pulses. Colour vision keeps working on top.
+   ============================================================ */
+
+:root[data-theme] {
+  /* Surfaces: the background with a little more of the primary each step. */
+  --surface-sunken:  color-mix(in oklab, var(--th-primary) 3%,  var(--th-bg));
+  --surface-base:    color-mix(in oklab, var(--th-primary) 4%,  var(--th-bg));
+  --surface-well:    color-mix(in oklab, var(--th-primary) 6%,  var(--th-bg));
+  --surface-panel:   color-mix(in oklab, var(--th-primary) 9%,  var(--th-bg));
+  --surface-raised:  color-mix(in oklab, var(--th-primary) 12%, var(--th-bg));
+  --surface-hover:   color-mix(in oklab, var(--th-primary) 15%, var(--th-bg));
+  --surface-overlay: color-mix(in oklab, var(--th-primary) 18%, var(--th-bg));
+  --surface-muted:   color-mix(in oklab, var(--th-primary) 35%, var(--th-bg));
+
+  /* Borders */
+  --border:               color-mix(in oklab, var(--th-primary) 20%, var(--th-bg));
+  --border-strong:        color-mix(in oklab, var(--th-primary) 32%, var(--th-bg));
+  --border-accent:        color-mix(in oklab, var(--th-highlight) 35%, var(--th-bg));
+  --border-accent-strong: color-mix(in oklab, var(--th-highlight) 55%, var(--th-bg));
+  --accent-fill:          color-mix(in oklab, var(--th-highlight) 22%, var(--th-bg));
+
+  /* Text: near-white tinted by the primary, bright to faint. */
+  --text-bright:    color-mix(in oklab, var(--th-primary) 8%,  #f4f5f7);
+  --text-primary:   color-mix(in oklab, var(--th-primary) 14%, #e6e8ec);
+  --text-default:   color-mix(in oklab, var(--th-primary) 14%, #dfe2e7);
+  --text-secondary: color-mix(in oklab, var(--th-primary) 18%, #d6dae0);
+  --text-subtle:    color-mix(in oklab, var(--th-primary) 30%, #a9afb8);
+  --text-muted:     color-mix(in oklab, var(--th-primary) 30%, #99a0aa);
+  --text-dim:       color-mix(in oklab, var(--th-primary) 30%, #888f99);
+  --text-faint:     color-mix(in oklab, var(--th-primary) 28%, #80868f);
+  --text-faintest:  color-mix(in oklab, var(--th-primary) 30%, #6c727b);
+
+  /* Interactive accents follow the highlight. */
+  --accent:        var(--th-highlight);
+  --accent-bright: color-mix(in oklab, var(--th-highlight) 85%, #ffffff);
+  --accent-alt:    var(--th-highlight);
+  --accent-light:  color-mix(in oklab, var(--th-highlight) 75%, #ffffff);
+  --accent-pale:   color-mix(in oklab, var(--th-highlight) 60%, #ffffff);
+
+  --theme-accent:  var(--th-accent);
+}
+
+/* ── Presets ── Our own colours, in the spirit of EVE's faction themes. */
+
+:root[data-theme='amarr'] {
+  --th-primary:   #a8916f;
+  --th-highlight: #e8c872;
+  --th-bg:        #0c0b09;
+  --th-accent:    #e8955a;
+}
+
+:root[data-theme='caldari'] {
+  --th-primary:   #8fbfd8;
+  --th-highlight: #5cc0b5;
+  --th-bg:        #090c0e;
+  --th-accent:    #d9953f;
+}
+
+:root[data-theme='gallente'] {
+  --th-primary:   #6a9d86;
+  --th-highlight: #86c2a6;
+  --th-bg:        #090d0b;
+  --th-accent:    #e8955a;
+}
+
+:root[data-theme='minmatar'] {
+  --th-primary:   #c06a52;
+  --th-highlight: #e0866a;
+  --th-bg:        #0e0a09;
+  --th-accent:    #e8b45a;
+}
+
+:root[data-theme='carbon'] {
+  --th-primary:   #9a9a9a;
+  --th-highlight: #d8d8d8;
+  --th-bg:        #0a0a0a;
+  --th-accent:    #e8955a;
+}
+
+:root[data-theme='photon'] {
+  --th-primary:   #5c8fb3;
+  --th-highlight: #6fa9d2;
+  --th-bg:        #0a0d11;
+  --th-accent:    #e8955a;
+}

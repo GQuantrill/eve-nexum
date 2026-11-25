@@ -1757,7 +1757,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
 .settings-modal__tab--active {
   color: var(--accent-pale);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--theme-accent);
 }
 
 .settings-modal__body {
@@ -2856,3 +2856,37 @@ select.sig-toolbar-btn option {
 .popout__title { font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); }
 .popout__back { margin-left: auto; }
 .popout__body { flex: 1; overflow: auto; padding: 8px var(--sp-16); }
+
+/* ── Theme picker (Settings > Appearance) ── */
+.theme-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--sp-4, 4px);
+}
+.theme-picker__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-default);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-picker__row:hover { background: var(--surface-hover); }
+.theme-picker__row--on {
+  background: var(--accent-fill);
+  border-color: var(--border-accent-strong);
+  color: var(--text-bright);
+}
+.theme-picker__swatches { display: inline-flex; gap: 3px; }
+.theme-picker__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}

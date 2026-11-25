@@ -15,10 +15,12 @@ import { useSyncExternalStore } from 'react';
 import { api, apiUrl } from '../api/client';
 
 export const MAP_BG_COLOR_KEY = 'nexum.map.bgColor';
-export const MAP_BG_COLOR_DEFAULT = '#0b0e16'; // --surface-sunken
+/** '' = the theme's own (--surface-sunken). */
+export const MAP_BG_COLOR_DEFAULT = '';
+export const MAP_BG_THEME = 'var(--surface-sunken)';
 export const GRID_COLOR_KEY = 'nexum.map.gridColor';
-/** The grid's colour when the pilot hasn't picked one ('' = these). */
-export const GRID_COLOR_AUTO = { lines: '#1a2240', snapDots: '#3a4a7a', dots: '#1a2040' };
+/** The grid's colour when the pilot hasn't picked one (''): the theme's. */
+export const GRID_COLOR_AUTO = { lines: 'var(--surface-overlay)', snapDots: 'var(--border-accent)', dots: 'var(--surface-overlay)' };
 export const SHOW_GRID_KEY = 'nexum.map.showGrid';
 
 export const BG_IMAGE_MAX_BYTES = 20 * 1024 * 1024;

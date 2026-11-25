@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "デフォルト（なし）",
     "orgBgNone": "なし",
     "orgBgUnnamed": "画像 {{n}}",
-    "orgBgOverridden": "代わりに下の自分の画像が表示されています。これを表示するには自分の画像を削除してください。"
+    "orgBgOverridden": "代わりに下の自分の画像が表示されています。これを表示するには自分の画像を削除してください。",
+    "theme": "テーマ",
+    "themes": {
+      "nexum": "Nexum（デフォルト）",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

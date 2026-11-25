@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "Predeterminado (ninguno)",
     "orgBgNone": "Ninguno",
     "orgBgUnnamed": "Imagen {{n}}",
-    "orgBgOverridden": "Se muestra tu propia imagen de abajo en su lugar. Quítala para ver esta."
+    "orgBgOverridden": "Se muestra tu propia imagen de abajo en su lugar. Quítala para ver esta.",
+    "theme": "Tema",
+    "themes": {
+      "nexum": "Nexum (predeterminado)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

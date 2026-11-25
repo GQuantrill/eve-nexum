@@ -4,6 +4,7 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
 import { useAuth, isAdminRole } from './context/AuthContext';
 import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
+import { THEME_KEY, THEME_DEFAULT, applyTheme } from './utils/themes';
 import { applyMapMarkers, HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT } from './utils/mapMarkers';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
@@ -112,6 +113,11 @@ function MapApp() {
       delete document.documentElement.dataset.colorVision;
     }
   }, [colorVision]);
+
+  // Colour theme → data-theme on <html>; styles/themes.css re-derives the
+  // chrome tokens from it. The default leaves tokens.css as it is.
+  const [theme] = useUserSetting<string>(THEME_KEY, THEME_DEFAULT);
+  useEffect(() => { applyTheme(theme); }, [theme]);
 
   // Home / you-are-here marker colours and pulse strength → CSS variables.
   const [homeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);

@@ -2252,7 +2252,17 @@
     "orgBgDefaultNone": "По умолчанию (нет)",
     "orgBgNone": "Нет",
     "orgBgUnnamed": "Изображение {{n}}",
-    "orgBgOverridden": "Вместо него показано ваше собственное изображение ниже. Удалите его, чтобы увидеть этот фон."
+    "orgBgOverridden": "Вместо него показано ваше собственное изображение ниже. Удалите его, чтобы увидеть этот фон.",
+    "theme": "Тема",
+    "themes": {
+      "nexum": "Nexum (по умолчанию)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

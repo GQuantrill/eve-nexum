@@ -2228,7 +2228,17 @@
     "orgBgDefaultNone": "기본(없음)",
     "orgBgNone": "없음",
     "orgBgUnnamed": "이미지 {{n}}",
-    "orgBgOverridden": "아래의 내 이미지가 대신 표시됩니다. 이 배경을 보려면 내 이미지를 제거하세요."
+    "orgBgOverridden": "아래의 내 이미지가 대신 표시됩니다. 이 배경을 보려면 내 이미지를 제거하세요.",
+    "theme": "테마",
+    "themes": {
+      "nexum": "Nexum(기본)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    }
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

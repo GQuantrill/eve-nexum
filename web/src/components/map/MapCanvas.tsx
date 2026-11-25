@@ -85,7 +85,7 @@ import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import {
-  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
+  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, MAP_BG_THEME, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
   useMapBgImage, bgImageStyle, useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
 } from '../../utils/mapBackground';
 import { safeColor } from '../../utils/mapMarkers';
@@ -208,7 +208,7 @@ export function MapCanvas() {
   const [bgColorSetting]     = useUserSetting<string>(MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT);
   const [gridColorSetting]   = useUserSetting<string>(GRID_COLOR_KEY, '');
   const [showGrid]           = useUserSetting<boolean>(SHOW_GRID_KEY, true);
-  const bgColor              = safeColor(bgColorSetting, MAP_BG_COLOR_DEFAULT);
+  const bgColor              = safeColor(bgColorSetting, MAP_BG_THEME);
   const gridColor            = safeColor(gridColorSetting,
     gridLines ? GRID_COLOR_AUTO.lines : gridDots ? GRID_COLOR_AUTO.snapDots : GRID_COLOR_AUTO.dots);
   const bgImage              = useMapBgImage();
