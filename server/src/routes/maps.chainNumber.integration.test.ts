@@ -227,7 +227,7 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     expect((await jump(home, a)).body).toEqual({ chainLabel: '1', deferred: false });
   });
 
-  it('a hand-edited number drops reservations made under the old one', async () => {
+  it('a hand-edited number takes the reservations made under the old one with it', async () => {
     const home = await system(true);
     const a = await system();
     await link(home, a);
@@ -235,7 +235,32 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     const x = await sig(a);
     await reserve(a, [x]); // 11
     await request(app).patch(`/api/maps/${mapId}/systems/${a}`).send({ chainLabel: '5' });
-    expect(await sigLabel(x)).toBeNull();
+    expect(await sigLabel(x)).toBe('51');
+  });
+
+  it('renumbering a system by hand moves the chain beneath it', async () => {
+    const home = await system(true);
+    const set = (id: string, label: string) =>
+      db.query(`UPDATE map_systems SET chain_label = $2 WHERE id = $1`, [id, label]);
+    const [s7, s71, s73, s737, s2] = [await system(), await system(), await system(), await system(), await system()];
+    await set(s7, '7'); await set(s71, '71'); await set(s73, '73'); await set(s737, '737'); await set(s2, '2');
+    const r = await sig(s73);
+    await reserve(s73, [r]); // 731
+    void home;
+    const patch = (id: string, chainLabel: string) =>
+      request(app).patch(`/api/maps/${mapId}/systems/${id}`).send({ chainLabel });
+    // 2 is still on the map, and 7 can't go beneath itself.
+    expect((await patch(s7, '2')).status).toBe(409);
+    expect((await patch(s7, '75')).status).toBe(409);
+    expect(await sysLabel(s7)).toBe('7');
+    expect((await patch(s7, '3')).status).toBe(200);
+    expect([await sysLabel(s7), await sysLabel(s71), await sysLabel(s73), await sysLabel(s737)])
+      .toEqual(['3', '31', '33', '337']);
+    expect(await sigLabel(r)).toBe('331');
+    expect(await sysLabel(s2)).toBe('2');
+    // Past 9 the dots come in: 3 to 12 takes 337 to .12.3.7.
+    expect((await patch(s7, '.12')).status).toBe(200);
+    expect(await sysLabel(s737)).toBe('.12.3.7');
   });
 
   it('a deleted system put back loses its number if it went to another meanwhile', async () => {

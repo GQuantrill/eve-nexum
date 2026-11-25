@@ -61,7 +61,7 @@ import { PromptModal } from '../ui/PromptModal';
 import type { MapSystem, SystemIntel, SystemClass } from '../../types';
 import { isDefiniteWormholeHop, isKnownStargateAdjacent, prefetchStargateNeighbors } from '../../utils/stargateAdjacency';
 import { isProtectedGate } from '../../utils/gateProtection';
-import { api } from '../../api/client';
+import { api, ApiError } from '../../api/client';
 import { truesecColor } from '../../utils/truesec';
 import { readUserSetting } from '../../hooks/useUserSetting';
 import { linkEndSigs, LINK_SIG_IDS_KEY } from '../../utils/linkSigIds';
@@ -2147,8 +2147,19 @@ export function MapCanvas() {
             onConfirm={(value) => {
               const v = value.trim();
               if (v && !CHAIN_LABEL_RE.test(v)) { toast.error(t('chainNumber.invalid')); return; }
-              updateSystem(chainDialogFor, { chainLabel: v || null });
+              const id = chainDialogFor;
               setChainDialogFor(null);
+              if ((v || null) === (sys.chainLabel ?? null)) return;
+              // Straight to the server, not the offline queue: a number in use
+              // is refused and mustn't be retried. The chain beneath it moves
+              // (or goes) on the server and arrives as live updates.
+              api(`/api/maps/${activeMapId}/systems/${id}`, {
+                method: 'PATCH', body: JSON.stringify({ chainLabel: v || null }),
+              }).then(() => {
+                useMapStore.getState().applyRemote({ type: 'system.update', id, updates: { chainLabel: v || null } });
+              }).catch((err: unknown) => {
+                toast.error(t(err instanceof ApiError && err.status === 409 ? 'chainNumber.inUse' : 'chainNumber.saveFailed', { label: v }));
+              });
             }}
             onCancel={() => setChainDialogFor(null)}
           />

@@ -3020,10 +3020,12 @@
   },
   "chainNumber": {
     "toggle": "Numerar a cadeia a partir de home (L+1)",
-    "hint": "Cada sistema recebe um número no primeiro salto por buraco de minhoca para ele: 1, 2, 3 a partir de home, 51, 52 a partir de 5, etc. Os marcadores de buracos começam pelo número do destino, ficando pela ordem da cadeia no EVE. Um número nunca muda nem se repete.",
+    "hint": "Cada sistema recebe um número no primeiro salto por buraco de minhoca para ele: 1, 2, 3 a partir de home, 51, 52 a partir de 5, etc. Os marcadores de buracos começam pelo número do destino, ficando pela ordem da cadeia no EVE. Um número pertence ao seu sistema enquanto ele está no mapa; quando o sistema sai, o número fica livre para o próximo buraco.",
     "set": "Definir número da cadeia…",
     "setTitle": "Número da cadeia",
-    "setMessage": "Número da cadeia para {{name}}. Deixe vazio para o limpar.",
-    "invalid": "Um número da cadeia só tem algarismos, como 51, com um ponto antes de qualquer parte acima de 9, como 5.10."
+    "setMessage": "Número de cadeia para {{name}}. Os números abaixo mudam junto (de 7 para 3, o 71 vira 31). Deixe vazio para apagá-lo junto com os números abaixo.",
+    "invalid": "Um número da cadeia só tem algarismos, como 51, com um ponto antes de qualquer parte acima de 9, como 5.10.",
+    "inUse": "{{label}} já está em uso neste mapa, ou algum número abaixo dele.",
+    "saveFailed": "Não foi possível salvar o número de cadeia."
   }
 }

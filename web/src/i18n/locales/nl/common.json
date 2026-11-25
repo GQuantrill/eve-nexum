@@ -3020,10 +3020,12 @@
   },
   "chainNumber": {
     "toggle": "Keten nummeren vanaf home (L+1)",
-    "hint": "Elk systeem krijgt een nummer bij de eerste wormhole-sprong erin: 1, 2, 3 vanaf home, 51, 52 vanaf 5, enzovoort. Bookmarks van gaten beginnen met het nummer van waar ze heen gaan, zodat ze in EVE op ketenvolgorde staan. Een nummer verandert nooit en wordt nooit twee keer gebruikt.",
+    "hint": "Elk systeem krijgt een nummer bij de eerste wormhole-sprong erin: 1, 2, 3 vanaf home, 51, 52 vanaf 5, enzovoort. Bookmarks van gaten beginnen met het nummer van waar ze heen gaan, zodat ze in EVE op ketenvolgorde staan. Een nummer hoort bij zijn systeem zolang het op de kaart staat; is het systeem weg, dan is het nummer vrij voor het volgende gat.",
     "set": "Ketennummer instellen…",
     "setTitle": "Ketennummer",
-    "setMessage": "Ketennummer voor {{name}}. Laat leeg om het te wissen.",
-    "invalid": "Een ketennummer bestaat alleen uit cijfers, zoals 51, met een punt voor elk deel boven 9, zoals 5.10."
+    "setMessage": "Ketennummer voor {{name}}. De nummers eronder veranderen mee (7 naar 3 maakt van 71 een 31). Laat leeg om het en de nummers eronder te wissen.",
+    "invalid": "Een ketennummer bestaat alleen uit cijfers, zoals 51, met een punt voor elk deel boven 9, zoals 5.10.",
+    "inUse": "{{label}} is al in gebruik op deze kaart, of een nummer eronder.",
+    "saveFailed": "Het ketennummer kon niet worden opgeslagen."
   }
 }
