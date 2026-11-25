@@ -114,7 +114,8 @@
       "discord": "Discord",
       "audit": "Audit log",
       "flags": "Flag presets",
-      "defaults": "Default layout"
+      "defaults": "Default layout",
+      "backgrounds": "Backgrounds"
     },
     "access": {
       "title": "Login access",
@@ -444,6 +445,27 @@
       "saved": "Saved",
       "loadFailed": "Couldn't load the defaults.",
       "saveFailed": "Couldn't save the defaults."
+    },
+    "backgrounds": {
+      "title": "Map backgrounds",
+      "noOrg": "Map backgrounds are for corporation and alliance installs.",
+      "loadFailed": "Couldn't load the backgrounds.",
+      "saveFailed": "Couldn't save that change.",
+      "tooBig": "That picture is too big (20 MB at most).",
+      "unreadable": "Couldn't use that picture. Try a PNG, JPEG or WebP.",
+      "hintCorp": "Up to {{max}} pictures members of your corporation can show behind the map. Members see the default unless they pick another one, or none, in their settings.",
+      "hintAlliance": "Up to {{max}} pictures members of your alliance can show behind the map. Members see the default unless they pick another one, or none, in their settings.",
+      "hintMembers": "Pictures are scaled down before upload. A pilot's own picture on their device takes priority over these.",
+      "namePlaceholder": "Name (optional)",
+      "name": "Name",
+      "makeDefault": "Make default",
+      "unsetDefault": "No default",
+      "remove": "Remove",
+      "default": "Default",
+      "noDefault": "No default: members see no picture unless they pick one.",
+      "add": "Add picture…",
+      "working": "Working…",
+      "count": "{{n}} of {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Shortest",
     "sections": {
       "mapOptions": "Map Options",
+      "appearance": "Appearance",
       "wormholeBookmarks": "Bookmarks",
       "bookmarks": "Bookmarks",
       "mapControls": "Map Controls",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Always shown",
     "connInfoFolded": "Folded",
     "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows",
-    "importSystems": "↑ Import systems from CSV"
+    "importSystems": "↑ Import systems from CSV",
+    "mapBgColor": "Map background colour",
+    "gridColor": "Grid colour",
+    "showGrid": "Grid",
+    "bgImage": "Background picture",
+    "bgImageChoose": "Choose…",
+    "bgImageChange": "Change…",
+    "bgImageRemove": "Remove",
+    "bgImageHint": "Your own picture behind the map. It stays on this device only and is never uploaded, so set it again in the desktop app or another browser. Darken it so systems stay easy to read.",
+    "bgImageFit": "Picture fit",
+    "bgImageDim": "Darken picture: {{pct}}%",
+    "bgImageTooBig": "That picture is too big (20 MB at most).",
+    "bgImageFailed": "Couldn't use that picture. Try a PNG, JPEG or WebP.",
+    "bgFitOptions": {
+      "cover": "Fill",
+      "contain": "Fit",
+      "tile": "Tile"
+    },
+    "orgBg": "Corp/alliance background",
+    "orgBgDefaultNamed": "Default ({{name}})",
+    "orgBgDefaultNone": "Default (none)",
+    "orgBgNone": "None",
+    "orgBgUnnamed": "Picture {{n}}",
+    "orgBgOverridden": "Your own picture below is shown instead. Remove it to see this one.",
+    "theme": "Theme",
+    "themes": {
+      "nexum": "Nexum (default)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Create new theme",
+      "edit": "Edit",
+      "delete": "Delete",
+      "name": "Name",
+      "untitled": "My theme",
+      "custom": "Your themes",
+      "hint": "The whole app previews your colours while you edit. Map colours, icons and alerts don't change.",
+      "tooLight": "Pick a darker background: nexum's text is light, so it would be hard to read.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "limit": "Up to {{max}} of your own themes. Delete one to make another.",
+      "seeds": {
+        "primary": "Windows and borders",
+        "highlight": "Highlight",
+        "bg": "Background",
+        "accent": "Accent"
+      }
+    },
+    "themeIntensity": "Theme intensity: {{pct}}%",
+    "homeShape": "Home system outline",
+    "homeShapes": {
+      "octagon": "Octagon",
+      "rounded": "Rounded",
+      "shield": "Shield",
+      "fortress": "Fortress",
+      "hexagon": "Hexagon",
+      "spiked": "Spiked"
+    }
   },
   "mass": {
     "billionKg": "{{value}} B kg",

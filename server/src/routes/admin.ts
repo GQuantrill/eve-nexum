@@ -18,6 +18,12 @@ import {
   parsePresets, resolveWriteScope, readScopePresets, writeScopePresets, MAX_FLAG_PRESETS,
 } from '../services/flagPresets.js';
 import { readDefaults, captureFrom, clearDefaults } from '../services/uiDefaults.js';
+import {
+  backgroundWriteScope, listBackgrounds, addBackground, removeBackground, renameBackground,
+  setDefaultBackground, readBackgroundImage, sniffImage, BackgroundLimit,
+  MAX_BACKGROUNDS, MAX_BACKGROUND_BYTES, MAX_BACKGROUND_NAME,
+} from '../services/orgBackgrounds.js';
+import { sendBackgroundImage } from './backgrounds.js';
 import { resolveEntityNames } from '../services/entityNames.js';
 import {
   standingPermitsTarget, grantKindAllowedForInstall,
@@ -716,6 +722,111 @@ adminRouter.delete('/ui-defaults', async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     log.error('ui-defaults clear failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// ── Map backgrounds ───────────────────────────────────────────────────────────
+// Pictures the org's members can show behind the map (services/orgBackgrounds.ts):
+// up to five, one the default. Corp and alliance installs only; on a solo
+// install the scope is null and the tab says so.
+
+const BG_UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** A name an admin typed: no control characters, trimmed, capped. */
+function backgroundName(v: unknown): string {
+  return typeof v === 'string'
+    ? v.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, MAX_BACKGROUND_NAME)
+    : '';
+}
+
+adminRouter.get('/backgrounds', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope) { res.json({ scope: null, backgrounds: [], max: MAX_BACKGROUNDS }); return; }
+  try {
+    res.json({ scope: scope.kind, backgrounds: await listBackgrounds(scope), max: MAX_BACKGROUNDS });
+  } catch (err) {
+    log.error('backgrounds read failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// The admin's own org's picture, for the editor (a member's read may point at
+// a different org while the alliance has none yet).
+adminRouter.get('/backgrounds/:id/image', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope || !BG_UUID_RE.test(req.params.id)) { res.status(404).json({ error: 'Not found' }); return; }
+  try {
+    sendBackgroundImage(res, await readBackgroundImage(scope, req.params.id));
+  } catch (err) {
+    log.error('background image read failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// POST { data: base64 picture, name? }. The admin's browser has already scaled
+// it down; here only the size and the real type (from its bytes) are checked.
+adminRouter.post('/backgrounds', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  const body = req.body as { data?: unknown; name?: unknown } | undefined;
+  if (typeof body?.data !== 'string' || body.data.length > Math.ceil(MAX_BACKGROUND_BYTES / 3) * 4 + 4) {
+    res.status(413).json({ error: 'too_big' }); return;
+  }
+  const buf = Buffer.from(body.data, 'base64');
+  const mime = sniffImage(buf);
+  if (!mime) { res.status(400).json({ error: 'not_an_image' }); return; }
+  if (buf.length > MAX_BACKGROUND_BYTES) { res.status(413).json({ error: 'too_big' }); return; }
+  try {
+    const added = await addBackground(scope, buf, mime, backgroundName(body.name), req.session.userId ?? null);
+    await audit(req, null, null, 'background_add', null, JSON.stringify({ id: added.id, name: added.name, bytes: buf.length }));
+    res.json(added);
+  } catch (err) {
+    if (err instanceof BackgroundLimit) { res.status(409).json({ error: 'limit', max: MAX_BACKGROUNDS }); return; }
+    log.error('background add failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// PATCH { name } -- rename.
+adminRouter.patch('/backgrounds/:id', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope || !BG_UUID_RE.test(req.params.id)) { res.status(404).json({ error: 'Not found' }); return; }
+  const name = backgroundName((req.body as { name?: unknown } | undefined)?.name);
+  try {
+    if (!(await renameBackground(scope, req.params.id, name))) { res.status(404).json({ error: 'Not found' }); return; }
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('background rename failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+adminRouter.delete('/backgrounds/:id', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope || !BG_UUID_RE.test(req.params.id)) { res.status(404).json({ error: 'Not found' }); return; }
+  try {
+    if (!(await removeBackground(scope, req.params.id))) { res.status(404).json({ error: 'Not found' }); return; }
+    await audit(req, null, null, 'background_remove', JSON.stringify({ id: req.params.id }), null);
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('background remove failed:', err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+});
+
+// PUT { id | null } -- the default members see; null for none.
+adminRouter.put('/backgrounds/default', async (req, res) => {
+  const scope = backgroundWriteScope(req);
+  if (!scope) { res.status(400).json({ error: 'No org context' }); return; }
+  const id = (req.body as { id?: unknown } | undefined)?.id ?? null;
+  if (id !== null && (typeof id !== 'string' || !BG_UUID_RE.test(id))) { res.status(400).json({ error: 'invalid id' }); return; }
+  try {
+    if (!(await setDefaultBackground(scope, id))) { res.status(404).json({ error: 'Not found' }); return; }
+    await audit(req, null, null, 'background_default', null, JSON.stringify({ id }));
+    res.json({ ok: true });
+  } catch (err) {
+    log.error('background default failed:', err);
     res.status(500).json({ error: 'Database query failed' });
   }
 });

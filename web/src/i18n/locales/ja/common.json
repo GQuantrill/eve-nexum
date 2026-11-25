@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "監査ログ",
       "flags": "フラグプリセット",
-      "defaults": "既定レイアウト"
+      "defaults": "既定レイアウト",
+      "backgrounds": "背景"
     },
     "access": {
       "title": "ログインアクセス",
@@ -444,6 +445,27 @@
       "saved": "保存しました",
       "loadFailed": "既定値を読み込めませんでした。",
       "saveFailed": "既定値を保存できませんでした。"
+    },
+    "backgrounds": {
+      "title": "マップ背景",
+      "noOrg": "マップ背景はコーポレーションとアライアンスの導入でのみ使えます。",
+      "loadFailed": "背景を読み込めませんでした。",
+      "saveFailed": "変更を保存できませんでした。",
+      "tooBig": "画像が大きすぎます（最大 20 MB）。",
+      "unreadable": "この画像は使えませんでした。PNG、JPEG、WebP をお試しください。",
+      "hintCorp": "コーポレーションのメンバーがマップの後ろに表示できる画像を最大 {{max}} 枚まで。メンバーが設定で別の画像かなしを選ばない限り、デフォルトが表示されます。",
+      "hintAlliance": "アライアンスのメンバーがマップの後ろに表示できる画像を最大 {{max}} 枚まで。メンバーが設定で別の画像かなしを選ばない限り、デフォルトが表示されます。",
+      "hintMembers": "画像はアップロード前に縮小されます。パイロットが自分の端末で設定した画像が優先されます。",
+      "namePlaceholder": "名前（任意）",
+      "name": "名前",
+      "makeDefault": "デフォルトにする",
+      "unsetDefault": "デフォルトなし",
+      "remove": "削除",
+      "default": "デフォルト",
+      "noDefault": "デフォルトなし：メンバーが選ばない限り画像は表示されません。",
+      "add": "画像を追加…",
+      "working": "処理中…",
+      "count": "{{n}} / {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "最短",
     "sections": {
       "mapOptions": "マップオプション",
+      "appearance": "外観",
       "wormholeBookmarks": "ブックマーク",
       "bookmarks": "ブックマーク",
       "mapControls": "マップ操作",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "常に表示",
     "connInfoFolded": "折りたたむ",
     "importSystemsTitle": "CSV またはタブ区切りの行からこのマップに星系を追加",
-    "importSystems": "↑ CSV から星系をインポート"
+    "importSystems": "↑ CSV から星系をインポート",
+    "mapBgColor": "マップの背景色",
+    "gridColor": "グリッドの色",
+    "showGrid": "グリッド",
+    "bgImage": "背景画像",
+    "bgImageChoose": "選択…",
+    "bgImageChange": "変更…",
+    "bgImageRemove": "削除",
+    "bgImageHint": "マップの後ろに自分の画像を表示します。この端末にだけ保存され、アップロードされることはないので、デスクトップアプリや別のブラウザでは設定し直してください。星系が読みやすいよう暗くしてください。",
+    "bgImageFit": "画像の合わせ方",
+    "bgImageDim": "画像を暗く：{{pct}}%",
+    "bgImageTooBig": "画像が大きすぎます（最大 20 MB）。",
+    "bgImageFailed": "この画像は使えませんでした。PNG、JPEG、WebP をお試しください。",
+    "bgFitOptions": {
+      "cover": "塗りつぶし",
+      "contain": "全体を表示",
+      "tile": "タイル"
+    },
+    "orgBg": "コーポ/アライアンスの背景",
+    "orgBgDefaultNamed": "デフォルト（{{name}}）",
+    "orgBgDefaultNone": "デフォルト（なし）",
+    "orgBgNone": "なし",
+    "orgBgUnnamed": "画像 {{n}}",
+    "orgBgOverridden": "代わりに下の自分の画像が表示されています。これを表示するには自分の画像を削除してください。",
+    "theme": "テーマ",
+    "themes": {
+      "nexum": "Nexum（デフォルト）",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "新しいテーマを作成",
+      "edit": "編集",
+      "delete": "削除",
+      "name": "名前",
+      "untitled": "マイテーマ",
+      "custom": "あなたのテーマ",
+      "hint": "編集中はアプリ全体で色をプレビューします。マップの色、アイコン、アラートは変わりません。",
+      "tooLight": "もっと暗い背景を選んでください。nexum の文字は明るいので読みにくくなります。",
+      "save": "保存",
+      "cancel": "キャンセル",
+      "limit": "自分のテーマは最大 {{max}} 個まで。新しく作るには 1 つ削除してください。",
+      "seeds": {
+        "primary": "ウィンドウと枠",
+        "highlight": "ハイライト",
+        "bg": "背景",
+        "accent": "アクセント"
+      }
+    },
+    "themeIntensity": "テーマの強さ：{{pct}}%",
+    "homeShape": "ホーム星系の枠",
+    "homeShapes": {
+      "octagon": "八角形",
+      "rounded": "角丸",
+      "shield": "盾",
+      "fortress": "要塞",
+      "hexagon": "六角形",
+      "spiked": "トゲトゲ"
+    }
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

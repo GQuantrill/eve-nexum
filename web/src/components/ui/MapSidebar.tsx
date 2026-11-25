@@ -49,7 +49,14 @@ import { useEscapeClose } from '../../hooks/useEscapeClose';
 import { LINK_SIG_IDS_KEY, CONN_INFO_KEY, type ConnInfoMode } from '../../utils/linkSigIds';
 import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
-import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
+import {
+  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, MAP_BG_THEME, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
+  BG_FITS, useMapBgImage, setBgImage, clearBgImage, setBgFit, setBgDim, BgImageError, type BgFit,
+  useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
+} from '../../utils/mapBackground';
+import { resolveColorHex } from '../../utils/cssVar';
+import { ThemePicker } from './ThemePicker';
+import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor, HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT, HOME_SHAPES, normaliseHomeShape } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
 // state syncs cross-device via users.ui_settings. Used by the Activity
@@ -913,7 +920,7 @@ export function MapSidebar() {
   // toolbar, with the rest of the pilot's controls.
   const settingsOpen = useMapStore((s) => s.mapSettingsOpen);
   const setSettingsOpen = useMapStore((s) => s.setMapSettingsOpen);
-  const [settingsTab, setSettingsTab] = useState<"display" | "signatures" | "shortcuts">("display");
+  const [settingsTab, setSettingsTab] = useState<"display" | "appearance" | "signatures" | "shortcuts">("display");
   const [patchNotesOpen, setPatchNotesOpen] = useState(false);
   const notifPermission = useNotificationPermission();
   const { user } = useAuth();
@@ -958,7 +965,7 @@ export function MapSidebar() {
     }
     try {
       const blob = await toBlob(target, {
-        backgroundColor: "#08101a",
+        backgroundColor: resolveColorHex(safeColor(mapBgColor, MAP_BG_THEME), '#0b0e16'),
         pixelRatio: 2,
         filter: (node) => {
           // Skip ReactFlow's own controls / minimap / attribution from the export
@@ -1001,6 +1008,23 @@ export function MapSidebar() {
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [homeColor, setHomeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);
   const [hereColor, setHereColor] = useUserSetting<string>(HERE_COLOR_KEY, HERE_COLOR_DEFAULT);
+  const [mapBgColor, setMapBgColor] = useUserSetting<string>(MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT);
+  const [gridColor, setGridColor] = useUserSetting<string>(GRID_COLOR_KEY, "");
+  const [showGrid, setShowGrid] = useUserSetting<boolean>(SHOW_GRID_KEY, true);
+  const bgImage = useMapBgImage();
+  const orgBackgrounds = useOrgBackgrounds();
+  const [bgChoice, setBgChoice] = useUserSetting<string>(BG_CHOICE_KEY, BG_CHOICE_DEFAULT);
+  const anyBgShown = !!shownBackground(bgImage.url, bgChoice, orgBackgrounds.backgrounds);
+  const orgBgName = (b: { name: string }, i: number) => b.name || t("mapSidebar.orgBgUnnamed", { n: i + 1 });
+  const orgDefaultBg = orgBackgrounds.backgrounds.findIndex((b) => b.isDefault);
+  const bgFileRef = useRef<HTMLInputElement>(null);
+  const pickBgImage = (file: File | undefined) => {
+    if (!file) return;
+    setBgImage(file).catch((err: unknown) => {
+      toast.error(t(err instanceof BgImageError && err.reason === "tooBig" ? "mapSidebar.bgImageTooBig" : "mapSidebar.bgImageFailed"));
+    });
+  };
+  const [homeShape, setHomeShape] = useUserSetting<string>(HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT);
   const [herePulse, setHerePulse] = useUserSetting<string>(HERE_PULSE_KEY, HERE_PULSE_DEFAULT);
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
@@ -2146,6 +2170,9 @@ export function MapSidebar() {
               <button type="button" className={`settings-modal__tab${settingsTab === "display" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("display")}>
                 {t("mapSidebar.sections.mapOptions")}
               </button>
+              <button type="button" className={`settings-modal__tab${settingsTab === "appearance" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("appearance")}>
+                {t("mapSidebar.sections.appearance")}
+              </button>
               <button type="button" className={`settings-modal__tab${settingsTab === "signatures" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("signatures")}>
                 {t("mapSidebar.sections.wormholeBookmarks")}
               </button>
@@ -2157,6 +2184,12 @@ export function MapSidebar() {
             <div className="settings-modal__body">
               {settingsTab === "display" && (
                 <>
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label">{t("mapSidebar.showGrid")}</label>
+                    <button className={`toolbar__toggle${showGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setShowGrid(!showGrid)} aria-pressed={showGrid}>
+                      {showGrid ? t("actions.on") : t("actions.off")}
+                    </button>
+                  </div>
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label">{t("mapSidebar.snapToGrid")}</label>
                     <button className={`toolbar__toggle${snapToGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setSnapToGrid(!snapToGrid)} aria-pressed={snapToGrid}>
@@ -2218,6 +2251,12 @@ export function MapSidebar() {
                       { value: "north", label: t("mapSidebar.placementOptions.north") },
                     ]} />
                   </div>
+                </>
+              )}
+
+              {settingsTab === "appearance" && (
+                <>
+                  <ThemePicker />
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
                     <Select id="color-vision" value={colorVision} onChange={(v) => setColorVision(v)} options={[
@@ -2227,17 +2266,56 @@ export function MapSidebar() {
                       { value: "tritanopia", label: t("mapSidebar.colorVisionOptions.tritanopia") },
                     ]} />
                   </div>
+                  {(() => {
+                    const markerColor = (id: string, label: 'mapSidebar.homeColor' | 'mapSidebar.hereColor', value: string, set: (v: string) => void, def: string) => {
+                      const color = safeColor(value, def);
+                      return (
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
+                          <div className="map-sidebar__color">
+                            {value !== def && (
+                              <button type="button" className="map-sidebar__zoom-value" onClick={() => set(def)}>
+                                {t("mapSidebar.resetColor")}
+                              </button>
+                            )}
+                            <label className="map-sidebar__swatch" style={{ background: color }}>
+                              <input id={id} type="color" value={color} onChange={(e) => set(e.target.value)} />
+                            </label>
+                          </div>
+                        </div>
+                      );
+                    };
+                    return (
+                      <>
+                        {markerColor("home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT)}
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor="home-shape">{t("mapSidebar.homeShape")}</label>
+                          <Select id="home-shape" value={normaliseHomeShape(homeShape)} onChange={(v) => setHomeShape(v)}
+                            options={HOME_SHAPES.map((sh) => ({ value: sh, label: t(`mapSidebar.homeShapes.${sh}`) }))} />
+                        </div>
+                        {markerColor("here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT)}
+                        <div className="map-sidebar__row">
+                          <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
+                          <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
+                            options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
+                        </div>
+                      </>
+                    );
+                  })()}
                   {([
-                    ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT],
-                    ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT],
-                  ] as const).map(([id, label, value, set, def]) => {
-                    const color = safeColor(value, def);
+                    // '' follows the theme; Reset goes back to that.
+                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_THEME, MAP_BG_COLOR_DEFAULT],
+                    // Grid: '' follows the grid style's own colour; Reset goes back to that.
+                    ["grid-color", "mapSidebar.gridColor", gridColor, setGridColor, GRID_COLOR_AUTO.lines, ""],
+                  ] as const).map(([id, label, value, set, def, reset]) => {
+                    // Unset follows the theme: show what the theme paints.
+                    const color = resolveColorHex(safeColor(value, def), '#0b0e16');
                     return (
                       <div key={id} className="map-sidebar__row">
                         <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
                         <div className="map-sidebar__color">
-                          {color !== def && (
-                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(def)}>
+                          {value !== reset && (
+                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(reset)}>
                               {t("mapSidebar.resetColor")}
                             </button>
                           )}
@@ -2248,13 +2326,56 @@ export function MapSidebar() {
                       </div>
                     );
                   })}
+                  {orgBackgrounds.backgrounds.length > 0 && (
+                    <>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="org-bg">{t("mapSidebar.orgBg")}</label>
+                        <Select id="org-bg"
+                          value={bgChoice === "none" || orgBackgrounds.backgrounds.some((b) => b.id === bgChoice) ? bgChoice : "default"}
+                          onChange={(v) => setBgChoice(v)} options={[
+                            { value: "default", label: orgDefaultBg >= 0
+                              ? t("mapSidebar.orgBgDefaultNamed", { name: orgBgName(orgBackgrounds.backgrounds[orgDefaultBg], orgDefaultBg) })
+                              : t("mapSidebar.orgBgDefaultNone") },
+                            ...orgBackgrounds.backgrounds.map((b, i) => ({ value: b.id, label: orgBgName(b, i) })),
+                            { value: "none", label: t("mapSidebar.orgBgNone") },
+                          ]} />
+                      </div>
+                      {bgImage.url && <p className="map-sidebar__help">{t("mapSidebar.orgBgOverridden")}</p>}
+                    </>
+                  )}
                   <div className="map-sidebar__row">
-                    <label className="map-sidebar__label" htmlFor="here-pulse">{t("mapSidebar.herePulse")}</label>
-                    <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
-                      options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
+                    <label className="map-sidebar__label">{t("mapSidebar.bgImage")}</label>
+                    <div className="map-sidebar__color">
+                      {bgImage.url && (
+                        <button type="button" className="map-sidebar__zoom-value" onClick={() => void clearBgImage()}>
+                          {t("mapSidebar.bgImageRemove")}
+                        </button>
+                      )}
+                      <button type="button" className="map-sidebar__zoom-value" onClick={() => bgFileRef.current?.click()}>
+                        {t(bgImage.url ? "mapSidebar.bgImageChange" : "mapSidebar.bgImageChoose")}
+                      </button>
+                      <input ref={bgFileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden
+                        onChange={(e) => { pickBgImage(e.target.files?.[0]); e.target.value = ""; }} />
+                    </div>
                   </div>
+                  <p className="map-sidebar__help">{t("mapSidebar.bgImageHint")}</p>
+                  {anyBgShown && (
+                    <>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="bg-fit">{t("mapSidebar.bgImageFit")}</label>
+                        <Select id="bg-fit" value={bgImage.fit} onChange={(v) => setBgFit(v as BgFit)}
+                          options={BG_FITS.map((f) => ({ value: f, label: t(`mapSidebar.bgFitOptions.${f}`) }))} />
+                      </div>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="bg-dim">{t("mapSidebar.bgImageDim", { pct: bgImage.dim })}</label>
+                        <input id="bg-dim" type="range" min={0} max={90} step={5} value={bgImage.dim}
+                          onChange={(e) => setBgDim(parseInt(e.target.value, 10))} className="map-sidebar__zoom-slider" />
+                      </div>
+                    </>
+                  )}
                 </>
               )}
+
 
               {settingsTab === "signatures" && (
                 <>

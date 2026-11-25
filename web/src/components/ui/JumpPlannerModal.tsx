@@ -301,7 +301,7 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
   );
   return (
     <div style={{ position: 'relative' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: '#0d1117', borderRadius: 6, display: 'block' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 300, background: 'var(--surface-well)', borderRadius: 6, display: 'block' }}>
         {/* One line per leg so a regional-gate jump can render dashed/amber. */}
         {pts.slice(1).map((p, idx) => {
           const prev = pts[idx];
@@ -319,8 +319,8 @@ function RouteMap({ hops }: { hops: RouteHop[] }) {
                 // Alternate labels above/below along the path so clustered
                 // systems don't overprint each other; a dark halo keeps them
                 // readable over lines and adjacent labels.
-                <text x={p.x} y={p.y + (i % 2 === 0 ? -9 : 18)} fill="#c9d1d9" fontSize={11} textAnchor="middle"
-                  stroke="#0d1117" strokeWidth={3} paintOrder="stroke">{p.h.name}</text>
+                <text x={p.x} y={p.y + (i % 2 === 0 ? -9 : 18)} style={{ fill: "var(--text-default)", stroke: "var(--surface-well)" }} fontSize={11} textAnchor="middle"
+                  strokeWidth={3} paintOrder="stroke">{p.h.name}</text>
               )}
             </g>
           );

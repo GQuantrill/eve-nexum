@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Registo de auditoria",
       "flags": "Predefinições",
-      "defaults": "Esquema predefinido"
+      "defaults": "Esquema predefinido",
+      "backgrounds": "Fundos"
     },
     "access": {
       "title": "Acesso de início de sessão",
@@ -444,6 +445,27 @@
       "saved": "Guardado",
       "loadFailed": "Não foi possível carregar as predefinições.",
       "saveFailed": "Não foi possível guardar as predefinições."
+    },
+    "backgrounds": {
+      "title": "Fundos do mapa",
+      "noOrg": "Fundos do mapa são para instalações de corporação e aliança.",
+      "loadFailed": "Não foi possível carregar os fundos.",
+      "saveFailed": "Não foi possível salvar a alteração.",
+      "tooBig": "A imagem é grande demais (no máximo 20 MB).",
+      "unreadable": "Não foi possível usar a imagem. Tente PNG, JPEG ou WebP.",
+      "hintCorp": "Até {{max}} imagens que os membros da sua corporação podem mostrar atrás do mapa. Os membros veem a padrão, a menos que escolham outra, ou nenhuma, nas configurações.",
+      "hintAlliance": "Até {{max}} imagens que os membros da sua aliança podem mostrar atrás do mapa. Os membros veem a padrão, a menos que escolham outra, ou nenhuma, nas configurações.",
+      "hintMembers": "As imagens são reduzidas antes do envio. A imagem própria de um piloto no dispositivo dele tem prioridade.",
+      "namePlaceholder": "Nome (opcional)",
+      "name": "Nome",
+      "makeDefault": "Tornar padrão",
+      "unsetDefault": "Sem padrão",
+      "remove": "Remover",
+      "default": "Padrão",
+      "noDefault": "Sem padrão: os membros não veem imagem, a menos que escolham uma.",
+      "add": "Adicionar imagem…",
+      "working": "Processando…",
+      "count": "{{n}} de {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Mais curta",
     "sections": {
       "mapOptions": "Opções de mapa",
+      "appearance": "Aparência",
       "wormholeBookmarks": "Marcadores",
       "bookmarks": "Marcadores",
       "mapControls": "Controlos do mapa",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Sempre visível",
     "connInfoFolded": "Recolhida",
     "importSystemsTitle": "Adicionar sistemas a este mapa a partir de linhas CSV ou separadas por tabulações",
-    "importSystems": "↑ Importar sistemas de CSV"
+    "importSystems": "↑ Importar sistemas de CSV",
+    "mapBgColor": "Cor de fundo do mapa",
+    "gridColor": "Cor da grade",
+    "showGrid": "Grade",
+    "bgImage": "Imagem de fundo",
+    "bgImageChoose": "Escolher…",
+    "bgImageChange": "Trocar…",
+    "bgImageRemove": "Remover",
+    "bgImageHint": "Sua própria imagem atrás do mapa. Ela fica só neste dispositivo e nunca é enviada, então configure de novo no app de desktop ou em outro navegador. Escureça para os sistemas continuarem fáceis de ler.",
+    "bgImageFit": "Ajuste da imagem",
+    "bgImageDim": "Escurecer imagem: {{pct}}%",
+    "bgImageTooBig": "A imagem é grande demais (no máximo 20 MB).",
+    "bgImageFailed": "Não foi possível usar a imagem. Tente PNG, JPEG ou WebP.",
+    "bgFitOptions": {
+      "cover": "Preencher",
+      "contain": "Ajustar",
+      "tile": "Lado a lado"
+    },
+    "orgBg": "Fundo da corp/aliança",
+    "orgBgDefaultNamed": "Padrão ({{name}})",
+    "orgBgDefaultNone": "Padrão (nenhum)",
+    "orgBgNone": "Nenhum",
+    "orgBgUnnamed": "Imagem {{n}}",
+    "orgBgOverridden": "Sua própria imagem abaixo é mostrada no lugar. Remova-a para ver esta.",
+    "theme": "Tema",
+    "themes": {
+      "nexum": "Nexum (padrão)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Criar tema",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "name": "Nome",
+      "untitled": "Meu tema",
+      "custom": "Seus temas",
+      "hint": "O app inteiro mostra suas cores enquanto você edita. Cores do mapa, ícones e alertas não mudam.",
+      "tooLight": "Escolha um fundo mais escuro: o texto do nexum é claro e ficaria difícil de ler.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "limit": "Até {{max}} temas próprios. Exclua um para criar outro.",
+      "seeds": {
+        "primary": "Janelas e bordas",
+        "highlight": "Destaque",
+        "bg": "Fundo",
+        "accent": "Acento"
+      }
+    },
+    "themeIntensity": "Intensidade do tema: {{pct}}%",
+    "homeShape": "Contorno do sistema base",
+    "homeShapes": {
+      "octagon": "Octógono",
+      "rounded": "Arredondado",
+      "shield": "Escudo",
+      "fortress": "Fortaleza",
+      "hexagon": "Hexágono",
+      "spiked": "Espinhoso"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

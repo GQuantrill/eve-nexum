@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Registro de auditoría",
       "flags": "Plantillas",
-      "defaults": "Diseño por defecto"
+      "defaults": "Diseño por defecto",
+      "backgrounds": "Fondos"
     },
     "access": {
       "title": "Acceso de inicio de sesión",
@@ -444,6 +445,27 @@
       "saved": "Guardado",
       "loadFailed": "No se pudieron cargar los ajustes.",
       "saveFailed": "No se pudieron guardar los ajustes."
+    },
+    "backgrounds": {
+      "title": "Fondos del mapa",
+      "noOrg": "Los fondos del mapa son para instalaciones de corporación y alianza.",
+      "loadFailed": "No se pudieron cargar los fondos.",
+      "saveFailed": "No se pudo guardar el cambio.",
+      "tooBig": "La imagen es demasiado grande (20 MB como máximo).",
+      "unreadable": "No se pudo usar la imagen. Prueba PNG, JPEG o WebP.",
+      "hintCorp": "Hasta {{max}} imágenes que los miembros de tu corporación pueden mostrar detrás del mapa. Los miembros ven la predeterminada salvo que elijan otra, o ninguna, en sus ajustes.",
+      "hintAlliance": "Hasta {{max}} imágenes que los miembros de tu alianza pueden mostrar detrás del mapa. Los miembros ven la predeterminada salvo que elijan otra, o ninguna, en sus ajustes.",
+      "hintMembers": "Las imágenes se reducen antes de subirlas. La imagen propia de un piloto en su dispositivo tiene prioridad.",
+      "namePlaceholder": "Nombre (opcional)",
+      "name": "Nombre",
+      "makeDefault": "Hacer predeterminada",
+      "unsetDefault": "Sin predeterminada",
+      "remove": "Quitar",
+      "default": "Predeterminada",
+      "noDefault": "Sin predeterminada: los miembros no ven ninguna imagen salvo que elijan una.",
+      "add": "Añadir imagen…",
+      "working": "Procesando…",
+      "count": "{{n}} de {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Más corta",
     "sections": {
       "mapOptions": "Opciones de mapa",
+      "appearance": "Apariencia",
       "wormholeBookmarks": "Marcadores",
       "bookmarks": "Marcadores",
       "mapControls": "Controles del mapa",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Siempre visible",
     "connInfoFolded": "Plegada",
     "importSystemsTitle": "Añadir sistemas a este mapa desde filas CSV o separadas por tabulaciones",
-    "importSystems": "↑ Importar sistemas desde CSV"
+    "importSystems": "↑ Importar sistemas desde CSV",
+    "mapBgColor": "Color de fondo del mapa",
+    "gridColor": "Color de la cuadrícula",
+    "showGrid": "Cuadrícula",
+    "bgImage": "Imagen de fondo",
+    "bgImageChoose": "Elegir…",
+    "bgImageChange": "Cambiar…",
+    "bgImageRemove": "Quitar",
+    "bgImageHint": "Tu propia imagen detrás del mapa. Se queda solo en este dispositivo y nunca se sube, así que configúrala de nuevo en la app de escritorio u otro navegador. Oscurécela para que los sistemas se lean bien.",
+    "bgImageFit": "Ajuste de la imagen",
+    "bgImageDim": "Oscurecer imagen: {{pct}} %",
+    "bgImageTooBig": "La imagen es demasiado grande (20 MB como máximo).",
+    "bgImageFailed": "No se pudo usar la imagen. Prueba PNG, JPEG o WebP.",
+    "bgFitOptions": {
+      "cover": "Rellenar",
+      "contain": "Ajustar",
+      "tile": "Mosaico"
+    },
+    "orgBg": "Fondo de corp/alianza",
+    "orgBgDefaultNamed": "Predeterminado ({{name}})",
+    "orgBgDefaultNone": "Predeterminado (ninguno)",
+    "orgBgNone": "Ninguno",
+    "orgBgUnnamed": "Imagen {{n}}",
+    "orgBgOverridden": "Se muestra tu propia imagen de abajo en su lugar. Quítala para ver esta.",
+    "theme": "Tema",
+    "themes": {
+      "nexum": "Nexum (predeterminado)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Crear tema",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "name": "Nombre",
+      "untitled": "Mi tema",
+      "custom": "Tus temas",
+      "hint": "Toda la app muestra tus colores mientras editas. Los colores del mapa, los iconos y las alertas no cambian.",
+      "tooLight": "Elige un fondo más oscuro: el texto de nexum es claro y costaría leerlo.",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "limit": "Hasta {{max}} temas propios. Elimina uno para crear otro.",
+      "seeds": {
+        "primary": "Ventanas y bordes",
+        "highlight": "Resaltado",
+        "bg": "Fondo",
+        "accent": "Acento"
+      }
+    },
+    "themeIntensity": "Intensidad del tema: {{pct}} %",
+    "homeShape": "Contorno del sistema base",
+    "homeShapes": {
+      "octagon": "Octógono",
+      "rounded": "Redondeado",
+      "shield": "Escudo",
+      "fortress": "Fortaleza",
+      "hexagon": "Hexágono",
+      "spiked": "Con púas"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

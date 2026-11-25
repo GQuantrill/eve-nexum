@@ -1501,6 +1501,25 @@ export async function migrate() {
     -- Live for 48 hours; the full label, not just the index.
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_label       TEXT;
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS chain_reserved_at TIMESTAMPTZ;
+
+    -- Map background pictures an admin offers their corp or alliance
+    -- (services/orgBackgrounds.ts): up to five per org, one of them the
+    -- default members see. Corp and alliance installs only. The picture is
+    -- scaled down by the admin's browser before upload, and kept small.
+    CREATE TABLE IF NOT EXISTS org_backgrounds (
+      id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+      scope_kind TEXT        NOT NULL CHECK (scope_kind IN ('corp', 'alliance')),
+      scope_id   INTEGER     NOT NULL,
+      name       TEXT        NOT NULL DEFAULT '',
+      mime       TEXT        NOT NULL,
+      data       BYTEA       NOT NULL,
+      is_default BOOLEAN     NOT NULL DEFAULT FALSE,
+      created_by INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_org_backgrounds_scope ON org_backgrounds (scope_kind, scope_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_org_backgrounds_default
+      ON org_backgrounds (scope_kind, scope_id) WHERE is_default;
   `);
 
   await encryptLegacyTokens();

@@ -185,7 +185,7 @@
   color: var(--text-default);
   cursor: pointer;
 }
-.custom-label-dialog__icon:hover { background: var(--surface-hover); border-color: #4a5a78; color: #fff; }
+.custom-label-dialog__icon:hover { background: var(--surface-hover); border-color: var(--text-faintest); color: #fff; }
 /* The currently-selected icon (single-pick IconPickerDialog) stays highlighted. */
 .custom-label-dialog__icon--active { border-color: var(--cv-conn-4h); color: var(--cv-conn-4h); }
 
@@ -320,7 +320,7 @@
 }
 .map-sidebar__brand-by {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #6a8ab0;
+  color: var(--text-dim);
 }
 .map-sidebar__brand-by a { color: var(--accent); text-decoration: none; }
 .map-sidebar__brand-by a:hover { text-decoration: underline; }
@@ -338,7 +338,7 @@
   background: transparent;
   border: 1px solid var(--border-strong);
   border-radius: 4px;
-  color: #9ec0e8;
+  color: var(--accent-pale);
   font-family: inherit;
   font-size: calc(12px * var(--font-scale, 1));
   padding: 3px 8px;
@@ -372,7 +372,7 @@
   text-decoration: none;
 }
 .patchnotes__version:hover { text-decoration: underline; }
-.patchnotes__date { font-size: calc(12px * var(--font-scale, 1)); color: #6a8ab0; }
+.patchnotes__date { font-size: calc(12px * var(--font-scale, 1)); color: var(--text-dim); }
 .patchnotes__empty { padding: 28px; text-align: center; color: var(--text-subtle); }
 .patchnotes__md.wmde-markdown,
 .patchnotes__md {
@@ -396,14 +396,14 @@
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
 
-  &:hover { background: var(--surface-overlay); border-color: var(--border-accent); color: #a0ccf8; }
+  &:hover { background: var(--surface-overlay); border-color: var(--border-accent); color: var(--accent-pale); }
 }
 
 .map-sidebar__discord-btn { text-decoration: none; }
 .map-sidebar__discord-btn:hover {
   background: rgba(88, 101, 242, 0.14);
   border-color: #5865f2;
-  color: #c7ceff;
+  color: var(--text-primary);
 }
 
 
@@ -509,7 +509,7 @@
 .whchart__code:hover { background: var(--surface-raised); color: var(--text-primary); }
 
 .whchart__code--active {
-  background: rgba(91,155,255,0.16);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
   color: #fff;
   font-weight: 700;
 }
@@ -544,7 +544,7 @@
   font-size: calc(12px * var(--font-scale, 1)); padding: 3px 12px;
 }
 .standings-viewer__source:hover { background: var(--surface-overlay); color: var(--text-default); }
-.standings-viewer__source--active { background: #1a3a6a; border-color: var(--border-accent-strong); color: var(--accent-light); }
+.standings-viewer__source--active { background: var(--accent-fill); border-color: var(--border-accent-strong); color: var(--accent-light); }
 
 /* The five standing-band tabs. */
 .standings-viewer__tabs {

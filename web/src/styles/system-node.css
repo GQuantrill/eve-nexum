@@ -60,7 +60,7 @@
 }
 
 .system-node--content-match {
-  box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
+  box-shadow: 0 0 0 2px var(--accent, var(--accent)), 0 0 12px 1px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 /* Hostile / friendly sov halos. Box-shadow only — doesn't displace the
@@ -115,7 +115,7 @@
    watchlist, plus a glyph badge in the top-left corner. --watch-color is set
    inline by SystemNode from the marker definition. */
 .system-node--watched {
-  box-shadow: 0 0 0 2px var(--watch-color, #6ea0ff), 0 0 10px 1px var(--watch-color, #6ea0ff);
+  box-shadow: 0 0 0 2px var(--watch-color, var(--accent-bright)), 0 0 10px 1px var(--watch-color, var(--accent-bright));
 }
 
 .system-node__watch-corner {
@@ -130,9 +130,9 @@
   line-height: 1;
   border-radius: 50%;
   background: var(--surface-base);
-  color: var(--watch-color, #6ea0ff);
-  border: 1px solid var(--watch-color, #6ea0ff);
-  box-shadow: 0 0 6px var(--watch-color, #6ea0ff);
+  color: var(--watch-color, var(--accent-bright));
+  border: 1px solid var(--watch-color, var(--accent-bright));
+  box-shadow: 0 0 6px var(--watch-color, var(--accent-bright));
   pointer-events: auto;
   z-index: 3;
 }
@@ -1018,7 +1018,7 @@
 }
 
 .system-node__a0-icon {
-  color: #b8d4ff;
+  color: var(--accent-pale);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   filter: drop-shadow(0 0 3px #b8d4ffaa);
@@ -1037,7 +1037,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #b8d4ff;
+  color: var(--accent-pale);
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
@@ -1352,7 +1352,7 @@ div.system-node__easy-handle {
   width: 8px !important;
   height: 8px !important;
   background: var(--border-strong) !important;
-  border-color: #4d6a9a !important;
+  border-color: var(--text-faintest) !important;
 
   &:hover { background: var(--accent-alt) !important; }
 
@@ -1475,6 +1475,100 @@ div.system-node__easy-handle {
     clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)),
                        calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
   }
+}
+
+/* The pilot's choice of home outline (utils/mapMarkers.ts HOME_SHAPES), set as
+   data-home-shape on <html>; octagon is the default above. Shapes that need
+   more room than the node's box (the shield's point, the fortress's
+   battlements, the hexagon's sides) grow outward, so the content never sits
+   outside the fill. The inner polygon is the edge's fill, 2px in. */
+:root[data-home-shape='rounded'] .system-node__home-shape {
+  & > span        { clip-path: inset(0 round 9px); }
+  & > span::after { clip-path: inset(0 round 7px); }
+}
+
+:root[data-home-shape='shield'] .system-node__home-shape {
+  inset: -1.5px -1.5px -22px;
+  & > span {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 24px),
+                       50% 100%, 0 calc(100% - 24px), 0 10px);
+  }
+  & > span::after {
+    clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 23px),
+                       50% 100%, 0 calc(100% - 23px), 0 9px);
+  }
+}
+
+:root[data-home-shape='fortress'] .system-node__home-shape {
+  inset: -10px -1.5px -1.5px;
+  & > span::after { clip-path: polygon(0 0, calc(14.29% + -3.43px) 0, calc(14.29% + -3.43px) 8px, calc(28.57% + 1.14px) 8px, calc(28.57% + 1.14px) 0, calc(42.86% + -2.29px) 0, calc(42.86% + -2.29px) 8px, calc(57.14% + 2.29px) 8px, calc(57.14% + 2.29px) 0, calc(71.43% + -1.14px) 0, calc(71.43% + -1.14px) 8px, calc(85.71% + 3.43px) 8px, calc(85.71% + 3.43px) 0, 100% 0, 100% 100%, 0 100%); }
+  & > span {
+    clip-path: polygon(0 0, 14.28% 0, 14.28% 8px, 28.57% 8px, 28.57% 0, 42.86% 0, 42.86% 8px,
+                       57.14% 8px, 57.14% 0, 71.43% 0, 71.43% 8px, 85.71% 8px, 85.71% 0,
+                       100% 0, 100% 100%, 0 100%);
+  }
+}
+
+:root[data-home-shape='hexagon'] .system-node__home-shape {
+  inset: -1.5px -12px;
+  & > span {
+    clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+  }
+  & > span::after {
+    clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 50%, calc(100% - 13px) 100%, 13px 100%, 0 50%);
+  }
+}
+
+/* Spiked: gold teeth all round a plain box, the box's edge 2px inside them. */
+:root[data-home-shape='spiked'] .system-node__home-shape {
+  inset: -9px;
+  & > span {
+    clip-path: polygon(0 0,
+                       calc(8px + 6.25% - 1.00px) 8px,
+                       calc(8px + 12.50% - 2.00px) 0,
+                       calc(8px + 18.75% - 3.00px) 8px,
+                       calc(8px + 25.00% - 4.00px) 0,
+                       calc(8px + 31.25% - 5.00px) 8px,
+                       calc(8px + 37.50% - 6.00px) 0,
+                       calc(8px + 43.75% - 7.00px) 8px,
+                       calc(8px + 50.00% - 8.00px) 0,
+                       calc(8px + 56.25% - 9.00px) 8px,
+                       calc(8px + 62.50% - 10.00px) 0,
+                       calc(8px + 68.75% - 11.00px) 8px,
+                       calc(8px + 75.00% - 12.00px) 0,
+                       calc(8px + 81.25% - 13.00px) 8px,
+                       calc(8px + 87.50% - 14.00px) 0,
+                       calc(8px + 93.75% - 15.00px) 8px,
+                       100% 0,
+                       calc(100% - 8px) calc(8px + 16.67% - 2.67px),
+                       100% calc(8px + 33.33% - 5.33px),
+                       calc(100% - 8px) calc(8px + 50.00% - 8.00px),
+                       100% calc(8px + 66.67% - 10.67px),
+                       calc(100% - 8px) calc(8px + 83.33% - 13.33px),
+                       100% 100%,
+                       calc(8px + 93.75% - 15.00px) calc(100% - 8px),
+                       calc(8px + 87.50% - 14.00px) 100%,
+                       calc(8px + 81.25% - 13.00px) calc(100% - 8px),
+                       calc(8px + 75.00% - 12.00px) 100%,
+                       calc(8px + 68.75% - 11.00px) calc(100% - 8px),
+                       calc(8px + 62.50% - 10.00px) 100%,
+                       calc(8px + 56.25% - 9.00px) calc(100% - 8px),
+                       calc(8px + 50.00% - 8.00px) 100%,
+                       calc(8px + 43.75% - 7.00px) calc(100% - 8px),
+                       calc(8px + 37.50% - 6.00px) 100%,
+                       calc(8px + 31.25% - 5.00px) calc(100% - 8px),
+                       calc(8px + 25.00% - 4.00px) 100%,
+                       calc(8px + 18.75% - 3.00px) calc(100% - 8px),
+                       calc(8px + 12.50% - 2.00px) 100%,
+                       calc(8px + 6.25% - 1.00px) calc(100% - 8px),
+                       0 100%,
+                       8px calc(8px + 83.33% - 13.33px),
+                       0 calc(8px + 66.67% - 10.67px),
+                       8px calc(8px + 50.00% - 8.00px),
+                       0 calc(8px + 33.33% - 5.33px),
+                       8px calc(8px + 16.67% - 2.67px));
+  }
+  & > span::after { clip-path: inset(8px round 2px); }
 }
 
 .system-node[data-home='true'][data-heat]::before { display: none; }

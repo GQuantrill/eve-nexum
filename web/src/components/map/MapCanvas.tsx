@@ -84,6 +84,11 @@ import { CHAIN_LABEL_RE } from '../../utils/chainNumber';
 import i18n from '../../i18n';
 import { useCustomIntel } from '../../hooks/useCustomIntel';
 import { useUserSetting } from '../../hooks/useUserSetting';
+import {
+  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, MAP_BG_THEME, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
+  useMapBgImage, bgImageStyle, useOrgBackgrounds, shownBackground, BG_CHOICE_KEY, BG_CHOICE_DEFAULT,
+} from '../../utils/mapBackground';
+import { safeColor } from '../../utils/mapMarkers';
 import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useFleet } from '../../hooks/useFleet';
 import { HeatmapContext } from '../../context/HeatmapContext';
@@ -199,6 +204,18 @@ export function MapCanvas() {
   const [snapGridStyle]      = useUserSetting<'lines' | 'dots'>('nexum.snapGridStyle', 'lines');
   const gridLines            = snapToGrid && snapGridStyle !== 'dots';
   const gridDots             = snapToGrid && !gridLines;
+  // The pilot's background colour, grid colour and picture (utils/mapBackground.ts).
+  const [bgColorSetting]     = useUserSetting<string>(MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT);
+  const [gridColorSetting]   = useUserSetting<string>(GRID_COLOR_KEY, '');
+  const [showGrid]           = useUserSetting<boolean>(SHOW_GRID_KEY, true);
+  const bgColor              = safeColor(bgColorSetting, MAP_BG_THEME);
+  const gridColor            = safeColor(gridColorSetting,
+    gridLines ? GRID_COLOR_AUTO.lines : gridDots ? GRID_COLOR_AUTO.snapDots : GRID_COLOR_AUTO.dots);
+  const bgImage              = useMapBgImage();
+  const orgBackgrounds       = useOrgBackgrounds();
+  const [bgChoice]           = useUserSetting<string>(BG_CHOICE_KEY, BG_CHOICE_DEFAULT);
+  const bgImageLayer         = bgImageStyle(bgImage, bgColor,
+    shownBackground(bgImage.url, bgChoice, orgBackgrounds.backgrounds));
   const showMinimap          = useMapStore((s) => s.showMinimap);
   const [minimapPosition]    = useMinimapPosition();
   // React Flow's <Controls> usually sits bottom-left. When the user docks
@@ -1954,7 +1971,8 @@ export function MapCanvas() {
 
   return (
     <HeatmapContext.Provider value={heatmapState}>
-    <div className="map-canvas" ref={wrapperRef}>
+    <div className="map-canvas" ref={wrapperRef} style={{ background: bgColor }}>
+      {bgImageLayer && <div className="map-canvas__image" style={bgImageLayer} aria-hidden="true" />}
       {/* connectOnClick={false}: React Flow joins a source handle to a target
           handle on CLICK by default. Easy Connect lays a full-node source
           handle over every system so you can drag from anywhere on it, which
@@ -2008,7 +2026,7 @@ export function MapCanvas() {
         zoomOnPinch={!invertZoom}
         deleteKeyCode={null}
       >
-        <Background
+        {showGrid && <Background
           variant={gridLines ? BackgroundVariant.Lines : BackgroundVariant.Dots}
           gap={snapToGrid ? 20 : 24}
           // Snap dots mark the snap points, so they need to read clearly; the
@@ -2020,8 +2038,8 @@ export function MapCanvas() {
           // `radius` in from its tile's corner. An offset of the radius puts the
           // dot centres on the snap points.
           offset={gridDots ? SNAP_DOT_SIZE / 2 : undefined}
-          color={snapToGrid ? (gridLines ? '#1a2240' : '#3a4a7a') : '#1a2040'}
-        />
+          color={gridColor}
+        />}
         <Controls position={controlsPosition}>
           <ControlButton
             onClick={centerOnMe}
@@ -2059,8 +2077,8 @@ export function MapCanvas() {
               );
             }}
             style={{
-              background: '#0d1117',
-              border: '3px solid #1e2740',
+              background: 'var(--surface-well)',
+              border: '3px solid var(--border)',
               borderRadius: '8px',
               // The sidebar opens from the right and overlaps anything in
               // the right two corners; left-anchored minimaps don't need

@@ -127,9 +127,9 @@
 .killGood {
   border-left: 3px solid var(--accent);
   padding-left: var(--sp-6);
-  background: linear-gradient(to right, rgba(91,155,255,0.18), rgba(91,155,255,0) 35%);
+  background: linear-gradient(to right, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 0%, transparent) 35%);
 }
-.killGood:hover { background: linear-gradient(to right, rgba(91,155,255,0.28), rgba(91,155,255,0.04) 50%); }
+.killGood:hover { background: linear-gradient(to right, color-mix(in srgb, var(--accent) 28%, transparent), color-mix(in srgb, var(--accent) 4%, transparent) 50%); }
 
 /* Ship icon — round, with a small attacker-count badge clipped to its
    bottom-left corner like Pathfinder does. */

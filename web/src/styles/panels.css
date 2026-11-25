@@ -198,7 +198,7 @@
   font-size: 14px;
   line-height: 1;
 
-  &:hover { background: var(--surface-overlay); color: #a0ccf8; }
+  &:hover { background: var(--surface-overlay); color: var(--accent-pale); }
 }
 
 .system-panel__left {
@@ -289,8 +289,8 @@
   padding: var(--sp-3) var(--sp-8);
   white-space: nowrap;
 
-  &:hover { background: var(--border); color: #a0ccf8; }
-  &:active { background: #1a3a6a; }
+  &:hover { background: var(--border); color: var(--accent-pale); }
+  &:active { background: var(--accent-fill); }
 }
 
 .sys-btn--ok {
@@ -358,7 +358,7 @@
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--accent-bright);
   padding: var(--sp-4) var(--sp-8);
-  background: rgba(110, 160, 255, 0.06);
+  background: color-mix(in srgb, var(--accent-bright) 6%, transparent);
   border-left: 2px solid var(--accent-bright);
   border-radius: 0 3px 3px 0;
   margin-top: 2px;
@@ -670,7 +670,7 @@
 }
 
 .sys-info__chain-fx__chip--current {
-  border-color: #4a7ab8;
+  border-color: var(--border-accent-strong);
   background: var(--border);
 }
 

@@ -935,6 +935,16 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.map.homeColor',
   'nexum.map.hereColor',
   'nexum.map.herePulse',
+  'nexum.map.homeShape',
+  // Appearance (web/src/utils/themes.ts, mapBackground.ts). The background
+  // PICTURE is not here: it stays on the device by design.
+  'nexum.theme',
+  'nexum.customThemes',
+  'nexum.themeIntensity',
+  'nexum.map.bgColor',
+  'nexum.map.gridColor',
+  'nexum.map.showGrid',
+  'nexum.map.bgChoice',
   'nexum.map.linkSigIds',
   'nexum.map.confirmKeyDelete',
   'nexum.ui.density',

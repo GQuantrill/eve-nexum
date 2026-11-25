@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Handle, Position, useConnection } from '@xyflow/react';
 import {
-  HouseIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
+  HouseIcon, ShieldIcon, CastleTurretIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
   SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon, SignOutIcon,
 } from '../../icons';
 import type { NodeProps } from '@xyflow/react';
@@ -50,6 +50,16 @@ import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { heatValue, heatColor } from '../../utils/heatmap';
 import { WHTypeInfo } from '../ui/WHTypeInfo';
 import { truesecColor } from '../../utils/truesec';
+import { HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT, normaliseHomeShape } from '../../utils/mapMarkers';
+
+/** The home system's header icon, matching its outline: a shield, a castle
+ *  turret, or the house for the other shapes. */
+function HomeIcon() {
+  const [shape] = useUserSetting<string>(HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT);
+  const s = normaliseHomeShape(shape);
+  const Icon = s === 'shield' ? ShieldIcon : s === 'fortress' ? CastleTurretIcon : HouseIcon;
+  return <Icon size={14} weight="regular" />;
+}
 
 type SystemNodeData = MapSystem & { selected: boolean; dimmed?: boolean; routeHighlighted?: boolean };
 
@@ -481,7 +491,7 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
         )}
         {showHome && (
           <span className="system-node__home-icon" aria-label={t('mapNode.homeSystem')}>
-            <HouseIcon size={14} weight="regular" />
+            <HomeIcon />
           </span>
         )}
         {sys.tag && <span className="system-node__tag">{sys.tag}</span>}

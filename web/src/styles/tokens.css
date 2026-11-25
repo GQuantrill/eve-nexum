@@ -33,6 +33,10 @@
   --border-strong: #2e3f60;
   --border-accent: #2e4a7a;
   --border-accent-strong: #2e5a9a;
+  /* Fill behind a selected/active control (toggle groups, chosen tabs). */
+  --accent-fill: #1a3a6a;
+  /* The small coloured marks (active tab). A theme sets its own (themes.css). */
+  --theme-accent: #5a9af8;
 
   /* Text — bright → faint. */
   --text-bright: #e2e8f8;

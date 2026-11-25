@@ -88,9 +88,9 @@
      station row or the panel chrome. Drop shadow adds a bit more visual
      separation from busy content underneath. */
   background: var(--surface-sunken);
-  border: 1px solid #4a6ea8;
+  border: 1px solid var(--border-accent-strong);
   border-radius: 4px;
-  color: #f0f4ff;
+  color: var(--text-bright);
   font-size: calc(13px * var(--font-scale, 1));
   font-weight: 500;
   white-space: nowrap;

@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Audit-Log",
       "flags": "Flaggen-Vorlagen",
-      "defaults": "Standard-Layout"
+      "defaults": "Standard-Layout",
+      "backgrounds": "Hintergründe"
     },
     "access": {
       "title": "Anmeldezugang",
@@ -444,6 +445,27 @@
       "saved": "Gespeichert",
       "loadFailed": "Standards konnten nicht geladen werden.",
       "saveFailed": "Standards konnten nicht gespeichert werden."
+    },
+    "backgrounds": {
+      "title": "Kartenhintergründe",
+      "noOrg": "Kartenhintergründe gibt es für Corporation- und Allianz-Installationen.",
+      "loadFailed": "Die Hintergründe konnten nicht geladen werden.",
+      "saveFailed": "Die Änderung konnte nicht gespeichert werden.",
+      "tooBig": "Das Bild ist zu groß (höchstens 20 MB).",
+      "unreadable": "Das Bild konnte nicht verwendet werden. Versuche PNG, JPEG oder WebP.",
+      "hintCorp": "Bis zu {{max}} Bilder, die Mitglieder deiner Corporation hinter der Karte anzeigen können. Mitglieder sehen den Standard, sofern sie in ihren Einstellungen kein anderes oder keines wählen.",
+      "hintAlliance": "Bis zu {{max}} Bilder, die Mitglieder deiner Allianz hinter der Karte anzeigen können. Mitglieder sehen den Standard, sofern sie in ihren Einstellungen kein anderes oder keines wählen.",
+      "hintMembers": "Bilder werden vor dem Hochladen verkleinert. Ein eigenes Bild eines Piloten auf seinem Gerät hat Vorrang.",
+      "namePlaceholder": "Name (optional)",
+      "name": "Name",
+      "makeDefault": "Als Standard",
+      "unsetDefault": "Kein Standard",
+      "remove": "Entfernen",
+      "default": "Standard",
+      "noDefault": "Kein Standard: Mitglieder sehen kein Bild, außer sie wählen eines.",
+      "add": "Bild hinzufügen…",
+      "working": "Wird bearbeitet…",
+      "count": "{{n}} von {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Kürzeste",
     "sections": {
       "mapOptions": "Kartenoptionen",
+      "appearance": "Darstellung",
       "wormholeBookmarks": "Lesezeichen",
       "bookmarks": "Lesezeichen",
       "mapControls": "Kartensteuerung",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Immer anzeigen",
     "connInfoFolded": "Eingeklappt",
     "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen",
-    "importSystems": "↑ Systeme aus CSV importieren"
+    "importSystems": "↑ Systeme aus CSV importieren",
+    "mapBgColor": "Kartenhintergrundfarbe",
+    "gridColor": "Rasterfarbe",
+    "showGrid": "Raster",
+    "bgImage": "Hintergrundbild",
+    "bgImageChoose": "Auswählen…",
+    "bgImageChange": "Ändern…",
+    "bgImageRemove": "Entfernen",
+    "bgImageHint": "Ein eigenes Bild hinter der Karte. Es bleibt nur auf diesem Gerät und wird nie hochgeladen, also in der Desktop-App oder einem anderen Browser erneut einrichten. Abdunkeln, damit Systeme gut lesbar bleiben.",
+    "bgImageFit": "Bildanpassung",
+    "bgImageDim": "Bild abdunkeln: {{pct}} %",
+    "bgImageTooBig": "Das Bild ist zu groß (höchstens 20 MB).",
+    "bgImageFailed": "Das Bild konnte nicht verwendet werden. Versuche PNG, JPEG oder WebP.",
+    "bgFitOptions": {
+      "cover": "Füllen",
+      "contain": "Einpassen",
+      "tile": "Kacheln"
+    },
+    "orgBg": "Corp-/Allianz-Hintergrund",
+    "orgBgDefaultNamed": "Standard ({{name}})",
+    "orgBgDefaultNone": "Standard (keiner)",
+    "orgBgNone": "Keiner",
+    "orgBgUnnamed": "Bild {{n}}",
+    "orgBgOverridden": "Stattdessen wird dein eigenes Bild unten angezeigt. Entferne es, um dieses zu sehen.",
+    "theme": "Farbschema",
+    "themes": {
+      "nexum": "Nexum (Standard)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Neues Farbschema",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "name": "Name",
+      "untitled": "Mein Farbschema",
+      "custom": "Deine Farbschemata",
+      "hint": "Die ganze App zeigt deine Farben schon beim Bearbeiten. Kartenfarben, Symbole und Alarme bleiben gleich.",
+      "tooLight": "Wähle einen dunkleren Hintergrund: Die Schrift in nexum ist hell und wäre sonst schwer lesbar.",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "limit": "Bis zu {{max}} eigene Farbschemata. Lösche eines, um ein neues anzulegen.",
+      "seeds": {
+        "primary": "Fenster und Rahmen",
+        "highlight": "Hervorhebung",
+        "bg": "Hintergrund",
+        "accent": "Akzent"
+      }
+    },
+    "themeIntensity": "Farbintensität: {{pct}} %",
+    "homeShape": "Umriss des Heimatsystems",
+    "homeShapes": {
+      "octagon": "Achteck",
+      "rounded": "Abgerundet",
+      "shield": "Schild",
+      "fortress": "Festung",
+      "hexagon": "Sechseck",
+      "spiked": "Stachelig"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

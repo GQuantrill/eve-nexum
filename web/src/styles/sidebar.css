@@ -57,7 +57,7 @@
   transition: opacity 0.12s, color 0.12s;
 }
 .toolbar__item:hover .toolbar__item-grip { opacity: 0.9; color: var(--text-subtle); }
-.toolbar__item--dragging .toolbar__item-grip { opacity: 1; color: #a9b8dc; }
+.toolbar__item--dragging .toolbar__item-grip { opacity: 1; color: var(--text-primary); }
 
 /* Groups several related controls inside a single movable item (e.g. the map
    switcher + name field), keeping them together as one draggable unit. */
@@ -162,7 +162,7 @@
   &:hover { background: var(--surface-overlay); color: var(--text-default); }
 
   &.toolbar__toggle--on {
-    background: #1a3a6a;
+    background: var(--accent-fill);
     border-color: var(--border-accent-strong);
     color: var(--accent-light);
   }
@@ -184,7 +184,7 @@
    * against the dark toolbar (e.g. Sign out). */
   &.toolbar__toggle--prominent {
     background: var(--border-strong);
-    border-color: #3a5a8a;
+    border-color: var(--border-accent-strong);
     color: var(--text-primary);
 
     &:hover { background: var(--surface-muted); color: #ffffff; }
@@ -637,7 +637,7 @@
   padding: var(--sp-2) var(--sp-8);
   border: 1px solid;
   border-radius: 999px;
-  background: rgba(8, 9, 15, 0.4);
+  background: color-mix(in srgb, var(--surface-sunken) 40%, transparent);
 }
 .chain-exits-menu__chip strong { font-weight: 700; margin-right: 3px; }
 
@@ -845,7 +845,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-.map-sidebar__content::-webkit-scrollbar-thumb:hover { background: #3d5f86; }
+.map-sidebar__content::-webkit-scrollbar-thumb:hover { background: var(--text-faintest); }
 
 .map-sidebar__section-title {
   font-size: calc(13px * var(--font-scale, 1));
@@ -966,7 +966,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   padding: var(--sp-2) var(--sp-8);
   border: 1px solid;
   border-radius: 999px;
-  background: rgba(8, 9, 15, 0.4);
+  background: color-mix(in srgb, var(--surface-sunken) 40%, transparent);
 }
 
 .chain-exits__chip strong {
@@ -978,7 +978,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-primary);
   padding: var(--sp-4) var(--sp-8);
-  background: rgba(110, 160, 255, 0.06);
+  background: color-mix(in srgb, var(--accent-bright) 6%, transparent);
   border-left: 2px solid var(--accent-bright);
   border-radius: 0 3px 3px 0;
 }
@@ -1067,8 +1067,8 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   background: var(--surface-overlay); border: 1px solid var(--border-accent-strong); border-radius: 4px;
   color: var(--accent-light); cursor: pointer;
 }
-.map-shares__add-btn:hover:not(:disabled) { background: #1a3a6a; }
-.map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: var(--border); color: #4a5670; }
+.map-shares__add-btn:hover:not(:disabled) { background: var(--accent-fill); }
+.map-shares__add-btn:disabled { opacity: 0.4; cursor: default; border-color: var(--border); color: var(--surface-muted); }
 
 /* Staged targets queued for the batch share. */
 .map-shares__staged { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
@@ -1076,7 +1076,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .map-shares__chip {
   display: inline-flex; align-items: center; gap: 5px;
   padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-3);
-  background: var(--surface-panel); border: 1px solid #263352; border-radius: 12px;
+  background: var(--surface-panel); border: 1px solid var(--border-strong); border-radius: 12px;
   font-size: calc(11px * var(--font-scale, 1)); color: var(--text-primary);
   max-width: 100%;
 }
@@ -1093,7 +1093,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   align-items: center;
   gap: var(--sp-6);
   font-size: calc(12px * var(--font-scale, 1));
-  color: #a8b6cc;
+  color: var(--text-secondary);
   cursor: pointer;
   margin: 2px 0;
 }
@@ -1140,9 +1140,9 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 }
 
 .map-shares__kind--corp {
-  background: rgba(100,160,255,0.15);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent-light);
-  border: 1px solid rgba(100,160,255,0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .map-shares__name {
@@ -1184,7 +1184,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
 .map-shares__access-label {
   font-size: calc(12px * var(--font-scale, 1));
-  color: #a8b6cc;
+  color: var(--text-secondary);
 }
 
 /* Per-row badge showing whether a grant is view-only or editable. */
@@ -1221,7 +1221,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   align-items: center;
   gap: var(--sp-6);
   font-size: calc(12px * var(--font-scale, 1));
-  color: #aeb9d6;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -1244,7 +1244,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   border-radius: 12px;
   padding: var(--sp-2) 9px;
   font-size: calc(11px * var(--font-scale, 1));
-  color: #9aa6c4;
+  color: var(--text-subtle);
   cursor: pointer;
   transition: color 0.12s, border-color 0.12s, background 0.12s;
 }
@@ -1252,9 +1252,9 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .watchlist__chip:hover { color: var(--text-primary); }
 
 .watchlist__chip--active {
-  color: #cfe0ff;
+  color: var(--text-primary);
   border-color: var(--border-accent-strong);
-  background: rgba(110,160,255,0.14);
+  background: color-mix(in srgb, var(--accent-bright) 14%, transparent);
 }
 
 .watchlist__list {
@@ -1267,9 +1267,9 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 /* Drag-and-drop: a container (ungrouped list or a group) tints while a row
    hovers over it, so the drop target is obvious. */
 .watchlist__drop-over {
-  outline: 1px dashed var(--accent, #5b9bff);
+  outline: 1px dashed var(--accent, var(--accent));
   outline-offset: 2px;
-  background: color-mix(in srgb, var(--accent, #5b9bff) 8%, transparent);
+  background: color-mix(in srgb, var(--accent, var(--accent)) 8%, transparent);
   border-radius: 6px;
 }
 
@@ -1279,8 +1279,8 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   padding: var(--sp-10);
   text-align: center;
   font-size: calc(12px * var(--font-scale, 1));
-  color: var(--muted, #8a98b8);
-  border: 1px dashed #2a3650;
+  color: var(--muted, var(--text-subtle));
+  border: 1px dashed var(--border-strong);
   border-radius: 6px;
 }
 
@@ -1328,7 +1328,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 }
 .watchlist__group-count {
   flex-shrink: 0;
-  color: #6a8ab0;
+  color: var(--text-dim);
   font-weight: 400;
   font-size: calc(12px * var(--font-scale, 1));
 }
@@ -1355,7 +1355,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   cursor: pointer;
   padding: var(--sp-2) var(--sp-4);
 }
-.watchlist__group-btn:hover:not(:disabled) { color: #a0ccf8; }
+.watchlist__group-btn:hover:not(:disabled) { color: var(--accent-pale); }
 .watchlist__group-btn:disabled { opacity: 0.4; cursor: default; }
 /* The group-delete trash is always red (matches the closest-systems remove). */
 .watchlist__group-btn--del { color: var(--danger); }
@@ -1412,7 +1412,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   align-items: center;
   gap: var(--sp-8);
 }
-.watchlist__import-room { flex: 1; color: #6a8ab0; font-size: calc(12px * var(--font-scale, 1)); }
+.watchlist__import-room { flex: 1; color: var(--text-dim); font-size: calc(12px * var(--font-scale, 1)); }
 
 /* Each entry is a small card: a top line (marker | what | delete) and a
    bottom line (value + note). The left-docked panel is wide enough for this
@@ -1486,7 +1486,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   align-items: center;
   gap: var(--sp-4);
   background: none;
-  border: 1px dashed #2a3550;
+  border: 1px dashed var(--border-strong);
   border-radius: 4px;
   /* Same height/type size as the criteria dropdowns above it. */
   padding: var(--sp-4) var(--sp-8);
@@ -1495,7 +1495,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   cursor: pointer;
 }
 .watchlist__add-criteria:hover {
-  color: #9fb0d0;
+  color: var(--text-subtle);
   border-color: var(--surface-muted);
 }
 
@@ -1562,7 +1562,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   outline: none;
 }
 
-.watchlist__note { color: #9aa6c4; }
+.watchlist__note { color: var(--text-subtle); }
 
 .watchlist__value:focus,
 .watchlist__note:focus {
@@ -1649,13 +1649,13 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   border-radius: 4px;
   padding: var(--sp-3) var(--sp-6);
   font-size: calc(12px * var(--font-scale, 1));
-  color: #aeb9d6;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
 .watchlist__match:hover {
-  background: rgba(110,160,255,0.12);
-  color: #cfe0ff;
+  background: color-mix(in srgb, var(--accent-bright) 12%, transparent);
+  color: var(--text-primary);
 }
 
 .watchlist__remove {
@@ -1756,8 +1756,8 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 }
 
 .settings-modal__tab--active {
-  color: #a0ccf8;
-  border-bottom-color: var(--accent);
+  color: var(--accent-pale);
+  border-bottom-color: var(--theme-accent);
 }
 
 .settings-modal__body {
@@ -1890,7 +1890,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .copymap__type-btn:hover { background: var(--surface-overlay); color: var(--text-default); }
-.copymap__type-btn--active { background: #1a3060; border-color: #3a6abf; color: var(--text-primary); }
+.copymap__type-btn--active { background: var(--accent-fill); border-color: var(--border-accent-strong); color: var(--text-primary); }
 
 .map-sidebar__btn-group-item {
   width: 100%;
@@ -1911,8 +1911,8 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 }
 
 .map-sidebar__btn-group-item--active {
-  background: #1a3060;
-  border-color: #3a6abf;
+  background: var(--accent-fill);
+  border-color: var(--border-accent-strong);
   color: var(--text-primary);
 }
 
@@ -2020,20 +2020,20 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .sig-filter-chip:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .sig-filter-chip--active {
   border-color: var(--accent);
-  background: rgba(90, 154, 248, 0.18);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
   color: var(--text-bright);
 }
 .sig-filter-clear {
   background: transparent;
   border: none;
-  color: #6a8ab0;
+  color: var(--text-dim);
   font-family: inherit;
   font-size: calc(12px * var(--font-scale, 1));
   padding: var(--sp-2) var(--sp-6);
   cursor: pointer;
   text-decoration: underline;
 }
-.sig-filter-clear:hover { color: #9ec0e8; }
+.sig-filter-clear:hover { color: var(--accent-pale); }
 
 /* Column picker — icon button in the filter row that opens a checkbox popover
    to hide/show optional columns (slims the pane when undocked). Pushed to the
@@ -2056,7 +2056,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   font-size: calc(11px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6a8ab0;
+  color: var(--text-dim);
   padding: var(--sp-2) var(--sp-6) var(--sp-6);
 }
 .sig-col-menu__item {
@@ -2069,7 +2069,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   color: var(--text-default);
   cursor: pointer;
 }
-.sig-col-menu__item:hover { background: rgba(90, 154, 248, 0.12); }
+.sig-col-menu__item:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .sig-col-menu__item input { cursor: pointer; }
 .sig-col-menu__sep { height: 1px; margin: var(--sp-4) var(--sp-2); background: var(--border-strong); }
 
@@ -2178,11 +2178,11 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 
 .sig-th__resize:hover,
 .sig-th__resize:active {
-  background: rgba(77, 157, 224, 0.4);
+  background: color-mix(in srgb, var(--accent-alt) 40%, transparent);
 }
 
 .sig-checkbox {
-  accent-color: #3a7ad8;
+  accent-color: var(--accent);
   cursor: pointer;
   width: 12px;
   height: 12px;
@@ -2236,7 +2236,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .structure-row--hostile  td { background: rgba(231,76,60,0.14); }
 .structure-row--bad      td { background: rgba(245,166,35,0.08); }
 .structure-row--good     td { background: rgba(143,200,255,0.08); }
-.structure-row--friendly td { background: rgba(91,155,255,0.12); }
+.structure-row--friendly td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 /* Auto-discovered structures section below the user-managed table.
    Treats the rows as inert intel — no edit controls. */
@@ -2251,7 +2251,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   align-items: baseline;
   gap: var(--sp-10);
 }
-.known-structures__hint     { font-size: calc(11px * var(--font-scale, 1)); text-transform: none; letter-spacing: 0; color: #4a5670; }
+.known-structures__hint     { font-size: calc(11px * var(--font-scale, 1)); text-transform: none; letter-spacing: 0; color: var(--surface-muted); }
 .known-structures__table    { width: 100%; }
 .known-structures__source   { width: 60px; }
 .known-structures__badge {
@@ -2263,7 +2263,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
 }
-.known-structures__badge--corp-esi       { background: rgba(91,155,255,0.15);  color: var(--accent-pale); border: 1px solid rgba(91,155,255,0.4); }
+.known-structures__badge--corp-esi       { background: color-mix(in srgb, var(--accent) 15%, transparent);  color: var(--accent-pale); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
 .known-structures__badge--public-dataset { background: rgba(122,138,168,0.15); color: var(--text-default); border: 1px solid rgba(122,138,168,0.4); }
 
 /* Read-only twin of .sig-input, used in share mode where the row cells
@@ -2314,7 +2314,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
    always shown at. */
 .sig-input--id {
   font-family: 'Courier New', monospace;
-  color: #7a9ac8;
+  color: var(--text-subtle);
   font-weight: 600;
   letter-spacing: 0.03em;
 }
@@ -2323,7 +2323,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   background: var(--surface-panel);
   border: 1px solid transparent;
   border-radius: 3px;
-  color: #a0b0c8;
+  color: var(--text-subtle);
   font-size: calc(13px * var(--font-scale, 1));
   font-family: inherit;
   padding: var(--sp-2) var(--sp-2);
@@ -2332,7 +2332,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   outline: none;
 
   &:hover { border-color: var(--border-strong); }
-  &:focus { border-color: #3a6aaa; color: var(--text-primary); }
+  &:focus { border-color: var(--border-accent-strong); color: var(--text-primary); }
 }
 
 /* Flat, not nested: `&--x` is Sass, not CSS nesting, so the browser dropped
@@ -2350,7 +2350,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
    deserve a colour nothing else claims. */
 .sig-select--type-ghost    { color: #b17df0; }
 
-.sig-select--leadsto { color: #78a0c0; font-size: calc(13px * var(--font-scale, 1)); }
+.sig-select--leadsto { color: var(--text-subtle); font-size: calc(13px * var(--font-scale, 1)); }
 
 /* Ghost-site tier chip, shown beside the type. Muted and small: it qualifies
    the type rather than competing with it. */
@@ -2410,7 +2410,7 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
 .sig-overwrite-toggle:hover { border-color: var(--accent); }
 .sig-overwrite-toggle--active {
   border-color: var(--accent);
-  background: rgba(90, 154, 248, 0.16);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
   color: var(--text-bright);
 }
 .sig-overwrite-toggle .map-sidebar__toggle-input { cursor: pointer; }
@@ -2451,7 +2451,7 @@ select.sig-toolbar-btn option {
 .lang-switcher__trigger:focus-visible {
   outline: none;
   border-color: var(--accent-alt);
-  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-alt) 25%, transparent);
 }
 .lang-switcher__flag {
   width: 18px;
@@ -2576,8 +2576,8 @@ select.sig-toolbar-btn option {
   white-space: nowrap;
   
 }
-.wh-picker__btn:hover       { border-color: #3a6aaa; }
-.wh-picker__btn--open       { border-color: #3a6aaa; }
+.wh-picker__btn:hover       { border-color: var(--border-accent-strong); }
+.wh-picker__btn--open       { border-color: var(--border-accent-strong); }
 .wh-picker__btn--empty      { color: var(--border-strong); font-family: inherit; font-weight: normal; }
 
 .wh-picker__btn-inner {
@@ -2657,7 +2657,7 @@ select.sig-toolbar-btn option {
 }
 .wh-picker__option:hover   { background: var(--border); }
 .wh-picker__option--kbd    { background: var(--border); box-shadow: inset 2px 0 0 var(--accent-light); }
-.wh-picker__option--active { background: #1e3555; }
+.wh-picker__option--active { background: var(--border-strong); }
 
 .wh-picker__code { font-family: 'Courier New', monospace; font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); color: var(--accent-light); min-width: 34px; }
 .wh-picker__arrow { color: var(--text-faintest); font-size: calc(13px * var(--font-scale, 1)); }
@@ -2856,3 +2856,67 @@ select.sig-toolbar-btn option {
 .popout__title { font-weight: 700; font-size: calc(14px * var(--font-scale, 1)); }
 .popout__back { margin-left: auto; }
 .popout__body { flex: 1; overflow: auto; padding: 8px var(--sp-16); }
+
+/* ── Theme picker (Settings > Appearance) ── */
+.theme-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--sp-4, 4px);
+}
+.theme-picker__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-default);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-picker__row:hover { background: var(--surface-hover); }
+.theme-picker__row--on {
+  background: var(--accent-fill);
+  border-color: var(--border-accent-strong);
+  color: var(--text-bright);
+}
+.theme-picker__swatches { display: inline-flex; gap: 3px; }
+.theme-picker__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.theme-picker__heading {
+  margin: 8px 0 2px;
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.theme-picker__row--custom { padding: 2px 4px 2px 0; cursor: default; }
+.theme-picker__pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 8px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.theme-picker__create { margin-top: 8px; align-self: flex-start; }
+.theme-editor {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-well);
+}
+.theme-editor__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }

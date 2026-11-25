@@ -67,7 +67,7 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
   const yOf    = (v: number) => PAD.top + IH - ((v - minVal) / span) * IH;
 
   const baselineY = signed ? yOf(0)   : (n > 0 ? yOf(avg) : PAD.top + IH);
-  const baselineColor = signed ? '#3a4a68' : '#f0a030';
+  const baselineColor = signed ? 'var(--surface-muted)' : '#f0a030';
   // Dedupe — at low maxVal the rounding collapses adjacent ticks to the same
   // integer (e.g. [0,0,1,1]), which would also produce duplicate React keys.
   const yTicks = [...new Set(
@@ -90,9 +90,9 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
           <g key={`tick-${v}`}>
             <line
               x1={PAD.left} y1={yOf(v)} x2={PAD.left + IW} y2={yOf(v)}
-              stroke="#1a2535" strokeWidth={0.5}
+              style={{ stroke: "var(--surface-hover)" }} strokeWidth={0.5}
             />
-            <text x={PAD.left - 3} y={yOf(v) + 3.5} textAnchor="end" fontSize={11} fill="#7a90a8">
+            <text x={PAD.left - 3} y={yOf(v) + 3.5} textAnchor="end" fontSize={11} style={{ fill: "var(--text-muted)" }}>
               {v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
             </text>
           </g>
@@ -103,7 +103,7 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
         {n > 0 && (
           <line
             x1={PAD.left} y1={baselineY} x2={PAD.left + IW} y2={baselineY}
-            stroke={baselineColor} strokeWidth={1} strokeDasharray="4 3" opacity={0.8}
+            style={{ stroke: baselineColor }} strokeWidth={1} strokeDasharray="4 3" opacity={0.8}
           />
         )}
 
@@ -111,7 +111,7 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
         <line
           x1={xOfSlot(SLOTS - 1)} y1={PAD.top}
           x2={xOfSlot(SLOTS - 1)} y2={PAD.top + IH}
-          stroke="#2e4060" strokeWidth={1} strokeDasharray="2 2"
+          style={{ stroke: "var(--border-strong)" }} strokeWidth={1} strokeDasharray="2 2"
         />
 
         {/* Crosshair on the hovered point */}
@@ -138,7 +138,7 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
           return (
             <g key={`pt-${i}`}>
               <circle cx={cx} cy={cy} r={isActive ? 3.4 : 2.2}
-                fill={color} stroke="#08090f" strokeWidth={0.8}
+                fill={color} style={{ stroke: "var(--surface-sunken)" }} strokeWidth={0.8}
                 pointerEvents="none" />
               <circle cx={cx} cy={cy} r={8}
                 fill="transparent"
@@ -158,7 +158,7 @@ function LineChartPlot({ values, color, signed = false, lag = 0 }: {
           const slot = SLOTS - 1 - hoursAgo;
           return (
             <text key={hoursAgo} x={xOfSlot(slot)} y={VB_H - 4}
-              textAnchor="middle" fontSize={11} fill="#7a90a8">
+              textAnchor="middle" fontSize={11} style={{ fill: "var(--text-muted)" }}>
               {hoursAgo}h
             </text>
           );
@@ -272,8 +272,8 @@ function CombinedChart({ series, lag = 0 }: { series: Series[]; lag?: number }) 
           {[0, 0.5, 1].map((f) => (
             <g key={f}>
               <line x1={CPAD.left} y1={yOf(f)} x2={CPAD.left + CIW} y2={yOf(f)}
-                stroke="#1a2535" strokeWidth={0.5} />
-              <text x={CPAD.left - 3} y={yOf(f) + 3.5} textAnchor="end" fontSize={11} fill="#7a90a8">
+                style={{ stroke: "var(--surface-hover)" }} strokeWidth={0.5} />
+              <text x={CPAD.left - 3} y={yOf(f) + 3.5} textAnchor="end" fontSize={11} style={{ fill: "var(--text-muted)" }}>
                 {f * 100}%
               </text>
             </g>
@@ -281,11 +281,11 @@ function CombinedChart({ series, lag = 0 }: { series: Series[]; lag?: number }) 
 
           {/* Current-hour marker (right edge) */}
           <line x1={xOfSlot(SLOTS - 1)} y1={CPAD.top} x2={xOfSlot(SLOTS - 1)} y2={CPAD.top + CIH}
-            stroke="#2e4060" strokeWidth={1} strokeDasharray="2 2" />
+            style={{ stroke: "var(--border-strong)" }} strokeWidth={1} strokeDasharray="2 2" />
 
           {hovered != null && (
             <line x1={xOfIdx(hovered)} y1={CPAD.top} x2={xOfIdx(hovered)} y2={CPAD.top + CIH}
-              stroke="#7a90a8" strokeWidth={0.8} opacity={0.5} pointerEvents="none" />
+              style={{ stroke: "var(--text-muted)" }} strokeWidth={0.8} opacity={0.5} pointerEvents="none" />
           )}
 
           {plotted.map((s) => (
@@ -296,7 +296,7 @@ function CombinedChart({ series, lag = 0 }: { series: Series[]; lag?: number }) 
           {hovered != null && plotted.map((s) => (
             <circle key={s.key} cx={xOfIdx(hovered)}
               cy={yOf(s.peak > 0 ? s.values[hovered] / s.peak : 0)}
-              r={3} fill={s.color} stroke="#08090f" strokeWidth={0.8} pointerEvents="none" />
+              r={3} fill={s.color} style={{ stroke: "var(--surface-sunken)" }} strokeWidth={0.8} pointerEvents="none" />
           ))}
 
           {/* One full-height hit column per hour. */}
@@ -311,7 +311,7 @@ function CombinedChart({ series, lag = 0 }: { series: Series[]; lag?: number }) 
 
           {X_TICKS.map((hoursAgo) => (
             <text key={hoursAgo} x={xOfSlot(SLOTS - 1 - hoursAgo)} y={CVB_H - 4}
-              textAnchor="middle" fontSize={11} fill="#7a90a8">
+              textAnchor="middle" fontSize={11} style={{ fill: "var(--text-muted)" }}>
               {hoursAgo}h
             </text>
           ))}

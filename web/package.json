@@ -1,7 +1,7 @@
 {
   "name": "nexum-web",
   "private": true,
-  "version": "6.1.2",
+  "version": "6.2.0",
   "license": "AGPL-3.0-or-later",
   "type": "module",
   "author": {
@@ -27,7 +27,7 @@
     "chart.js": "^4.5.1",
     "country-flag-icons": "^1.6.17",
     "html-to-image": "^1.11.13",
-    "i18next": "^26.3.0",
+    "i18next": "^26.7.2",
     "i18next-browser-languagedetector": "^8.2.1",
     "kokoro-js": "^1.2.1",
     "react": "^19.2.5",

@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "Journal d'audit",
       "flags": "Modèles",
-      "defaults": "Disposition par défaut"
+      "defaults": "Disposition par défaut",
+      "backgrounds": "Fonds"
     },
     "access": {
       "title": "Accès de connexion",
@@ -444,6 +445,27 @@
       "saved": "Enregistré",
       "loadFailed": "Impossible de charger les valeurs par défaut.",
       "saveFailed": "Impossible d'enregistrer les valeurs par défaut."
+    },
+    "backgrounds": {
+      "title": "Fonds de carte",
+      "noOrg": "Les fonds de carte sont réservés aux installations de corporation et d'alliance.",
+      "loadFailed": "Impossible de charger les fonds.",
+      "saveFailed": "Impossible d'enregistrer ce changement.",
+      "tooBig": "Cette image est trop lourde (20 Mo maximum).",
+      "unreadable": "Impossible d'utiliser cette image. Essayez PNG, JPEG ou WebP.",
+      "hintCorp": "Jusqu'à {{max}} images que les membres de votre corporation peuvent afficher derrière la carte. Les membres voient celle par défaut, sauf s'ils en choisissent une autre ou aucune dans leurs paramètres.",
+      "hintAlliance": "Jusqu'à {{max}} images que les membres de votre alliance peuvent afficher derrière la carte. Les membres voient celle par défaut, sauf s'ils en choisissent une autre ou aucune dans leurs paramètres.",
+      "hintMembers": "Les images sont réduites avant l'envoi. L'image personnelle d'un pilote sur son appareil passe avant.",
+      "namePlaceholder": "Nom (facultatif)",
+      "name": "Nom",
+      "makeDefault": "Par défaut",
+      "unsetDefault": "Aucune par défaut",
+      "remove": "Retirer",
+      "default": "Par défaut",
+      "noDefault": "Aucune par défaut : les membres ne voient aucune image sauf s'ils en choisissent une.",
+      "add": "Ajouter une image…",
+      "working": "En cours…",
+      "count": "{{n}} sur {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Le plus court",
     "sections": {
       "mapOptions": "Options de carte",
+      "appearance": "Apparence",
       "wormholeBookmarks": "Signets",
       "bookmarks": "Signets",
       "mapControls": "Commandes de carte",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Toujours affichées",
     "connInfoFolded": "Repliées",
     "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations",
-    "importSystems": "↑ Importer des systèmes depuis CSV"
+    "importSystems": "↑ Importer des systèmes depuis CSV",
+    "mapBgColor": "Couleur de fond de la carte",
+    "gridColor": "Couleur de la grille",
+    "showGrid": "Grille",
+    "bgImage": "Image de fond",
+    "bgImageChoose": "Choisir…",
+    "bgImageChange": "Changer…",
+    "bgImageRemove": "Retirer",
+    "bgImageHint": "Votre propre image derrière la carte. Elle reste sur cet appareil uniquement et n'est jamais envoyée : reconfigurez-la dans l'application de bureau ou un autre navigateur. Assombrissez-la pour que les systèmes restent lisibles.",
+    "bgImageFit": "Ajustement de l'image",
+    "bgImageDim": "Assombrir l'image : {{pct}} %",
+    "bgImageTooBig": "Cette image est trop lourde (20 Mo maximum).",
+    "bgImageFailed": "Impossible d'utiliser cette image. Essayez PNG, JPEG ou WebP.",
+    "bgFitOptions": {
+      "cover": "Remplir",
+      "contain": "Ajuster",
+      "tile": "Mosaïque"
+    },
+    "orgBg": "Fond corp/alliance",
+    "orgBgDefaultNamed": "Par défaut ({{name}})",
+    "orgBgDefaultNone": "Par défaut (aucun)",
+    "orgBgNone": "Aucun",
+    "orgBgUnnamed": "Image {{n}}",
+    "orgBgOverridden": "Votre image personnelle ci-dessous est affichée à la place. Retirez-la pour voir celle-ci.",
+    "theme": "Thème",
+    "themes": {
+      "nexum": "Nexum (par défaut)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Créer un thème",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "name": "Nom",
+      "untitled": "Mon thème",
+      "custom": "Vos thèmes",
+      "hint": "Toute l'application prévisualise vos couleurs pendant l'édition. Les couleurs de la carte, les icônes et les alertes ne changent pas.",
+      "tooLight": "Choisissez un fond plus sombre : le texte de nexum est clair et serait difficile à lire.",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "limit": "Jusqu'à {{max}} thèmes personnels. Supprimez-en un pour en créer un autre.",
+      "seeds": {
+        "primary": "Fenêtres et bordures",
+        "highlight": "Surbrillance",
+        "bg": "Fond",
+        "accent": "Accent"
+      }
+    },
+    "themeIntensity": "Intensité du thème : {{pct}} %",
+    "homeShape": "Contour du système d'origine",
+    "homeShapes": {
+      "octagon": "Octogone",
+      "rounded": "Arrondi",
+      "shield": "Bouclier",
+      "fortress": "Forteresse",
+      "hexagon": "Hexagone",
+      "spiked": "Hérissé"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

@@ -52,7 +52,7 @@
   text-transform: inherit;
   letter-spacing: inherit;
 
-  &:hover { color: #9ab0d0; }
+  &:hover { color: var(--text-subtle); }
 }
 
 .sectionCaret {
@@ -79,7 +79,7 @@
 
 .refreshBtn {
   background: transparent;
-  border: 1px solid #2a3550;
+  border: 1px solid var(--border-strong);
   color: var(--text-dim);
   border-radius: 3px;
   padding: 0 var(--sp-5);
@@ -209,7 +209,7 @@
   border-radius: 999px;
   font-size: calc(12px * var(--font-scale, 1));
   color: var(--text-primary);
-  background: rgba(8, 9, 15, 0.6);
+  background: color-mix(in srgb, var(--surface-sunken) 60%, transparent);
 }
 
 .intelSwatch {
@@ -316,7 +316,7 @@
 .sovTicker {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #6a8ab0;
+  color: var(--text-dim);
 }
 
 /* Sov hub: ADM + vulnerability window, side by side under the holder. */
@@ -431,7 +431,7 @@
   font-size: calc(13px * var(--font-scale, 1));
   padding: var(--sp-1) var(--sp-6);
   border-radius: 3px;
-  background: rgba(77,157,224,0.15);
+  background: color-mix(in srgb, var(--accent-alt) 15%, transparent);
   color: var(--accent-alt);
 }
 

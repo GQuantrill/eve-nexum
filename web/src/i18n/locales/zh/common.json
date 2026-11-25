@@ -102,7 +102,8 @@
       "discord": "Discord",
       "audit": "审计日志",
       "flags": "标记预设",
-      "defaults": "默认布局"
+      "defaults": "默认布局",
+      "backgrounds": "背景"
     },
     "access": {
       "title": "登录访问",
@@ -444,6 +445,27 @@
       "saved": "已保存",
       "loadFailed": "无法加载默认值。",
       "saveFailed": "无法保存默认值。"
+    },
+    "backgrounds": {
+      "title": "地图背景",
+      "noOrg": "地图背景仅适用于军团和联盟部署。",
+      "loadFailed": "无法加载背景。",
+      "saveFailed": "无法保存该更改。",
+      "tooBig": "图片太大（最大 20 MB）。",
+      "unreadable": "无法使用该图片。请尝试 PNG、JPEG 或 WebP。",
+      "hintCorp": "最多 {{max}} 张图片，供你的军团成员显示在地图后面。成员默认看到默认图片，除非他们在设置中选择其他图片或不显示。",
+      "hintAlliance": "最多 {{max}} 张图片，供你的联盟成员显示在地图后面。成员默认看到默认图片，除非他们在设置中选择其他图片或不显示。",
+      "hintMembers": "图片在上传前会被缩小。飞行员在自己设备上设置的图片优先。",
+      "namePlaceholder": "名称（可选）",
+      "name": "名称",
+      "makeDefault": "设为默认",
+      "unsetDefault": "取消默认",
+      "remove": "移除",
+      "default": "默认",
+      "noDefault": "没有默认：成员不会看到图片，除非自己选择。",
+      "add": "添加图片…",
+      "working": "处理中…",
+      "count": "{{n}} / {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "最短",
     "sections": {
       "mapOptions": "地图选项",
+      "appearance": "外观",
       "wormholeBookmarks": "书签",
       "bookmarks": "书签",
       "mapControls": "地图控制",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "始终显示",
     "connInfoFolded": "折叠",
     "importSystemsTitle": "从 CSV 或制表符分隔的行向此地图添加星系",
-    "importSystems": "↑ 从 CSV 导入星系"
+    "importSystems": "↑ 从 CSV 导入星系",
+    "mapBgColor": "地图背景颜色",
+    "gridColor": "网格颜色",
+    "showGrid": "网格",
+    "bgImage": "背景图片",
+    "bgImageChoose": "选择…",
+    "bgImageChange": "更换…",
+    "bgImageRemove": "移除",
+    "bgImageHint": "地图后面显示你自己的图片。图片只保存在本设备上，从不上传，所以在桌面应用或其他浏览器中需要重新设置。调暗图片，让星系保持清晰易读。",
+    "bgImageFit": "图片适配",
+    "bgImageDim": "调暗图片：{{pct}}%",
+    "bgImageTooBig": "图片太大（最大 20 MB）。",
+    "bgImageFailed": "无法使用该图片。请尝试 PNG、JPEG 或 WebP。",
+    "bgFitOptions": {
+      "cover": "填充",
+      "contain": "适应",
+      "tile": "平铺"
+    },
+    "orgBg": "军团/联盟背景",
+    "orgBgDefaultNamed": "默认（{{name}}）",
+    "orgBgDefaultNone": "默认（无）",
+    "orgBgNone": "无",
+    "orgBgUnnamed": "图片 {{n}}",
+    "orgBgOverridden": "当前显示的是下方你自己的图片。移除它即可看到这张。",
+    "theme": "主题",
+    "themes": {
+      "nexum": "Nexum（默认）",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "新建主题",
+      "edit": "编辑",
+      "delete": "删除",
+      "name": "名称",
+      "untitled": "我的主题",
+      "custom": "你的主题",
+      "hint": "编辑时整个应用会实时预览你的颜色。地图颜色、图标和警报不会改变。",
+      "tooLight": "请选择更深的背景：nexum 的文字是浅色的，否则难以阅读。",
+      "save": "保存",
+      "cancel": "取消",
+      "limit": "最多 {{max}} 个自定义主题。删除一个才能新建。",
+      "seeds": {
+        "primary": "窗口和边框",
+        "highlight": "高亮",
+        "bg": "背景",
+        "accent": "强调"
+      }
+    },
+    "themeIntensity": "主题强度：{{pct}}%",
+    "homeShape": "主星系轮廓",
+    "homeShapes": {
+      "octagon": "八边形",
+      "rounded": "圆角",
+      "shield": "盾牌",
+      "fortress": "堡垒",
+      "hexagon": "六边形",
+      "spiked": "尖刺"
+    }
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

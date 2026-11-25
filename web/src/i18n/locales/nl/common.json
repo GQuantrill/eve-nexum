@@ -114,7 +114,8 @@
       "discord": "Discord",
       "audit": "Auditlogboek",
       "flags": "Markeringsvoorinstellingen",
-      "defaults": "Standaardindeling"
+      "defaults": "Standaardindeling",
+      "backgrounds": "Achtergronden"
     },
     "access": {
       "title": "Inlogtoegang",
@@ -444,6 +445,27 @@
       "saved": "Opgeslagen",
       "loadFailed": "Kon de standaardwaarden niet laden.",
       "saveFailed": "Kon de standaardwaarden niet opslaan."
+    },
+    "backgrounds": {
+      "title": "Kaartachtergronden",
+      "noOrg": "Kaartachtergronden zijn er voor corporation- en alliance-installaties.",
+      "loadFailed": "De achtergronden konden niet worden geladen.",
+      "saveFailed": "Die wijziging kon niet worden opgeslagen.",
+      "tooBig": "Die afbeelding is te groot (maximaal 20 MB).",
+      "unreadable": "Die afbeelding kon niet worden gebruikt. Probeer PNG, JPEG of WebP.",
+      "hintCorp": "Tot {{max}} afbeeldingen die leden van je corporation achter de kaart kunnen tonen. Leden zien de standaard, tenzij ze in hun instellingen een andere of geen kiezen.",
+      "hintAlliance": "Tot {{max}} afbeeldingen die leden van je alliance achter de kaart kunnen tonen. Leden zien de standaard, tenzij ze in hun instellingen een andere of geen kiezen.",
+      "hintMembers": "Afbeeldingen worden vóór het uploaden verkleind. Een eigen afbeelding van een piloot op zijn apparaat gaat voor.",
+      "namePlaceholder": "Naam (optioneel)",
+      "name": "Naam",
+      "makeDefault": "Als standaard",
+      "unsetDefault": "Geen standaard",
+      "remove": "Verwijderen",
+      "default": "Standaard",
+      "noDefault": "Geen standaard: leden zien geen afbeelding, tenzij ze er een kiezen.",
+      "add": "Afbeelding toevoegen…",
+      "working": "Bezig…",
+      "count": "{{n}} van {{max}}"
     }
   },
   "anomType": {
@@ -2079,6 +2101,7 @@
     "routeShortest": "Kortste",
     "sections": {
       "mapOptions": "Kaartopties",
+      "appearance": "Weergave",
       "wormholeBookmarks": "Bookmarks",
       "bookmarks": "Bookmarks",
       "mapControls": "Kaartbediening",
@@ -2182,7 +2205,69 @@
     "connInfoFull": "Altijd tonen",
     "connInfoFolded": "Ingeklapt",
     "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels",
-    "importSystems": "↑ Systemen importeren uit CSV"
+    "importSystems": "↑ Systemen importeren uit CSV",
+    "mapBgColor": "Achtergrondkleur kaart",
+    "gridColor": "Rasterkleur",
+    "showGrid": "Raster",
+    "bgImage": "Achtergrondafbeelding",
+    "bgImageChoose": "Kiezen…",
+    "bgImageChange": "Wijzigen…",
+    "bgImageRemove": "Verwijderen",
+    "bgImageHint": "Je eigen afbeelding achter de kaart. Die blijft alleen op dit apparaat en wordt nooit geüpload, dus stel hem opnieuw in in de desktop-app of een andere browser. Maak hem donkerder zodat systemen goed leesbaar blijven.",
+    "bgImageFit": "Afbeelding passen",
+    "bgImageDim": "Afbeelding donkerder: {{pct}}%",
+    "bgImageTooBig": "Die afbeelding is te groot (maximaal 20 MB).",
+    "bgImageFailed": "Die afbeelding kon niet worden gebruikt. Probeer PNG, JPEG of WebP.",
+    "bgFitOptions": {
+      "cover": "Vullen",
+      "contain": "Passend",
+      "tile": "Tegels"
+    },
+    "orgBg": "Corp-/alliance-achtergrond",
+    "orgBgDefaultNamed": "Standaard ({{name}})",
+    "orgBgDefaultNone": "Standaard (geen)",
+    "orgBgNone": "Geen",
+    "orgBgUnnamed": "Afbeelding {{n}}",
+    "orgBgOverridden": "Je eigen afbeelding hieronder wordt in plaats daarvan getoond. Verwijder die om deze te zien.",
+    "theme": "Kleurenthema",
+    "themes": {
+      "nexum": "Nexum (standaard)",
+      "amarr": "Amarr",
+      "caldari": "Caldari",
+      "gallente": "Gallente",
+      "minmatar": "Minmatar",
+      "carbon": "Carbon",
+      "photon": "Photon"
+    },
+    "themeEditor": {
+      "create": "Nieuw thema maken",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "name": "Naam",
+      "untitled": "Mijn thema",
+      "custom": "Jouw thema's",
+      "hint": "De hele app toont je kleuren al tijdens het bewerken. Kaartkleuren, iconen en meldingen veranderen niet.",
+      "tooLight": "Kies een donkerdere achtergrond: de tekst in nexum is licht en zou slecht leesbaar zijn.",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "limit": "Tot {{max}} eigen thema's. Verwijder er een om een nieuw te maken.",
+      "seeds": {
+        "primary": "Vensters en randen",
+        "highlight": "Markering",
+        "bg": "Achtergrond",
+        "accent": "Accent"
+      }
+    },
+    "themeIntensity": "Thema-intensiteit: {{pct}}%",
+    "homeShape": "Omtrek van thuissysteem",
+    "homeShapes": {
+      "octagon": "Achthoek",
+      "rounded": "Afgerond",
+      "shield": "Schild",
+      "fortress": "Vesting",
+      "hexagon": "Zeshoek",
+      "spiked": "Stekelig"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

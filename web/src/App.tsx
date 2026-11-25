@@ -4,7 +4,8 @@ import { ReactFlowProvider } from '@xyflow/react';
 import { AuthProvider } from './context/AuthProvider';
 import { useAuth, isAdminRole } from './context/AuthContext';
 import { seedUserSettings, readUserSetting, useUserSetting } from './hooks/useUserSetting';
-import { applyMapMarkers, HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT } from './utils/mapMarkers';
+import { THEME_KEY, THEME_DEFAULT, CUSTOM_THEMES_KEY, THEME_INTENSITY_KEY, THEME_INTENSITY_DEFAULT, applyTheme, parseCustomThemes } from './utils/themes';
+import { applyMapMarkers, HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT, applyHomeShape } from './utils/mapMarkers';
 import { MapCanvas } from './components/map/MapCanvas';
 import { SystemPanel } from './components/ui/SystemPanel';
 import { ConnectionPanel } from './components/ui/ConnectionPanel';
@@ -112,6 +113,18 @@ function MapApp() {
       delete document.documentElement.dataset.colorVision;
     }
   }, [colorVision]);
+
+  // Colour theme → data-theme on <html>; styles/themes.css re-derives the
+  // chrome tokens from it. The default leaves tokens.css as it is.
+  const [theme] = useUserSetting<string>(THEME_KEY, THEME_DEFAULT);
+  const [customThemes] = useUserSetting<unknown>(CUSTOM_THEMES_KEY, []);
+  const [themeIntensity] = useUserSetting<number>(THEME_INTENSITY_KEY, THEME_INTENSITY_DEFAULT);
+  useEffect(() => { applyTheme(theme, parseCustomThemes(customThemes), themeIntensity); },
+    [theme, customThemes, themeIntensity]);
+
+  // The home system's outline shape → data-home-shape on <html>.
+  const [homeShape] = useUserSetting<string>(HOME_SHAPE_KEY, HOME_SHAPE_DEFAULT);
+  useEffect(() => { applyHomeShape(homeShape); }, [homeShape]);
 
   // Home / you-are-here marker colours and pulse strength → CSS variables.
   const [homeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);

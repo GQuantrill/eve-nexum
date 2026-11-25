@@ -6,8 +6,8 @@
 
 body {
   margin: 0;
-  background: #08090f;
-  color: #c8d0e0;
+  background: var(--surface-sunken);
+  color: var(--text-default);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }

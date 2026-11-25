@@ -80,9 +80,9 @@
   padding: 1px 5px;
   border-radius: 3px;
   font-weight: 600;
-  background: rgba(100,160,255,0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent-light);
-  border: 1px solid rgba(100,160,255,0.3);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .detail {

@@ -4,6 +4,7 @@ import i18n, { ensureLanguage } from './i18n' // initialise i18next before any c
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/tokens.css' // design tokens — load before any other CSS
+import './styles/themes.css' // colour themes: re-derive the chrome tokens (utils/themes.ts)
 import './index.css'
 // Shared global styles, relocated verbatim out of App.css (Phase 2 bucket-2).
 import './styles/buttons.css' // shared icon-button primitives

@@ -270,7 +270,7 @@
 
     h1, h2, h3 { color: var(--text-bright); border-color: var(--border); }
     a { color: var(--accent); }
-    code { background: var(--surface-panel); color: #a8c0e8; }
+    code { background: var(--surface-panel); color: var(--text-primary); }
     pre { background: var(--surface-panel); }
     blockquote { border-color: var(--border-accent); color: var(--text-secondary); }
   }
