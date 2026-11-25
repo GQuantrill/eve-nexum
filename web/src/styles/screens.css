@@ -79,10 +79,10 @@
 .lock-screen__resume {
   width: 100%;
   padding: 10px 14px;
-  background: #1a3a6a;
+  background: var(--accent-fill);
   border: 1px solid var(--border-accent);
   border-radius: 6px;
-  color: #cfe2ff;
+  color: var(--text-primary);
   cursor: pointer;
   font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
@@ -97,7 +97,7 @@
   cursor: pointer;
   font-size: calc(12px * var(--font-scale, 1));
 
-  &:hover { color: #9ab0d0; text-decoration: underline; }
+  &:hover { color: var(--text-subtle); text-decoration: underline; }
 }
 
 .loading-screen__logo {

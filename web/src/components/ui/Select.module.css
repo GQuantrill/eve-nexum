@@ -89,8 +89,8 @@
 .option:hover:not(.optionDisabled),
 .optionActive:not(.optionDisabled) { background: var(--border); }
 /* The currently-selected value. */
-.optionSelected { color: var(--text-bright); background: #1e3555; }
-.optionSelected.optionActive { background: #24406a; }
+.optionSelected { color: var(--text-bright); background: var(--border-strong); }
+.optionSelected.optionActive { background: var(--accent-fill); }
 .optionDisabled { opacity: 0.4; cursor: not-allowed; }
 
 /* A small tick space so selected rows read clearly even without colour. */

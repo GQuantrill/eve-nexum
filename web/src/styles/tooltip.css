@@ -49,9 +49,9 @@
   position: fixed;
   z-index: 99999;
   background: var(--surface-sunken);
-  border: 1px solid #4a6ea8;
+  border: 1px solid var(--border-accent-strong);
   border-radius: 4px;
-  color: #f0f4ff;
+  color: var(--text-bright);
   font-size: calc(12px * var(--font-scale, 1));
   font-weight: 500;
   padding: 4px 9px;
@@ -87,8 +87,8 @@
   transform: translateY(-50%);
   width: max-content;
   background: var(--surface-sunken);
-  border: 1px solid #4a6ea8;
-  color: #f0f4ff;
+  border: 1px solid var(--border-accent-strong);
+  color: var(--text-bright);
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
@@ -104,8 +104,8 @@
   transform: translateX(-50%);
   width: max-content;
   background: var(--surface-sunken);
-  border: 1px solid #4a6ea8;
-  color: #f0f4ff;
+  border: 1px solid var(--border-accent-strong);
+  color: var(--text-bright);
   font-weight: 500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
@@ -120,7 +120,7 @@
 
 .toolbar__player-count {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #6a8ab0;
+  color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
 

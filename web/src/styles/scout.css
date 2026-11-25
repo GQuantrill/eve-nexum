@@ -70,7 +70,7 @@
 }
 
 .scout-row__class--a0 {
-  color: #b8d4ff;
+  color: var(--accent-pale);
 }
 
 .scout-row__class--home {
@@ -360,7 +360,7 @@
 .fleet-pane__search:focus-visible {
   outline: none;
   border-color: var(--accent-alt);
-  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-alt) 25%, transparent);
 }
 .fleet-pane__list {
   list-style: none;
@@ -387,7 +387,7 @@
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-.fleet-pane__list::-webkit-scrollbar-thumb:hover { background: #3d5f86; }
+.fleet-pane__list::-webkit-scrollbar-thumb:hover { background: var(--text-faintest); }
 .fleet-pane__row {
   display: flex;
   align-items: center;
@@ -478,7 +478,7 @@
 
 .fleet-pane__jumps {
   flex-shrink: 0;
-  color: #9fb3cd;
+  color: var(--text-subtle);
   font-size: calc(12px * var(--font-scale, 1));
   text-align: right;
   min-width: 48px;

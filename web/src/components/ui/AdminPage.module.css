@@ -25,7 +25,7 @@
 .mTab:hover { background: var(--surface-overlay); color: var(--text-default); }
 
 .mTabActive {
-  background: #1a3a6a;
+  background: var(--accent-fill);
   border-color: var(--border-accent-strong);
   color: var(--accent-light);
 }
@@ -260,7 +260,7 @@
 .pgTab:hover { background: var(--surface-overlay); color: var(--text-default); }
 
 .pgTabActive {
-  background: #1a3a6a;
+  background: var(--accent-fill);
   border-color: var(--border-accent-strong);
   color: var(--accent-light);
 }
@@ -313,9 +313,9 @@
 .usersSearch:focus-visible {
   outline: none;
   border-color: var(--accent-alt);
-  box-shadow: 0 0 0 2px rgba(77, 157, 224, 0.25);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-alt) 25%, transparent);
 }
-.usersSearch::placeholder { color: #4a5670; }
+.usersSearch::placeholder { color: var(--surface-muted); }
 
 /* Roles explainer modal: a badge + description per role. */
 .rolesModal { width: min(640px, 94vw); }
@@ -406,7 +406,7 @@
   font-size: calc(12px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6a8ab0;
+  color: var(--text-dim);
   margin: 12px 0 5px;
 }
 .dcTogglechips {
@@ -429,10 +429,10 @@
 .dcTogglechip:hover { border-color: var(--accent-alt); color: var(--text-default); }
 .dcTogglechipOn {
   border-color: var(--accent);
-  background: rgba(90, 154, 248, 0.18);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
   color: var(--text-bright);
 }
-.dcResultMeta { color: #6a8ab0; }
+.dcResultMeta { color: var(--text-dim); }
 .dcRadio {
   display: flex;
   align-items: center;
@@ -459,15 +459,15 @@
   align-items: center;
   gap: 6px;
   padding: 3px 6px 3px 10px;
-  background: rgba(91, 155, 255, 0.12);
-  color: #aecbff;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent-pale);
   border-radius: 12px;
   font-size: calc(13px * var(--font-scale, 1));
 }
 .dcChip button {
   background: none;
   border: none;
-  color: #aecbff;
+  color: var(--accent-pale);
   cursor: pointer;
   font-size: 15px;
   line-height: 1;
@@ -511,7 +511,7 @@
   cursor: pointer;
   font-size: calc(13px * var(--font-scale, 1));
 }
-.dcResults li button:hover { background: rgba(91, 155, 255, 0.12); }
+.dcResults li button:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 /* ── Admin: login access (allow-list) tab ──────────────────────────────── */
 .acIntro {
@@ -523,7 +523,7 @@
 }
 .acNote {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #a8b6cc;
+  color: var(--text-secondary);
   max-width: 720px;
   line-height: 1.5;
   margin: 0 0 20px;
@@ -563,7 +563,7 @@
 .acHintDelay { display: block; margin: 3px 0 0; max-width: 720px; line-height: 1.5; }
 .acResult {
   font-size: calc(13px * var(--font-scale, 1));
-  color: #7aa2c8;
+  color: var(--text-subtle);
   margin: 2px 0 4px;
 }
 .acAdd {
@@ -599,7 +599,7 @@
   display: inline-flex;
   align-items: center;
   margin-left: 6px;
-  color: #6a8ab0;
+  color: var(--text-dim);
   vertical-align: middle;
 }
 .acEvewho:hover { color: var(--accent-bright); }
@@ -673,7 +673,7 @@
 .pgSubtab:hover { background: var(--surface-overlay); color: var(--text-default); }
 
 .pgSubtabActive {
-  background: #1a3a6a;
+  background: var(--accent-fill);
   border-color: var(--border-accent-strong);
   color: var(--accent-light);
 }

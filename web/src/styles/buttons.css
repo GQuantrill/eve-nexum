@@ -47,11 +47,11 @@
 }
 
 .btn--primary {
-  background: #1a3a6a;
+  background: var(--accent-fill);
   color: var(--accent-light);
   border: 1px solid var(--border-accent-strong);
 
-  &:hover:not(:disabled) { background: #1e4a8a; }
+  &:hover:not(:disabled) { background: var(--accent-fill); }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 

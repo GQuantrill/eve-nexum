@@ -50,7 +50,7 @@
   display: inline-flex;
   align-items: center;
   padding: var(--sp-4) var(--sp-12);
-  background: #1d3a6b;
+  background: var(--accent-fill);
   border: 1px solid var(--border-accent);
   border-radius: 4px;
   color: var(--text-bright);

@@ -67,7 +67,7 @@
 .search-field__empty {
   margin: 6px 0 0;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #4a5a7a;
+  color: var(--text-faintest);
   padding: 0 var(--sp-2);
 }
 

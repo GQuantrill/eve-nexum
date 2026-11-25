@@ -66,7 +66,7 @@
 
 .action {
   background: var(--surface-hover);
-  border: 1px solid #2e3a4f;
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
   color: var(--text-default);
   font-size: calc(12px * var(--font-scale, 1));
@@ -75,11 +75,11 @@
   cursor: pointer;
 }
 
-.action:hover { border-color: #4a5a78; background: var(--border); }
+.action:hover { border-color: var(--text-faintest); background: var(--border); }
 
 .primary {
   background: var(--border-strong);
-  border-color: #3b6ea5;
+  border-color: var(--border-accent-strong);
   color: var(--text-bright);
 }
 

@@ -2077,8 +2077,8 @@ export function MapCanvas() {
               );
             }}
             style={{
-              background: '#0d1117',
-              border: '3px solid #1e2740',
+              background: 'var(--surface-well)',
+              border: '3px solid var(--border)',
               borderRadius: '8px',
               // The sidebar opens from the right and overlaps anything in
               // the right two corners; left-anchored minimaps don't need

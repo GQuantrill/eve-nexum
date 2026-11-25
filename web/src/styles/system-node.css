@@ -60,7 +60,7 @@
 }
 
 .system-node--content-match {
-  box-shadow: 0 0 0 2px var(--accent, #5b9bff), 0 0 12px 1px rgba(91,155,255,0.45);
+  box-shadow: 0 0 0 2px var(--accent, var(--accent)), 0 0 12px 1px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 /* Hostile / friendly sov halos. Box-shadow only — doesn't displace the
@@ -115,7 +115,7 @@
    watchlist, plus a glyph badge in the top-left corner. --watch-color is set
    inline by SystemNode from the marker definition. */
 .system-node--watched {
-  box-shadow: 0 0 0 2px var(--watch-color, #6ea0ff), 0 0 10px 1px var(--watch-color, #6ea0ff);
+  box-shadow: 0 0 0 2px var(--watch-color, var(--accent-bright)), 0 0 10px 1px var(--watch-color, var(--accent-bright));
 }
 
 .system-node__watch-corner {
@@ -130,9 +130,9 @@
   line-height: 1;
   border-radius: 50%;
   background: var(--surface-base);
-  color: var(--watch-color, #6ea0ff);
-  border: 1px solid var(--watch-color, #6ea0ff);
-  box-shadow: 0 0 6px var(--watch-color, #6ea0ff);
+  color: var(--watch-color, var(--accent-bright));
+  border: 1px solid var(--watch-color, var(--accent-bright));
+  box-shadow: 0 0 6px var(--watch-color, var(--accent-bright));
   pointer-events: auto;
   z-index: 3;
 }
@@ -1018,7 +1018,7 @@
 }
 
 .system-node__a0-icon {
-  color: #b8d4ff;
+  color: var(--accent-pale);
   font-size: calc(13px * var(--font-scale, 1));
   cursor: default;
   filter: drop-shadow(0 0 3px #b8d4ffaa);
@@ -1037,7 +1037,7 @@
   padding: 4px 10px;
   white-space: nowrap;
   font-size: calc(13px * var(--font-scale, 1));
-  color: #b8d4ff;
+  color: var(--accent-pale);
   font-weight: 600;
   pointer-events: none;
   z-index: 9999;
@@ -1352,7 +1352,7 @@ div.system-node__easy-handle {
   width: 8px !important;
   height: 8px !important;
   background: var(--border-strong) !important;
-  border-color: #4d6a9a !important;
+  border-color: var(--text-faintest) !important;
 
   &:hover { background: var(--accent-alt) !important; }
 

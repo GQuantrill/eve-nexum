@@ -180,8 +180,8 @@
 .multiTooltip {
   position: absolute;
   top: 4px;
-  background: var(--bg-elevated, #0d1117);
-  border: 1px solid var(--border-subtle, #1f2a3a);
+  background: var(--bg-elevated, var(--surface-well));
+  border: 1px solid var(--border-subtle, var(--surface-hover));
   border-radius: 4px;
   padding: var(--sp-4) var(--sp-7);
   font-size: calc(11px * var(--font-scale, 1));

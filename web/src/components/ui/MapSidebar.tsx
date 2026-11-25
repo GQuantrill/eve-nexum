@@ -2182,6 +2182,12 @@ export function MapSidebar() {
               {settingsTab === "display" && (
                 <>
                   <div className="map-sidebar__row">
+                    <label className="map-sidebar__label">{t("mapSidebar.showGrid")}</label>
+                    <button className={`toolbar__toggle${showGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setShowGrid(!showGrid)} aria-pressed={showGrid}>
+                      {showGrid ? t("actions.on") : t("actions.off")}
+                    </button>
+                  </div>
+                  <div className="map-sidebar__row">
                     <label className="map-sidebar__label">{t("mapSidebar.snapToGrid")}</label>
                     <button className={`toolbar__toggle${snapToGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setSnapToGrid(!snapToGrid)} aria-pressed={snapToGrid}>
                       {snapToGrid ? t("actions.on") : t("actions.off")}
@@ -2304,12 +2310,6 @@ export function MapSidebar() {
                       </div>
                     );
                   })}
-                  <div className="map-sidebar__row">
-                    <label className="map-sidebar__label">{t("mapSidebar.showGrid")}</label>
-                    <button className={`toolbar__toggle${showGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setShowGrid(!showGrid)} aria-pressed={showGrid}>
-                      {showGrid ? t("actions.on") : t("actions.off")}
-                    </button>
-                  </div>
                   {orgBackgrounds.backgrounds.length > 0 && (
                     <>
                       <div className="map-sidebar__row">
