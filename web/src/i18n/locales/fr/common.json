@@ -2101,6 +2101,7 @@
     "routeShortest": "Le plus court",
     "sections": {
       "mapOptions": "Options de carte",
+      "appearance": "Apparence",
       "wormholeBookmarks": "Signets",
       "bookmarks": "Signets",
       "mapControls": "Commandes de carte",

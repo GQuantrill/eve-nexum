@@ -2101,6 +2101,7 @@
     "routeShortest": "최단",
     "sections": {
       "mapOptions": "지도 옵션",
+      "appearance": "모양",
       "wormholeBookmarks": "북마크",
       "bookmarks": "북마크",
       "mapControls": "지도 컨트롤",

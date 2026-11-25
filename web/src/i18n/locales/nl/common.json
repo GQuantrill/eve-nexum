@@ -2101,6 +2101,7 @@
     "routeShortest": "Kortste",
     "sections": {
       "mapOptions": "Kaartopties",
+      "appearance": "Weergave",
       "wormholeBookmarks": "Bookmarks",
       "bookmarks": "Bookmarks",
       "mapControls": "Kaartbediening",

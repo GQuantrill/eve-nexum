@@ -2101,6 +2101,7 @@
     "routeShortest": "最短",
     "sections": {
       "mapOptions": "地图选项",
+      "appearance": "外观",
       "wormholeBookmarks": "书签",
       "bookmarks": "书签",
       "mapControls": "地图控制",

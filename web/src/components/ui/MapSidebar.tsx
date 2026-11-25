@@ -918,7 +918,7 @@ export function MapSidebar() {
   // toolbar, with the rest of the pilot's controls.
   const settingsOpen = useMapStore((s) => s.mapSettingsOpen);
   const setSettingsOpen = useMapStore((s) => s.setMapSettingsOpen);
-  const [settingsTab, setSettingsTab] = useState<"display" | "signatures" | "shortcuts">("display");
+  const [settingsTab, setSettingsTab] = useState<"display" | "appearance" | "signatures" | "shortcuts">("display");
   const [patchNotesOpen, setPatchNotesOpen] = useState(false);
   const notifPermission = useNotificationPermission();
   const { user } = useAuth();
@@ -2167,6 +2167,9 @@ export function MapSidebar() {
               <button type="button" className={`settings-modal__tab${settingsTab === "display" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("display")}>
                 {t("mapSidebar.sections.mapOptions")}
               </button>
+              <button type="button" className={`settings-modal__tab${settingsTab === "appearance" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("appearance")}>
+                {t("mapSidebar.sections.appearance")}
+              </button>
               <button type="button" className={`settings-modal__tab${settingsTab === "signatures" ? " settings-modal__tab--active" : ""}`} onClick={() => setSettingsTab("signatures")}>
                 {t("mapSidebar.sections.wormholeBookmarks")}
               </button>
@@ -2251,9 +2254,6 @@ export function MapSidebar() {
                   {([
                     ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT, HOME_COLOR_DEFAULT],
                     ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT, HERE_COLOR_DEFAULT],
-                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_COLOR_DEFAULT, MAP_BG_COLOR_DEFAULT],
-                    // Grid: '' follows the grid style's own colour; Reset goes back to that.
-                    ["grid-color", "mapSidebar.gridColor", gridColor, setGridColor, GRID_COLOR_AUTO.lines, ""],
                   ] as const).map(([id, label, value, set, def, reset]) => {
                     const color = safeColor(value, def);
                     return (
@@ -2277,6 +2277,33 @@ export function MapSidebar() {
                     <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
                       options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
                   </div>
+                </>
+              )}
+
+              {settingsTab === "appearance" && (
+                <>
+                  {([
+                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_COLOR_DEFAULT, MAP_BG_COLOR_DEFAULT],
+                    // Grid: '' follows the grid style's own colour; Reset goes back to that.
+                    ["grid-color", "mapSidebar.gridColor", gridColor, setGridColor, GRID_COLOR_AUTO.lines, ""],
+                  ] as const).map(([id, label, value, set, def, reset]) => {
+                    const color = safeColor(value, def);
+                    return (
+                      <div key={id} className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
+                        <div className="map-sidebar__color">
+                          {value !== reset && (
+                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(reset)}>
+                              {t("mapSidebar.resetColor")}
+                            </button>
+                          )}
+                          <label className="map-sidebar__swatch" style={{ background: color }}>
+                            <input id={id} type="color" value={color} onChange={(e) => set(e.target.value)} />
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label">{t("mapSidebar.showGrid")}</label>
                     <button className={`toolbar__toggle${showGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setShowGrid(!showGrid)} aria-pressed={showGrid}>
@@ -2332,6 +2359,7 @@ export function MapSidebar() {
                   )}
                 </>
               )}
+
 
               {settingsTab === "signatures" && (
                 <>

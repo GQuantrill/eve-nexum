@@ -2125,6 +2125,7 @@
     "routeShortest": "Кратчайший",
     "sections": {
       "mapOptions": "Параметры карты",
+      "appearance": "Внешний вид",
       "wormholeBookmarks": "Закладки",
       "bookmarks": "Закладки",
       "mapControls": "Управление картой",
