@@ -2182,7 +2182,24 @@
     "connInfoFull": "Immer anzeigen",
     "connInfoFolded": "Eingeklappt",
     "importSystemsTitle": "Systeme aus CSV- oder tabulatorgetrennten Zeilen zu dieser Karte hinzufügen",
-    "importSystems": "↑ Systeme aus CSV importieren"
+    "importSystems": "↑ Systeme aus CSV importieren",
+    "mapBgColor": "Kartenhintergrundfarbe",
+    "gridColor": "Rasterfarbe",
+    "showGrid": "Raster",
+    "bgImage": "Hintergrundbild",
+    "bgImageChoose": "Auswählen…",
+    "bgImageChange": "Ändern…",
+    "bgImageRemove": "Entfernen",
+    "bgImageHint": "Ein eigenes Bild hinter der Karte. Es bleibt nur auf diesem Gerät und wird nie hochgeladen, also in der Desktop-App oder einem anderen Browser erneut einrichten. Abdunkeln, damit Systeme gut lesbar bleiben.",
+    "bgImageFit": "Bildanpassung",
+    "bgImageDim": "Bild abdunkeln: {{pct}} %",
+    "bgImageTooBig": "Das Bild ist zu groß (höchstens 20 MB).",
+    "bgImageFailed": "Das Bild konnte nicht verwendet werden. Versuche PNG, JPEG oder WebP.",
+    "bgFitOptions": {
+      "cover": "Füllen",
+      "contain": "Einpassen",
+      "tile": "Kacheln"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

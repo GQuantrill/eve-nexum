@@ -2182,7 +2182,24 @@
     "connInfoFull": "Sempre visível",
     "connInfoFolded": "Recolhida",
     "importSystemsTitle": "Adicionar sistemas a este mapa a partir de linhas CSV ou separadas por tabulações",
-    "importSystems": "↑ Importar sistemas de CSV"
+    "importSystems": "↑ Importar sistemas de CSV",
+    "mapBgColor": "Cor de fundo do mapa",
+    "gridColor": "Cor da grade",
+    "showGrid": "Grade",
+    "bgImage": "Imagem de fundo",
+    "bgImageChoose": "Escolher…",
+    "bgImageChange": "Trocar…",
+    "bgImageRemove": "Remover",
+    "bgImageHint": "Sua própria imagem atrás do mapa. Ela fica só neste dispositivo e nunca é enviada, então configure de novo no app de desktop ou em outro navegador. Escureça para os sistemas continuarem fáceis de ler.",
+    "bgImageFit": "Ajuste da imagem",
+    "bgImageDim": "Escurecer imagem: {{pct}}%",
+    "bgImageTooBig": "A imagem é grande demais (no máximo 20 MB).",
+    "bgImageFailed": "Não foi possível usar a imagem. Tente PNG, JPEG ou WebP.",
+    "bgFitOptions": {
+      "cover": "Preencher",
+      "contain": "Ajustar",
+      "tile": "Lado a lado"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mil M kg",

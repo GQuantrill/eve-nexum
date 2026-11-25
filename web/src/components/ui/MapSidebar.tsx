@@ -49,6 +49,10 @@ import { useEscapeClose } from '../../hooks/useEscapeClose';
 import { LINK_SIG_IDS_KEY, CONN_INFO_KEY, type ConnInfoMode } from '../../utils/linkSigIds';
 import { RouteAvoidList } from './RouteAvoidList';
 import { CONFIRM_KEY_DELETE_KEY } from '../../utils/confirmPref';
+import {
+  MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT, GRID_COLOR_KEY, GRID_COLOR_AUTO, SHOW_GRID_KEY,
+  BG_FITS, useMapBgImage, setBgImage, clearBgImage, setBgFit, setBgDim, BgImageError, type BgFit,
+} from '../../utils/mapBackground';
 import { HOME_COLOR_KEY, HOME_COLOR_DEFAULT, HERE_COLOR_KEY, HERE_COLOR_DEFAULT, HERE_PULSE_KEY, HERE_PULSE_DEFAULT, HERE_PULSES, normalisePulse, safeColor } from '../../utils/mapMarkers';
 
 // Single labelled checkbox row backed by useUserSetting so the on/off
@@ -958,7 +962,7 @@ export function MapSidebar() {
     }
     try {
       const blob = await toBlob(target, {
-        backgroundColor: "#08101a",
+        backgroundColor: safeColor(mapBgColor, MAP_BG_COLOR_DEFAULT),
         pixelRatio: 2,
         filter: (node) => {
           // Skip ReactFlow's own controls / minimap / attribution from the export
@@ -1001,6 +1005,17 @@ export function MapSidebar() {
   const [colorVision, setColorVision] = useUserSetting<string>("nexum.a11y.colorVision", "off");
   const [homeColor, setHomeColor] = useUserSetting<string>(HOME_COLOR_KEY, HOME_COLOR_DEFAULT);
   const [hereColor, setHereColor] = useUserSetting<string>(HERE_COLOR_KEY, HERE_COLOR_DEFAULT);
+  const [mapBgColor, setMapBgColor] = useUserSetting<string>(MAP_BG_COLOR_KEY, MAP_BG_COLOR_DEFAULT);
+  const [gridColor, setGridColor] = useUserSetting<string>(GRID_COLOR_KEY, "");
+  const [showGrid, setShowGrid] = useUserSetting<boolean>(SHOW_GRID_KEY, true);
+  const bgImage = useMapBgImage();
+  const bgFileRef = useRef<HTMLInputElement>(null);
+  const pickBgImage = (file: File | undefined) => {
+    if (!file) return;
+    setBgImage(file).catch((err: unknown) => {
+      toast.error(t(err instanceof BgImageError && err.reason === "tooBig" ? "mapSidebar.bgImageTooBig" : "mapSidebar.bgImageFailed"));
+    });
+  };
   const [herePulse, setHerePulse] = useUserSetting<string>(HERE_PULSE_KEY, HERE_PULSE_DEFAULT);
   const [sigBookmarkFmt, setSigBookmarkFmt] = useUserSetting<string>("nexum.sig.bookmarkFormat", DEFAULT_BOOKMARK_FORMAT);
   const [siteBookmarkFmt, setSiteBookmarkFmt] = useUserSetting<string>("nexum.sig.siteBookmarkFormat", DEFAULT_SITE_BOOKMARK_FORMAT);
@@ -2228,16 +2243,19 @@ export function MapSidebar() {
                     ]} />
                   </div>
                   {([
-                    ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT],
-                    ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT],
-                  ] as const).map(([id, label, value, set, def]) => {
+                    ["home-color", "mapSidebar.homeColor", homeColor, setHomeColor, HOME_COLOR_DEFAULT, HOME_COLOR_DEFAULT],
+                    ["here-color", "mapSidebar.hereColor", hereColor, setHereColor, HERE_COLOR_DEFAULT, HERE_COLOR_DEFAULT],
+                    ["map-bg-color", "mapSidebar.mapBgColor", mapBgColor, setMapBgColor, MAP_BG_COLOR_DEFAULT, MAP_BG_COLOR_DEFAULT],
+                    // Grid: '' follows the grid style's own colour; Reset goes back to that.
+                    ["grid-color", "mapSidebar.gridColor", gridColor, setGridColor, GRID_COLOR_AUTO.lines, ""],
+                  ] as const).map(([id, label, value, set, def, reset]) => {
                     const color = safeColor(value, def);
                     return (
                       <div key={id} className="map-sidebar__row">
                         <label className="map-sidebar__label" htmlFor={id}>{t(label)}</label>
                         <div className="map-sidebar__color">
-                          {color !== def && (
-                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(def)}>
+                          {value !== reset && (
+                            <button type="button" className="map-sidebar__zoom-value" onClick={() => set(reset)}>
                               {t("mapSidebar.resetColor")}
                             </button>
                           )}
@@ -2253,6 +2271,42 @@ export function MapSidebar() {
                     <Select id="here-pulse" value={normalisePulse(herePulse)} onChange={(v) => setHerePulse(v)}
                       options={HERE_PULSES.map((p) => ({ value: p, label: t(`mapSidebar.herePulseOptions.${p}`) }))} />
                   </div>
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label">{t("mapSidebar.showGrid")}</label>
+                    <button className={`toolbar__toggle${showGrid ? " toolbar__toggle--on" : ""}`} onClick={() => setShowGrid(!showGrid)} aria-pressed={showGrid}>
+                      {showGrid ? t("actions.on") : t("actions.off")}
+                    </button>
+                  </div>
+                  <div className="map-sidebar__row">
+                    <label className="map-sidebar__label">{t("mapSidebar.bgImage")}</label>
+                    <div className="map-sidebar__color">
+                      {bgImage.url && (
+                        <button type="button" className="map-sidebar__zoom-value" onClick={() => void clearBgImage()}>
+                          {t("mapSidebar.bgImageRemove")}
+                        </button>
+                      )}
+                      <button type="button" className="map-sidebar__zoom-value" onClick={() => bgFileRef.current?.click()}>
+                        {t(bgImage.url ? "mapSidebar.bgImageChange" : "mapSidebar.bgImageChoose")}
+                      </button>
+                      <input ref={bgFileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden
+                        onChange={(e) => { pickBgImage(e.target.files?.[0]); e.target.value = ""; }} />
+                    </div>
+                  </div>
+                  <p className="map-sidebar__help">{t("mapSidebar.bgImageHint")}</p>
+                  {bgImage.url && (
+                    <>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="bg-fit">{t("mapSidebar.bgImageFit")}</label>
+                        <Select id="bg-fit" value={bgImage.fit} onChange={(v) => setBgFit(v as BgFit)}
+                          options={BG_FITS.map((f) => ({ value: f, label: t(`mapSidebar.bgFitOptions.${f}`) }))} />
+                      </div>
+                      <div className="map-sidebar__row">
+                        <label className="map-sidebar__label" htmlFor="bg-dim">{t("mapSidebar.bgImageDim", { pct: bgImage.dim })}</label>
+                        <input id="bg-dim" type="range" min={0} max={90} step={5} value={bgImage.dim}
+                          onChange={(e) => setBgDim(parseInt(e.target.value, 10))} className="map-sidebar__zoom-slider" />
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 

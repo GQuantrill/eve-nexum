@@ -234,6 +234,13 @@
   background: var(--surface-sunken);
 }
 
+/* The pilot's own background picture (utils/mapBackground.ts), under the map. */
+.map-canvas__image {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .map-canvas__hint {
   position: absolute;
   bottom: 12px;

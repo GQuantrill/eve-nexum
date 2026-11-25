@@ -2182,7 +2182,24 @@
     "connInfoFull": "항상 표시",
     "connInfoFolded": "접기",
     "importSystemsTitle": "CSV 또는 탭으로 구분된 행에서 이 지도에 성계 추가",
-    "importSystems": "↑ CSV에서 성계 가져오기"
+    "importSystems": "↑ CSV에서 성계 가져오기",
+    "mapBgColor": "지도 배경 색",
+    "gridColor": "격자 색",
+    "showGrid": "격자",
+    "bgImage": "배경 이미지",
+    "bgImageChoose": "선택…",
+    "bgImageChange": "변경…",
+    "bgImageRemove": "제거",
+    "bgImageHint": "지도 뒤에 나만의 이미지를 표시합니다. 이 기기에만 저장되고 업로드되지 않으므로, 데스크톱 앱이나 다른 브라우저에서는 다시 설정하세요. 성계가 잘 보이도록 어둡게 하세요.",
+    "bgImageFit": "이미지 맞춤",
+    "bgImageDim": "이미지 어둡게: {{pct}}%",
+    "bgImageTooBig": "이미지가 너무 큽니다(최대 20MB).",
+    "bgImageFailed": "이미지를 사용할 수 없습니다. PNG, JPEG 또는 WebP를 사용해 보세요.",
+    "bgFitOptions": {
+      "cover": "채우기",
+      "contain": "맞추기",
+      "tile": "바둑판"
+    }
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

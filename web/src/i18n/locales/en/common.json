@@ -2182,7 +2182,24 @@
     "connInfoFull": "Always shown",
     "connInfoFolded": "Folded",
     "importSystemsTitle": "Add systems to this map from CSV or tab-separated rows",
-    "importSystems": "↑ Import systems from CSV"
+    "importSystems": "↑ Import systems from CSV",
+    "mapBgColor": "Map background colour",
+    "gridColor": "Grid colour",
+    "showGrid": "Grid",
+    "bgImage": "Background picture",
+    "bgImageChoose": "Choose…",
+    "bgImageChange": "Change…",
+    "bgImageRemove": "Remove",
+    "bgImageHint": "Your own picture behind the map. It stays on this device only and is never uploaded, so set it again in the desktop app or another browser. Darken it so systems stay easy to read.",
+    "bgImageFit": "Picture fit",
+    "bgImageDim": "Darken picture: {{pct}}%",
+    "bgImageTooBig": "That picture is too big (20 MB at most).",
+    "bgImageFailed": "Couldn't use that picture. Try a PNG, JPEG or WebP.",
+    "bgFitOptions": {
+      "cover": "Fill",
+      "contain": "Fit",
+      "tile": "Tile"
+    }
   },
   "mass": {
     "billionKg": "{{value}} B kg",

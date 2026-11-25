@@ -2182,7 +2182,24 @@
     "connInfoFull": "Toujours affichées",
     "connInfoFolded": "Repliées",
     "importSystemsTitle": "Ajouter des systèmes à cette carte depuis des lignes CSV ou séparées par des tabulations",
-    "importSystems": "↑ Importer des systèmes depuis CSV"
+    "importSystems": "↑ Importer des systèmes depuis CSV",
+    "mapBgColor": "Couleur de fond de la carte",
+    "gridColor": "Couleur de la grille",
+    "showGrid": "Grille",
+    "bgImage": "Image de fond",
+    "bgImageChoose": "Choisir…",
+    "bgImageChange": "Changer…",
+    "bgImageRemove": "Retirer",
+    "bgImageHint": "Votre propre image derrière la carte. Elle reste sur cet appareil uniquement et n'est jamais envoyée : reconfigurez-la dans l'application de bureau ou un autre navigateur. Assombrissez-la pour que les systèmes restent lisibles.",
+    "bgImageFit": "Ajustement de l'image",
+    "bgImageDim": "Assombrir l'image : {{pct}} %",
+    "bgImageTooBig": "Cette image est trop lourde (20 Mo maximum).",
+    "bgImageFailed": "Impossible d'utiliser cette image. Essayez PNG, JPEG ou WebP.",
+    "bgFitOptions": {
+      "cover": "Remplir",
+      "contain": "Ajuster",
+      "tile": "Mosaïque"
+    }
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

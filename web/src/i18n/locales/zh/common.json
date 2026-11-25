@@ -2182,7 +2182,24 @@
     "connInfoFull": "始终显示",
     "connInfoFolded": "折叠",
     "importSystemsTitle": "从 CSV 或制表符分隔的行向此地图添加星系",
-    "importSystems": "↑ 从 CSV 导入星系"
+    "importSystems": "↑ 从 CSV 导入星系",
+    "mapBgColor": "地图背景颜色",
+    "gridColor": "网格颜色",
+    "showGrid": "网格",
+    "bgImage": "背景图片",
+    "bgImageChoose": "选择…",
+    "bgImageChange": "更换…",
+    "bgImageRemove": "移除",
+    "bgImageHint": "地图后面显示你自己的图片。图片只保存在本设备上，从不上传，所以在桌面应用或其他浏览器中需要重新设置。调暗图片，让星系保持清晰易读。",
+    "bgImageFit": "图片适配",
+    "bgImageDim": "调暗图片：{{pct}}%",
+    "bgImageTooBig": "图片太大（最大 20 MB）。",
+    "bgImageFailed": "无法使用该图片。请尝试 PNG、JPEG 或 WebP。",
+    "bgFitOptions": {
+      "cover": "填充",
+      "contain": "适应",
+      "tile": "平铺"
+    }
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

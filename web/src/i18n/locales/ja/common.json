@@ -2182,7 +2182,24 @@
     "connInfoFull": "常に表示",
     "connInfoFolded": "折りたたむ",
     "importSystemsTitle": "CSV またはタブ区切りの行からこのマップに星系を追加",
-    "importSystems": "↑ CSV から星系をインポート"
+    "importSystems": "↑ CSV から星系をインポート",
+    "mapBgColor": "マップの背景色",
+    "gridColor": "グリッドの色",
+    "showGrid": "グリッド",
+    "bgImage": "背景画像",
+    "bgImageChoose": "選択…",
+    "bgImageChange": "変更…",
+    "bgImageRemove": "削除",
+    "bgImageHint": "マップの後ろに自分の画像を表示します。この端末にだけ保存され、アップロードされることはないので、デスクトップアプリや別のブラウザでは設定し直してください。星系が読みやすいよう暗くしてください。",
+    "bgImageFit": "画像の合わせ方",
+    "bgImageDim": "画像を暗く：{{pct}}%",
+    "bgImageTooBig": "画像が大きすぎます（最大 20 MB）。",
+    "bgImageFailed": "この画像は使えませんでした。PNG、JPEG、WebP をお試しください。",
+    "bgFitOptions": {
+      "cover": "塗りつぶし",
+      "contain": "全体を表示",
+      "tile": "タイル"
+    }
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

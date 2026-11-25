@@ -2182,7 +2182,24 @@
     "connInfoFull": "Altijd tonen",
     "connInfoFolded": "Ingeklapt",
     "importSystemsTitle": "Systemen aan deze kaart toevoegen uit CSV- of tab-gescheiden regels",
-    "importSystems": "↑ Systemen importeren uit CSV"
+    "importSystems": "↑ Systemen importeren uit CSV",
+    "mapBgColor": "Achtergrondkleur kaart",
+    "gridColor": "Rasterkleur",
+    "showGrid": "Raster",
+    "bgImage": "Achtergrondafbeelding",
+    "bgImageChoose": "Kiezen…",
+    "bgImageChange": "Wijzigen…",
+    "bgImageRemove": "Verwijderen",
+    "bgImageHint": "Je eigen afbeelding achter de kaart. Die blijft alleen op dit apparaat en wordt nooit geüpload, dus stel hem opnieuw in in de desktop-app of een andere browser. Maak hem donkerder zodat systemen goed leesbaar blijven.",
+    "bgImageFit": "Afbeelding passen",
+    "bgImageDim": "Afbeelding donkerder: {{pct}}%",
+    "bgImageTooBig": "Die afbeelding is te groot (maximaal 20 MB).",
+    "bgImageFailed": "Die afbeelding kon niet worden gebruikt. Probeer PNG, JPEG of WebP.",
+    "bgFitOptions": {
+      "cover": "Vullen",
+      "contain": "Passend",
+      "tile": "Tegels"
+    }
   },
   "mass": {
     "billionKg": "{{value}} mld kg",
