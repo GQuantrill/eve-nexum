@@ -2257,7 +2257,8 @@
         "bg": "배경",
         "accent": "포인트"
       }
-    }
+    },
+    "themeIntensity": "테마 강도: {{pct}}%"
   },
   "mass": {
     "billionKg": "{{value}}십억 kg",

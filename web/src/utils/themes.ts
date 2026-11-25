@@ -88,9 +88,31 @@ export function applySeeds(seeds: ThemeSeeds | null, presetId = THEME_DEFAULT): 
   }
 }
 
-export function applyTheme(v: unknown, customs: CustomTheme[] = []): void {
+/** How strongly the primary tints windows, borders and text: a percentage,
+ *  100 as the theme was made. */
+export const THEME_INTENSITY_KEY = 'nexum.themeIntensity';
+export const THEME_INTENSITY_DEFAULT = 100;
+export const THEME_INTENSITY_MIN = 0;
+export const THEME_INTENSITY_MAX = 200;
+
+export function normaliseIntensity(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v)
+    ? Math.max(THEME_INTENSITY_MIN, Math.min(THEME_INTENSITY_MAX, Math.round(v)))
+    : THEME_INTENSITY_DEFAULT;
+}
+
+export function applyIntensity(v: unknown): void {
+  document.documentElement.style.setProperty('--th-k', String(normaliseIntensity(v) / 100));
+}
+
+/** Put the chosen theme on <html>. The default (Nexum) keeps tokens.css as
+ *  it is, unless its intensity is changed: then it is worked out from its
+ *  seeds like any other theme, so the intensity has something to scale. */
+export function applyTheme(v: unknown, customs: CustomTheme[] = [], intensity: unknown = THEME_INTENSITY_DEFAULT): void {
   const r = resolveTheme(v, customs);
+  applyIntensity(intensity);
   if (r.kind === 'custom') applySeeds(r.theme.seeds);
+  else if (r.id === THEME_DEFAULT && normaliseIntensity(intensity) !== THEME_INTENSITY_DEFAULT) applySeeds(THEMES[0].seeds);
   else applySeeds(null, r.id);
 }
 

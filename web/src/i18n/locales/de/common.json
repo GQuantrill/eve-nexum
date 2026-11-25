@@ -2257,7 +2257,8 @@
         "bg": "Hintergrund",
         "accent": "Akzent"
       }
-    }
+    },
+    "themeIntensity": "Farbintensität: {{pct}} %"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

@@ -2257,7 +2257,8 @@
         "bg": "背景",
         "accent": "强调"
       }
-    }
+    },
+    "themeIntensity": "主题强度：{{pct}}%"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

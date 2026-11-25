@@ -2281,7 +2281,8 @@
         "bg": "Фон",
         "accent": "Акцент"
       }
-    }
+    },
+    "themeIntensity": "Насыщенность темы: {{pct}}%"
   },
   "mass": {
     "billionKg": "{{value}} млрд кг",

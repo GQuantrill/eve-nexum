@@ -939,6 +939,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // PICTURE is not here: it stays on the device by design.
   'nexum.theme',
   'nexum.customThemes',
+  'nexum.themeIntensity',
   'nexum.map.bgColor',
   'nexum.map.gridColor',
   'nexum.map.showGrid',

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUserSetting, readUserSetting } from '../../hooks/useUserSetting';
 import {
-  THEMES, THEME_KEY, THEME_DEFAULT, CUSTOM_THEMES_KEY, MAX_CUSTOM_THEMES, MAX_THEME_NAME, MAX_BG_LUMINANCE,
+  THEMES, THEME_KEY, THEME_DEFAULT, CUSTOM_THEMES_KEY, THEME_INTENSITY_KEY, THEME_INTENSITY_DEFAULT,
+  THEME_INTENSITY_MIN, THEME_INTENSITY_MAX, normaliseIntensity, MAX_CUSTOM_THEMES, MAX_THEME_NAME, MAX_BG_LUMINANCE,
   SEED_KEYS, type ThemeSeeds, type CustomTheme,
   parseCustomThemes, normaliseTheme, customThemeValue, newCustomThemeId, seedsOf, applySeeds, applyTheme, luminance,
 } from '../../utils/themes';
@@ -24,6 +25,8 @@ export function ThemePicker() {
   const { t } = useTranslation();
   const [theme, setTheme] = useUserSetting<string>(THEME_KEY, THEME_DEFAULT);
   const [stored, setStored] = useUserSetting<unknown>(CUSTOM_THEMES_KEY, []);
+  const [intensitySetting, setIntensity] = useUserSetting<number>(THEME_INTENSITY_KEY, THEME_INTENSITY_DEFAULT);
+  const intensity = normaliseIntensity(intensitySetting);
   const customs = parseCustomThemes(stored);
   const chosen = normaliseTheme(theme, customs);
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -38,10 +41,11 @@ export function ThemePicker() {
   useEffect(() => () => applyTheme(
     readUserSetting<string>(THEME_KEY, THEME_DEFAULT),
     parseCustomThemes(readUserSetting<unknown>(CUSTOM_THEMES_KEY, [])),
+    readUserSetting<number>(THEME_INTENSITY_KEY, THEME_INTENSITY_DEFAULT),
   ), []);
   const close = () => {
     setDraft(null);
-    applyTheme(theme, customs);
+    applyTheme(theme, customs, intensity);
   };
 
   const tooLight = !!draft && luminance(draft.seeds.bg) > MAX_BG_LUMINANCE;
@@ -55,7 +59,7 @@ export function ThemePicker() {
     setStored(next);
     setTheme(customThemeValue(id));
     setDraft(null);
-    applyTheme(customThemeValue(id), next);
+    applyTheme(customThemeValue(id), next, intensity);
   };
   const remove = (c: CustomTheme) => {
     const next = customs.filter((x) => x.id !== c.id);
@@ -92,6 +96,19 @@ export function ThemePicker() {
             </button>
           </div>
         ))}
+      </div>
+
+      <div className="map-sidebar__row">
+        <label className="map-sidebar__label" htmlFor="theme-intensity">{t('mapSidebar.themeIntensity', { pct: intensity })}</label>
+        <div className="map-sidebar__color">
+          {intensity !== THEME_INTENSITY_DEFAULT && (
+            <button type="button" className="map-sidebar__zoom-value" onClick={() => setIntensity(THEME_INTENSITY_DEFAULT)}>
+              {t('mapSidebar.resetColor')}
+            </button>
+          )}
+          <input id="theme-intensity" type="range" min={THEME_INTENSITY_MIN} max={THEME_INTENSITY_MAX} step={10}
+            value={intensity} onChange={(e) => setIntensity(parseInt(e.target.value, 10))} className="map-sidebar__zoom-slider" />
+        </div>
       </div>
 
       {draft ? (
