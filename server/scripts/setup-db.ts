@@ -826,16 +826,32 @@ async function importNpcStations(zip: Zip) {
     );
     CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
   `);
+  await db.query(`
+    ALTER TABLE npc_stations ADD COLUMN IF NOT EXISTS owner_id INTEGER;
+    ALTER TABLE npc_stations ADD COLUMN IF NOT EXISTS services INTEGER[];
+  `);
+  // An operation's services (clone bay, repair, LP store...), copied onto each
+  // station so a lookup needs no join.
+  const services = new Map<number, number[]>();
+  for (const line of await readJsonl(zip, 'stationOperations.jsonl')) {
+    try {
+      const o = JSON.parse(line);
+      if (typeof o._key === 'number' && Array.isArray(o.services)) {
+        services.set(o._key, o.services.filter((n: unknown) => Number.isInteger(n)));
+      }
+    } catch { /* skip */ }
+  }
   const lines = await readJsonl(zip, 'npcStations.jsonl');
-  const rows: [number, number, number][] = [];
+  const rows: [number, number, number, number | null, number[]][] = [];
   for (const line of lines) {
     try {
       const o = JSON.parse(line);
       if (!o._key || !o.solarSystemID || !o.typeID) continue;
-      rows.push([o._key, o.solarSystemID, o.typeID]);
+      const svc = services.get(o.operationID) ?? [];
+      rows.push([o._key, o.solarSystemID, o.typeID, Number.isInteger(o.ownerID) ? o.ownerID : null, svc]);
     } catch { /* skip */ }
   }
-  await batchUpsert('npc_stations', ['station_id', 'solar_system_id', 'type_id'], 'station_id', rows, 1000);
+  await batchUpsert('npc_stations', ['station_id', 'solar_system_id', 'type_id', 'owner_id', 'services'], 'station_id', rows, 1000);
   console.log(`${rows.length} NPC stations`);
 }
 
@@ -851,9 +867,12 @@ async function topUpNpcStations(haveData: boolean): Promise<void> {
       );
       CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
     `);
-    const { rows } = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM npc_stations');
-    if (rows[0].n > 0) return;
-    console.log('npc_stations empty — pulling the SDE to back-fill station endpoints...');
+    await db.query(`ALTER TABLE npc_stations ADD COLUMN IF NOT EXISTS services INTEGER[]`);
+    // Empty, or from before stations carried their services.
+    const { rows } = await db.query<{ n: number; missing: number }>(
+      'SELECT count(*)::int AS n, count(*) FILTER (WHERE services IS NULL)::int AS missing FROM npc_stations');
+    if (rows[0].n > 0 && rows[0].missing === 0) return;
+    console.log('npc_stations empty or without services — pulling the SDE to back-fill station endpoints...');
     const resolved = await resolveZip(haveData);
     const zip = await unzipper.Open.file(resolved.path);
     await importNpcStations(zip);

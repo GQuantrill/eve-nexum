@@ -35,6 +35,7 @@ import { backgroundsRouter } from './routes/backgrounds.js';
 import wormholesRouter    from './routes/wormholes.js';
 import releasesRouter     from './routes/releases.js';
 import { loadRouteGraph } from './services/routeGraph.js';
+import { startBlueLootRefresher } from './services/blueLoot.js';
 import { seedDiscordWebhooksFromEnv } from './services/discordSeed.js';
 import { seedAccessGrantsFromEnv } from './services/accessGrantsSeed.js';
 import { expireIdleOrgMaps, expireOrphanPersonalMaps } from './services/mapCleanup.js';
@@ -245,6 +246,7 @@ migrate()
     startDscanSweeper();
     startMapAuditPruner();
     startFreezeDetector();
+    startBlueLootRefresher();
     void startTelemetry();
   })
   .catch((err) => { console.error('Migration failed:', err); process.exit(1); });

@@ -1169,6 +1169,26 @@ export async function migrate() {
       type_id         INTEGER
     );
     CREATE INDEX IF NOT EXISTS idx_npc_stations_system ON npc_stations (solar_system_id);
+    -- Who runs the station and what it offers (SDE ownerID, and the service ids
+    -- of its operation from stationOperations.jsonl), for the Closest Systems
+    -- suggestions: a station with a clone bay, CONCORD's LP store. NULL until
+    -- the importer fills them (setup-db tops up older deploys).
+    ALTER TABLE npc_stations ADD COLUMN IF NOT EXISTS owner_id INTEGER;
+    ALTER TABLE npc_stations ADD COLUMN IF NOT EXISTS services INTEGER[];
+
+    -- NPC buyers of blue loot (Sleeper salvage), from ESI market orders: buy
+    -- orders lasting 365 days are NPCs, a player's can't run past 90. Replaced
+    -- whole on each refresh (services/blueLoot.ts), about weekly.
+    CREATE TABLE IF NOT EXISTS blue_loot_buyers (
+      station_id      BIGINT    PRIMARY KEY,
+      solar_system_id INTEGER   NOT NULL,
+      type_ids        INTEGER[] NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_blue_loot_buyers_system ON blue_loot_buyers (solar_system_id);
+    CREATE TABLE IF NOT EXISTS blue_loot_refresh (
+      id          BOOLEAN     PRIMARY KEY DEFAULT TRUE CHECK (id),
+      finished_at TIMESTAMPTZ NOT NULL
+    );
 
     -- ── ISK for extra maps (config.iskMaps, services/iskDonations.ts) ─────────
     -- The operator token that reads the donation corp's wallet journal.

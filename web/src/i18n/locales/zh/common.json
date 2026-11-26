@@ -738,7 +738,53 @@
     "onList": "在列表中",
     "noMatch": "没有星系匹配「{{query}}」",
     "allMaps": "跨所有地图计算路线",
-    "allMapsHint": "距离可以使用你能看到的任何地图上的虫洞链，而不仅是当前打开的地图。关闭后将只通过屏幕上的地图计算路线。"
+    "allMapsHint": "距离可以使用你能看到的任何地图上的虫洞链，而不仅是当前打开的地图。关闭后将只通过屏幕上的地图计算路线。",
+    "suggest": {
+      "button": "建议",
+      "buttonHint": "将最近的交易中心、蓝色战利品收购点、A0 星系、空间站等加入此列表",
+      "title": "建议",
+      "hint": "从你所在位置出发每类最近的几个，航线与此列表相同。点击添加即可把星系放入列表。",
+      "failed": "无法加载建议，请稍后再试。",
+      "loading": "正在查找最近的星系……",
+      "quietHint": "过去一小时内没有玩家击杀。",
+      "concordHint": "在此出售 DED 安全标签以提高你的安全等级。",
+      "sections": {
+        "hub": "交易中心",
+        "hub2": "次级交易中心",
+        "blueloot": "蓝色战利品收购点",
+        "a0": "A0 星系",
+        "highsec": "高安",
+        "lowsec": "低安",
+        "nullsec": "00 区",
+        "station": "NPC 空间站",
+        "service": "提供服务的空间站",
+        "concord": "CONCORD LP 商店",
+        "clone": "你的跳跃克隆",
+        "thera": "Thera 入口",
+        "turnur": "Turnur 入口",
+        "incursion": "入侵",
+        "structure": "你军团的建筑",
+        "quiet": "安静星系"
+      },
+      "services": {
+        "cloning": "克隆舱",
+        "jumpClone": "跳跃克隆设施",
+        "repair": "维修",
+        "fitting": "装配",
+        "market": "市场",
+        "reprocessing": "提炼",
+        "insurance": "保险"
+      },
+      "none": {
+        "clone": "你没有跳跃克隆。",
+        "clonesOff": "你的角色尚未向 nexum 共享克隆信息。",
+        "blueloot": "蓝色战利品收购点列表尚未就绪，更新后几小时内会补全。",
+        "scout": "从这里无法到达任何开放的连接。",
+        "structure": "nexum 不知道你军团的任何建筑。",
+        "incursion": "从这里无法到达任何入侵。",
+        "generic": "从这里无法到达。"
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "搜索星系和地图…",

@@ -738,7 +738,53 @@
     "onList": "auf Liste",
     "noMatch": "Keine Systeme passen zu \"{{query}}\"",
     "allMaps": "Über alle meine Karten routen",
-    "allMapsHint": "Entfernungen dürfen die Wurmlochketten jeder für dich sichtbaren Karte nutzen, nicht nur der geöffneten. Schalte dies aus, um nur über die Karte auf dem Bildschirm zu routen."
+    "allMapsHint": "Entfernungen dürfen die Wurmlochketten jeder für dich sichtbaren Karte nutzen, nicht nur der geöffneten. Schalte dies aus, um nur über die Karte auf dem Bildschirm zu routen.",
+    "suggest": {
+      "button": "Vorschläge",
+      "buttonHint": "Die nächsten Handelszentren, Blue-Loot-Käufer, A0-Systeme, Stationen und mehr für diese Liste",
+      "title": "Vorschläge",
+      "hint": "Jeweils das Nächste von deinem Standort aus, so geroutet wie diese Liste. Hinzufügen setzt ein System auf deine Liste.",
+      "failed": "Vorschläge konnten nicht geladen werden. Versuch es gleich noch einmal.",
+      "loading": "Suche die nächsten Systeme...",
+      "quietHint": "Keine Spieler-Kills in der letzten Stunde.",
+      "concordHint": "Verkaufe hier DED-Sicherheitsmarken, um deinen Sicherheitsstatus zu erhöhen.",
+      "sections": {
+        "hub": "Handelszentren",
+        "hub2": "Weitere Handelszentren",
+        "blueloot": "Blue-Loot-Käufer",
+        "a0": "A0-Systeme",
+        "highsec": "Hochsicherheit",
+        "lowsec": "Niedrigsicherheit",
+        "nullsec": "Nullsicherheit",
+        "station": "NPC-Stationen",
+        "service": "Stationen mit",
+        "concord": "CONCORD-LP-Shop",
+        "clone": "Deine Sprungklone",
+        "thera": "Thera-Eingänge",
+        "turnur": "Turnur-Eingänge",
+        "incursion": "Incursions",
+        "structure": "Strukturen deiner Corp",
+        "quiet": "Ruhige Systeme"
+      },
+      "services": {
+        "cloning": "Klonbank",
+        "jumpClone": "Sprungklon-Einrichtung",
+        "repair": "Reparatur",
+        "fitting": "Ausrüstung",
+        "market": "Markt",
+        "reprocessing": "Wiederaufbereitung",
+        "insurance": "Versicherung"
+      },
+      "none": {
+        "clone": "Du hast keine Sprungklone.",
+        "clonesOff": "Dein Charakter hat seine Klone nicht für nexum freigegeben.",
+        "blueloot": "Die Liste der Blue-Loot-Käufer ist noch nicht fertig. Sie füllt sich innerhalb weniger Stunden nach einem Update.",
+        "scout": "Von hier erreicht man keine offene Verbindung.",
+        "structure": "nexum kennt keine Strukturen deiner Corp.",
+        "incursion": "Von hier ist keine Incursion erreichbar.",
+        "generic": "Von hier ist nichts erreichbar."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "Systeme und Karten suchen…",

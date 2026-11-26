@@ -738,7 +738,53 @@
     "onList": "dans la liste",
     "noMatch": "Aucun système ne correspond à « {{query}} »",
     "allMaps": "Calculer sur toutes mes cartes",
-    "allMapsHint": "Les distances peuvent emprunter les chaînes de trous de ver de toutes les cartes que vous pouvez voir, pas seulement celle ouverte. Désactivez ceci pour ne router que par la carte à l'écran."
+    "allMapsHint": "Les distances peuvent emprunter les chaînes de trous de ver de toutes les cartes que vous pouvez voir, pas seulement celle ouverte. Désactivez ceci pour ne router que par la carte à l'écran.",
+    "suggest": {
+      "button": "Suggestions",
+      "buttonHint": "Les hubs commerciaux, acheteurs de blue loot, A0, stations et autres les plus proches, à ajouter à cette liste",
+      "title": "Suggestions",
+      "hint": "Les plus proches de chaque type depuis votre position, avec le même itinéraire que cette liste. Ajouter place un système dans votre liste.",
+      "failed": "Impossible de charger les suggestions. Réessayez dans un instant.",
+      "loading": "Recherche des systèmes les plus proches...",
+      "quietHint": "Aucun kill de joueur dans la dernière heure.",
+      "concordHint": "Vendez ici vos tags de sécurité DED pour remonter votre statut de sécurité.",
+      "sections": {
+        "hub": "Hubs commerciaux",
+        "hub2": "Hubs commerciaux secondaires",
+        "blueloot": "Acheteurs de blue loot",
+        "a0": "Systèmes A0",
+        "highsec": "Haute sécurité",
+        "lowsec": "Basse sécurité",
+        "nullsec": "Sécurité nulle",
+        "station": "Stations PNJ",
+        "service": "Stations avec",
+        "concord": "Boutique LP de CONCORD",
+        "clone": "Vos clones de saut",
+        "thera": "Entrées de Thera",
+        "turnur": "Entrées de Turnur",
+        "incursion": "Incursions",
+        "structure": "Structures de votre corpo",
+        "quiet": "Systèmes calmes"
+      },
+      "services": {
+        "cloning": "Baie de clonage",
+        "jumpClone": "Installation de clones de saut",
+        "repair": "Réparation",
+        "fitting": "Équipement",
+        "market": "Marché",
+        "reprocessing": "Retraitement",
+        "insurance": "Assurance"
+      },
+      "none": {
+        "clone": "Vous n'avez aucun clone de saut.",
+        "clonesOff": "Votre personnage n'a pas partagé ses clones avec nexum.",
+        "blueloot": "La liste des acheteurs de blue loot n'est pas encore prête. Elle se remplit dans les heures qui suivent une mise à jour.",
+        "scout": "Aucune connexion ouverte n'est accessible d'ici.",
+        "structure": "nexum ne connaît aucune structure de votre corpo.",
+        "incursion": "Aucune incursion accessible d'ici.",
+        "generic": "Rien d'accessible d'ici."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "Rechercher systèmes et cartes…",

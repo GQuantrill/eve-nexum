@@ -148,15 +148,47 @@ export async function shortestRoutes(
   overlay?: RouteOverlay,
   avoid?: ReadonlySet<number>,
 ): Promise<Record<number, RouteEntry>> {
+  return searchRoutes(source, targets, mode, overlay, avoid).result;
+}
+
+/**
+ * The `limit` targets closest to `source` (by the mode's cost, so fewest jumps
+ * or safest), nearest first. The source itself never counts: "closest
+ * high-sec system" from a high-sec system means the next one over. The search
+ * stops as soon as it has them, so a target set of every null-sec system
+ * costs no more than one route.
+ */
+export async function nearestRoutes(
+  source: number,
+  targets: Iterable<number>,
+  limit: number,
+  mode: RouteMode = 'shortest',
+  overlay?: RouteOverlay,
+  avoid?: ReadonlySet<number>,
+): Promise<Array<{ id: number } & RouteEntry>> {
+  const ids = [...targets].filter((t) => t !== source);
+  const { result, order } = searchRoutes(source, ids, mode, overlay, avoid, limit);
+  return order.map((id) => ({ id, ...result[id] }));
+}
+
+function searchRoutes(
+  source: number,
+  targets: number[],
+  mode: RouteMode,
+  overlay: RouteOverlay | undefined,
+  avoid: ReadonlySet<number> | undefined,
+  maxFound = Infinity,
+): { result: Record<number, RouteEntry>; order: number[] } {
   if (!adjacency || !systemInfo) throw new Error('Route graph not loaded');
   const baseAdj  = adjacency;
   const baseInfo = systemInfo;
 
   const hasNode = (n: number): boolean => baseAdj.has(n) || (overlay?.info.has(n) ?? false);
-  if (!hasNode(source)) return {};
+  if (!hasNode(source)) return { result: {}, order: [] };
 
   const targetSet = new Set(targets.filter(hasNode));
-  if (targetSet.size === 0) return {};
+  if (targetSet.size === 0) return { result: {}, order: [] };
+  const want = Math.min(targetSet.size, maxFound);
 
   // Neighbours come from the static stargate graph plus any per-request overlay
   // edges; the base graph is never copied or mutated.
@@ -174,17 +206,17 @@ export async function shortestRoutes(
   const dist = new Map<number, number>();
   const prev = new Map<number, number>();
   dist.set(source, 0);
-  const found = new Set<number>();
+  const found = new Set<number>();   // insertion order = nearest first
 
   if (mode === 'shortest') {
     // Plain BFS — cheaper than Dijkstra for uniform-weight graphs.
     const queue: number[] = [source];
     let head = 0;
-    while (head < queue.length && found.size < targetSet.size) {
+    while (head < queue.length && found.size < want) {
       const node = queue[head++];
       if (targetSet.has(node)) {
         found.add(node);
-        if (found.size === targetSet.size) break;
+        if (found.size === want) break;
       }
       const neighbors = neighborsOf(node);
       if (neighbors.length === 0) continue;
@@ -202,12 +234,12 @@ export async function shortestRoutes(
     // — runs in well under a millisecond per source.
     const heap = new MinHeap();
     heap.push(source, 0);
-    while (!heap.empty() && found.size < targetSet.size) {
+    while (!heap.empty() && found.size < want) {
       const { id: node, cost } = heap.pop()!;
       if (cost > (dist.get(node) ?? Infinity)) continue; // stale entry
-      if (targetSet.has(node)) {
+      if (targetSet.has(node) && !found.has(node)) {
         found.add(node);
-        if (found.size === targetSet.size) break;
+        if (found.size === want) break;
       }
       const neighbors = neighborsOf(node);
       if (neighbors.length === 0) continue;
@@ -251,7 +283,7 @@ export async function shortestRoutes(
     result[t] = { jumps: ids.length - 1, path, usesSpecial };
   }
 
-  return result;
+  return { result, order: [...found] };
 }
 
 // Tiny binary heap keyed by cost. Sufficient for Dijkstra over the

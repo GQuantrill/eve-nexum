@@ -54,6 +54,7 @@ export { DesktopIcon } from '@phosphor-icons/react/dist/csr/Desktop';
 export { InfoIcon } from '@phosphor-icons/react/dist/csr/Info';
 export { WindowsLogoIcon } from '@phosphor-icons/react/dist/csr/WindowsLogo';
 export { AppleLogoIcon } from '@phosphor-icons/react/dist/csr/AppleLogo';
+export { LightbulbIcon } from '@phosphor-icons/react/dist/csr/Lightbulb';
 export { LinuxLogoIcon } from '@phosphor-icons/react/dist/csr/LinuxLogo';
 export { DiamondsFourIcon } from '@phosphor-icons/react/dist/csr/DiamondsFour';
 export { DiscordLogoIcon } from '@phosphor-icons/react/dist/csr/DiscordLogo';

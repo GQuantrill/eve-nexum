@@ -5,7 +5,8 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '../../icons';
+import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon, LightbulbIcon } from '../../icons';
+import { ClosestSuggestionsModal } from './ClosestSuggestionsModal';
 import { useRoute, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useSearchKeys } from '../../hooks/useSearchKeys';
@@ -180,6 +181,7 @@ export function ClosestSystemsPane() {
   const hiddenHome = useMemo(() => new Set(hiddenHomeArr), [hiddenHomeArr]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [adding, setAdding]     = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
   const [query, setQuery]       = useState('');
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const { results, loading }    = useEsiSearch(query);
@@ -343,13 +345,23 @@ export function ClosestSystemsPane() {
       </label>
 
       {!adding ? (
-        <button
-          type="button"
-          className="sys-btn scout-pane__add"
-          onClick={() => setAdding(true)}
-        >
-          <PlusIcon size={14} weight="bold" /> {t('addSystem.add')}
-        </button>
+        <div className="closest-pane__actions">
+          <button
+            type="button"
+            className="sys-btn scout-pane__add"
+            onClick={() => setAdding(true)}
+          >
+            <PlusIcon size={14} weight="bold" /> {t('addSystem.add')}
+          </button>
+          <button
+            type="button"
+            className="sys-btn scout-pane__add"
+            onClick={() => setSuggesting(true)}
+            data-tooltip={t('closest.suggest.buttonHint')}
+          >
+            <LightbulbIcon size={14} weight="bold" /> {t('closest.suggest.button')}
+          </button>
+        </div>
       ) : (
         <div className="scout-pane__add-row" ref={addRowRef}>
           <input
@@ -373,6 +385,16 @@ export function ClosestSystemsPane() {
             <XIcon size={14} weight="regular" color="#e25a5a" />
           </button>
         </div>
+      )}
+
+      {suggesting && origin.systemId !== null && (
+        <ClosestSuggestionsModal
+          from={origin.systemId}
+          whScope={allMaps ? 'all' : 'active'}
+          onList={existingIds}
+          onAdd={addSystem}
+          onClose={() => setSuggesting(false)}
+        />
       )}
 
       {adding && dropdownPos && showResults && results.length > 0 && createPortal(

@@ -150,3 +150,49 @@ export function useRoute(
 
   return data;
 }
+
+/** The route options useRoute sends, as a JSON body, for requests that aren't
+ *  a single from/to list (the Closest Systems suggestions). Same settings,
+ *  same rules: shortcuts only where the user turned them on. */
+export interface RouteOptionsBody {
+  mode: string;
+  includeThera?: boolean;
+  includeTurnur?: boolean;
+  includeWormholes?: boolean;
+  includeAnsiblex?: boolean;
+  avoidEol?: boolean;
+  avoid?: number[];
+  whScope?: 'all';
+  mapId?: string;
+}
+
+export function useRouteOptions(whScope: 'active' | 'all'): { body: RouteOptionsBody; revision: string } {
+  const routeMode   = useMapStore((s) => s.routeMode);
+  const activeMapId = useMapStore((s) => s.activeMapId);
+  const [inclThera]     = useUserSetting<boolean>('nexum.route.includeThera', false);
+  const [inclTurnur]    = useUserSetting<boolean>('nexum.route.includeTurnur', false);
+  const [inclWormholes] = useUserSetting<boolean>('nexum.route.includeWormholes', false);
+  const [inclAnsiblex]  = useUserSetting<boolean>('nexum.route.includeAnsiblex', false);
+  const [avoidEol]      = useUserSetting<boolean>('nexum.route.avoidEol', false);
+  const [avoided]       = useUserSetting<AvoidedSystem[]>(ROUTE_AVOID_KEY, []);
+  const flagRevision = useScoutFlagRevision();
+  const allScope = whScope === 'all';
+  const wantWh   = inclWormholes && (allScope || !!activeMapId);
+  const wantAnsi = inclAnsiblex  && (allScope || !!activeMapId);
+  const chainRevision = useChainRevision(wantWh || wantAnsi);
+
+  const avoid = (Array.isArray(avoided) ? avoided : [])
+    .map((a) => a.id).filter((n) => Number.isInteger(n) && n > 0).sort((a, b) => a - b);
+  const body: RouteOptionsBody = { mode: routeMode };
+  if (inclThera)  body.includeThera = true;
+  if (inclTurnur) body.includeTurnur = true;
+  if (wantWh)     body.includeWormholes = true;
+  if (wantAnsi)   body.includeAnsiblex = true;
+  if (avoidEol && (inclThera || inclTurnur || wantWh)) body.avoidEol = true;
+  if (avoid.length) body.avoid = avoid;
+  if (wantWh || wantAnsi) {
+    if (allScope) body.whScope = 'all';
+    else if (activeMapId) body.mapId = activeMapId;
+  }
+  return { body, revision: `${flagRevision}|${chainRevision}` };
+}
