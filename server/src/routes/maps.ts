@@ -3267,6 +3267,10 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     regionName: 'region_name', npcType: 'npc_type',
     status: 'status', isHome: 'is_home', locked: 'locked', notes: 'notes',
   };
+  if ('keep' in updates && typeof updates.keep !== 'boolean') {
+    res.status(400).json({ error: 'invalid keep' }); return;
+  }
+  if ('keep' in updates) colMap.keep = 'keep';
 
   const sets: string[] = [];
   const vals: unknown[] = [];
@@ -3372,10 +3376,11 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
 
   if (!sets.length) { res.status(400).json({ error: 'Nothing to update' }); return; }
 
-  // Notes-only updates are content, not topology — they pass through even
-  // when an admin has locked the map. Anything else (move, rename, status…)
-  // requires the strict lock-aware check.
-  const isNotesOnly = Object.keys(updates).length === 1 && 'notes' in updates;
+  // Notes and Keep are content, not topology — they pass through even when an
+  // admin has locked the map. Anything else (move, rename, status…) requires
+  // the strict lock-aware check.
+  const isNotesOnly = Object.keys(updates).length > 0
+    && Object.keys(updates).every((k) => k === 'notes' || k === 'keep');
   const access = isNotesOnly
     ? await requireMapContentWrite(res, mapId, req)
     : await requireMapWrite(res, mapId, req);

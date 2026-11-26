@@ -106,6 +106,9 @@ export interface MapSystem {
   intel?: SystemIntel | null;
   isHome: boolean;
   locked: boolean;
+  /** Keep: the cleanup actions (Remove orphans / stranded) leave it alone.
+   *  Any editor can set it; lighter than locked (it can still be moved). */
+  keep?: boolean;
   notes: string;
   /** Applied predefined label ids (subset of a,b,c,1,2,3) — coloured pills
    *  above the node. */

@@ -4,6 +4,7 @@ import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, ShieldIcon, CastleTurretIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
   SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon, SignOutIcon,
+  PushPinIcon,
 } from '../../icons';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
@@ -592,6 +593,11 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           {sys.locked && (
             <span className="system-node__lock-icon">
               <LockIcon size={14} weight="regular" />
+            </span>
+          )}
+          {sys.keep && !sys.locked && (
+            <span className="system-node__lock-icon" data-tooltip={t('mapNode.kept')}>
+              <PushPinIcon size={14} weight="fill" />
             </span>
           )}
           {insurgency && (

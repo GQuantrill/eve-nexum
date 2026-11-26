@@ -3,7 +3,7 @@ import { clearExpiredReservations } from './chainNumber.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { publishToMap } from './mapEvents.js';
-import { whLifetimeHours } from '../data/whLifetimes.js';
+import { whLifetimeHours, MAX_WH_LIFETIME_HOURS } from '../data/whLifetimes.js';
 import { linksLeftOrphaned, type DeletedSig, type LinkRow } from './mapWrite.js';
 
 const log = createLogger('whSweep');
@@ -274,8 +274,9 @@ export async function sweepAll(): Promise<void> {
   const now = Date.now();
   const byMap = new Map<string, CandidateRow[]>();
   for (const r of rows) {
-    const maxH = whLifetimeHours(r.whType);
-    if (maxH === null) continue; // unknown code → never auto-remove
+    // A wormhole sig with no type (or a code we don't know) still dies: it gets
+    // the longest life any hole has, so it's never removed early.
+    const maxH = whLifetimeHours(r.whType) ?? MAX_WH_LIFETIME_HOURS;
     const ageH = (now - new Date(r.createdAt).getTime()) / 3_600_000;
     // Same per-map grace buffer the connection-lifetime collapse uses, so a
     // hole's sig and its connection are removed together (~max life + grace)

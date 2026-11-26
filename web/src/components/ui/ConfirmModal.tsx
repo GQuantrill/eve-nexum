@@ -16,9 +16,12 @@ interface Props {
   /** Where "don't ask again" is remembered, for a confirm with its own
    *  setting. Defaults to the shared destructive-action preference. */
   onDontAskAgain?: () => void;
+  /** What the action applies to, listed under the message (e.g. the systems
+   *  a cleanup will remove). */
+  items?: string[];
 }
 
-export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, danger, showDontAskAgain = true, onDontAskAgain }: Props) {
+export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, danger, showDontAskAgain = true, onDontAskAgain, items }: Props) {
   useEscapeClose(onCancel);
   const { t } = useTranslation();
   const [dontShowAgain, setDontShowAgain] = useState(false);
@@ -43,6 +46,11 @@ export function ConfirmModal({ message, onConfirm, onCancel, confirmLabel, dange
         </div>
         <div className="modal__body">
           <p className="confirm-modal__message">{message}</p>
+          {items && items.length > 0 && (
+            <ul className="confirm-modal__items">
+              {items.map((it, i) => <li key={i}>{it}</li>)}
+            </ul>
+          )}
           {showDontAskAgain && (
             <label className="confirm-modal__skip">
               <input

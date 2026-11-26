@@ -20,9 +20,24 @@ function q003(ageH: number, over: Partial<Parameters<typeof connLifetimeAction>[
 describe('connLifetimeAction', () => {
   const now = Date.now();
 
-  it('does nothing when the lifetime is unknown', () => {
-    const row = { timeStatus: null, whType: null, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(), lazyRemove: true };
+  it('does nothing to a young connection with no lifetime of its own', () => {
+    const row = { timeStatus: null, whType: null, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(now - 47 * H), lazyRemove: true };
     expect(connLifetimeAction(row, now, GRACE)).toEqual({ kind: 'none' });
+  });
+
+  it('an untyped connection still dies at the 48h ceiling plus grace', () => {
+    const row = (lazyRemove: boolean, ageH: number, whType: string | null = null) =>
+      ({ timeStatus: null, whType, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(now - ageH * H), lazyRemove });
+    expect(connLifetimeAction(row(true, 49), now, GRACE)).toEqual({ kind: 'none' });   // within grace
+    expect(connLifetimeAction(row(true, 51), now, GRACE)).toEqual({ kind: 'collapse' });
+    expect(connLifetimeAction(row(false, 51), now, GRACE)).toEqual({ kind: 'sever' });
+    expect(connLifetimeAction(row(true, 51, 'ZZZ9'), now, GRACE)).toEqual({ kind: 'collapse' }); // unknown code
+  });
+
+  it('a manual override past the ceiling keeps an untyped connection alive', () => {
+    const row = { timeStatus: null, whType: null, eolAt: null, lifetimeExpiresAt: new Date(now + 5 * H),
+      createdAt: new Date(now - 60 * H), lazyRemove: true };
+    expect(connLifetimeAction(row, now, GRACE).kind).not.toMatch(/collapse|sever/);
   });
 
   it('does nothing when the stored bucket already matches', () => {
@@ -51,6 +66,11 @@ describe('connLifetimeAction', () => {
   it('does nothing extra once expired and already stored expired, within grace', () => {
     expect(connLifetimeAction(q003(5, { lazyRemove: true, timeStatus: 'expired' }), now, GRACE))
       .toEqual({ kind: 'none' });
+  });
+
+  it('only severs an expired hole past grace when the map has not opted in', () => {
+    expect(connLifetimeAction(q003(7, { lazyRemove: false, timeStatus: 'expired' }), now, GRACE))
+      .toEqual({ kind: 'sever' });
   });
 
   it('collapses once expired past the grace period on an opt-in map', () => {
