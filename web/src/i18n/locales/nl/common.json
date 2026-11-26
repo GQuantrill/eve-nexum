@@ -738,7 +738,53 @@
     "onList": "in de lijst",
     "noMatch": "Geen systemen komen overeen met \"{{query}}\"",
     "allMaps": "Over al mijn kaarten routeren",
-    "allMapsHint": "Afstanden mogen de wormgatketens gebruiken van elke kaart die je kunt zien, niet alleen de geopende. Zet dit uit om alleen via de kaart op het scherm te routeren."
+    "allMapsHint": "Afstanden mogen de wormgatketens gebruiken van elke kaart die je kunt zien, niet alleen de geopende. Zet dit uit om alleen via de kaart op het scherm te routeren.",
+    "suggest": {
+      "button": "Suggesties",
+      "buttonHint": "De dichtstbijzijnde handelshubs, blue-loot-kopers, A0's, stations en meer om aan deze lijst toe te voegen",
+      "title": "Suggesties",
+      "hint": "Steeds de dichtstbijzijnde vanaf waar je bent, gerouteerd zoals deze lijst. Toevoegen zet een systeem op je lijst.",
+      "failed": "Suggesties laden mislukt. Probeer het zo opnieuw.",
+      "loading": "Dichtstbijzijnde systemen zoeken...",
+      "quietHint": "Geen spelerkills in het afgelopen uur.",
+      "concordHint": "Verkoop hier DED-security tags om je security status te verhogen.",
+      "sections": {
+        "hub": "Handelshubs",
+        "hub2": "Andere handelshubs",
+        "blueloot": "Blue-loot-kopers",
+        "a0": "A0-systemen",
+        "highsec": "High-sec",
+        "lowsec": "Low-sec",
+        "nullsec": "Null-sec",
+        "station": "NPC-stations",
+        "service": "Stations met",
+        "concord": "CONCORD LP-winkel",
+        "clone": "Je jump clones",
+        "thera": "Thera-ingangen",
+        "turnur": "Turnur-ingangen",
+        "incursion": "Incursions",
+        "structure": "Structuren van je corp",
+        "quiet": "Rustige systemen"
+      },
+      "services": {
+        "cloning": "Kloonbank",
+        "jumpClone": "Jump clone-faciliteit",
+        "repair": "Reparatie",
+        "fitting": "Fitting",
+        "market": "Markt",
+        "reprocessing": "Herverwerking",
+        "insurance": "Verzekering"
+      },
+      "none": {
+        "clone": "Je hebt geen jump clones.",
+        "clonesOff": "Je personage heeft zijn clones niet met nexum gedeeld.",
+        "blueloot": "De lijst met blue-loot-kopers is nog niet klaar. Hij vult zich binnen een paar uur na een update.",
+        "scout": "Vanaf hier is geen open verbinding bereikbaar.",
+        "structure": "nexum kent geen structuren van je corp.",
+        "incursion": "Vanaf hier is geen incursion bereikbaar.",
+        "generic": "Niets bereikbaar vanaf hier."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "Zoek systemen en kaarten…",

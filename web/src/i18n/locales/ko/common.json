@@ -738,7 +738,53 @@
     "onList": "목록에 있음",
     "noMatch": "“{{query}}”와 일치하는 성계가 없습니다",
     "allMaps": "모든 지도에서 경로 계산",
-    "allMapsHint": "거리 계산에 열려 있는 지도뿐 아니라 볼 수 있는 모든 지도의 웜홀 체인을 사용할 수 있습니다. 끄면 화면에 있는 지도로만 경로를 계산합니다."
+    "allMapsHint": "거리 계산에 열려 있는 지도뿐 아니라 볼 수 있는 모든 지도의 웜홀 체인을 사용할 수 있습니다. 끄면 화면에 있는 지도로만 경로를 계산합니다.",
+    "suggest": {
+      "button": "추천",
+      "buttonHint": "가장 가까운 거래 허브, 블루 루트 구매처, A0, 정거장 등을 이 목록에 추가",
+      "title": "추천",
+      "hint": "현재 위치에서 종류별로 가장 가까운 곳을 이 목록과 같은 경로로 찾습니다. 추가를 누르면 목록에 넣습니다.",
+      "failed": "추천을 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+      "loading": "가장 가까운 성계를 찾는 중...",
+      "quietHint": "지난 1시간 동안 플레이어 킬이 없습니다.",
+      "concordHint": "이곳에서 DED 보안 태그를 팔아 보안 등급을 올리세요.",
+      "sections": {
+        "hub": "거래 허브",
+        "hub2": "보조 거래 허브",
+        "blueloot": "블루 루트 구매처",
+        "a0": "A0 성계",
+        "highsec": "하이시큐",
+        "lowsec": "로우시큐",
+        "nullsec": "널시큐",
+        "station": "NPC 정거장",
+        "service": "서비스가 있는 정거장",
+        "concord": "CONCORD LP 상점",
+        "clone": "내 점프 클론",
+        "thera": "Thera 입구",
+        "turnur": "Turnur 입구",
+        "incursion": "인커전",
+        "structure": "내 코퍼레이션 구조물",
+        "quiet": "조용한 성계"
+      },
+      "services": {
+        "cloning": "클론 베이",
+        "jumpClone": "점프 클론 시설",
+        "repair": "수리",
+        "fitting": "피팅",
+        "market": "마켓",
+        "reprocessing": "재처리",
+        "insurance": "보험"
+      },
+      "none": {
+        "clone": "점프 클론이 없습니다.",
+        "clonesOff": "캐릭터가 nexum과 클론 정보를 공유하지 않았습니다.",
+        "blueloot": "블루 루트 구매처 목록이 아직 준비되지 않았습니다. 업데이트 후 몇 시간 안에 채워집니다.",
+        "scout": "여기서 갈 수 있는 열린 연결이 없습니다.",
+        "structure": "nexum이 아는 코퍼레이션 구조물이 없습니다.",
+        "incursion": "여기서 갈 수 있는 인커전이 없습니다.",
+        "generic": "여기서 갈 수 있는 곳이 없습니다."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "성계와 지도 검색…",

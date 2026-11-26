@@ -113,6 +113,13 @@
   svg { display: block; }
 }
 
+/* Closest Systems: Add and Suggestions side by side. */
+.closest-pane__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .scout-pane__add-row {
   position: relative;
   display: flex;

@@ -738,7 +738,53 @@
     "onList": "en la lista",
     "noMatch": "Ningún sistema coincide con «{{query}}»",
     "allMaps": "Calcular en todos mis mapas",
-    "allMapsHint": "Las distancias pueden usar las cadenas de agujeros de gusano de cualquier mapa que puedas ver, no solo el abierto. Desactívalo para enrutar únicamente por el mapa en pantalla."
+    "allMapsHint": "Las distancias pueden usar las cadenas de agujeros de gusano de cualquier mapa que puedas ver, no solo el abierto. Desactívalo para enrutar únicamente por el mapa en pantalla.",
+    "suggest": {
+      "button": "Sugerencias",
+      "buttonHint": "Los centros comerciales, compradores de blue loot, A0, estaciones y más cercanos para añadir a esta lista",
+      "title": "Sugerencias",
+      "hint": "Lo más cercano de cada tipo desde donde estás, con la misma ruta que esta lista. Añadir pone un sistema en tu lista.",
+      "failed": "No se pudieron cargar las sugerencias. Inténtalo de nuevo en un momento.",
+      "loading": "Buscando los sistemas más cercanos...",
+      "quietHint": "Sin muertes de jugadores en la última hora.",
+      "concordHint": "Vende aquí etiquetas de seguridad DED para subir tu estado de seguridad.",
+      "sections": {
+        "hub": "Centros comerciales",
+        "hub2": "Centros comerciales secundarios",
+        "blueloot": "Compradores de blue loot",
+        "a0": "Sistemas A0",
+        "highsec": "Alta seguridad",
+        "lowsec": "Baja seguridad",
+        "nullsec": "Seguridad nula",
+        "station": "Estaciones NPC",
+        "service": "Estaciones con",
+        "concord": "Tienda LP de CONCORD",
+        "clone": "Tus clones de salto",
+        "thera": "Entradas a Thera",
+        "turnur": "Entradas a Turnur",
+        "incursion": "Incursiones",
+        "structure": "Estructuras de tu corporación",
+        "quiet": "Sistemas tranquilos"
+      },
+      "services": {
+        "cloning": "Bahía de clonación",
+        "jumpClone": "Instalación de clones de salto",
+        "repair": "Reparación",
+        "fitting": "Equipamiento",
+        "market": "Mercado",
+        "reprocessing": "Reprocesamiento",
+        "insurance": "Seguro"
+      },
+      "none": {
+        "clone": "No tienes clones de salto.",
+        "clonesOff": "Tu personaje no ha compartido sus clones con nexum.",
+        "blueloot": "La lista de compradores de blue loot aún no está lista. Se completa unas horas después de una actualización.",
+        "scout": "Ninguna conexión abierta es alcanzable desde aquí.",
+        "structure": "nexum no conoce estructuras de tu corporación.",
+        "incursion": "Ninguna incursión alcanzable desde aquí.",
+        "generic": "Nada alcanzable desde aquí."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "Buscar sistemas y mapas…",

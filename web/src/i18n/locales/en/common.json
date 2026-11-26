@@ -738,7 +738,53 @@
     "onList": "on list",
     "noMatch": "No systems match \"{{query}}\"",
     "allMaps": "Route across all my maps",
-    "allMapsHint": "Distances may use the wormhole chains of every map you can see, not just the open one. Turn this off to route only through the map on screen."
+    "allMapsHint": "Distances may use the wormhole chains of every map you can see, not just the open one. Turn this off to route only through the map on screen.",
+    "suggest": {
+      "button": "Suggestions",
+      "buttonHint": "The closest trade hubs, blue loot buyers, A0s, stations and more, to add to this list",
+      "title": "Suggestions",
+      "hint": "The closest of each, from where you are, routed the way this list is. Add puts a system on your list.",
+      "failed": "Couldn't load suggestions. Try again in a moment.",
+      "loading": "Finding the closest systems...",
+      "quietHint": "No player kills in the last hour.",
+      "concordHint": "Sell DED security tags here to raise your security status.",
+      "sections": {
+        "hub": "Trade hubs",
+        "hub2": "Secondary trade hubs",
+        "blueloot": "Blue loot buyers",
+        "a0": "A0 systems",
+        "highsec": "High-sec",
+        "lowsec": "Low-sec",
+        "nullsec": "Null-sec",
+        "station": "NPC stations",
+        "service": "Stations with",
+        "concord": "CONCORD LP store",
+        "clone": "Your jump clones",
+        "thera": "Thera entrances",
+        "turnur": "Turnur entrances",
+        "incursion": "Incursions",
+        "structure": "Your corp's structures",
+        "quiet": "Quiet systems"
+      },
+      "services": {
+        "cloning": "Clone bay",
+        "jumpClone": "Jump clone facility",
+        "repair": "Repair",
+        "fitting": "Fitting",
+        "market": "Market",
+        "reprocessing": "Reprocessing",
+        "insurance": "Insurance"
+      },
+      "none": {
+        "clone": "You have no jump clones.",
+        "clonesOff": "Your character hasn't shared clones with nexum.",
+        "blueloot": "The list of blue loot buyers isn't ready yet. It fills in within a few hours of an update.",
+        "scout": "No open connections reach from here.",
+        "structure": "Your corp has no structures nexum knows about.",
+        "incursion": "No incursions reachable from here.",
+        "generic": "None reachable from here."
+      }
+    }
   },
   "commandPalette": {
     "placeholder": "Search systems and maps…",
