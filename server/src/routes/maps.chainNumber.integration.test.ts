@@ -370,4 +370,17 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     const { rows } = await db.query<{ keep: boolean }>(`SELECT keep FROM map_systems WHERE map_id = $1`, [r.body.id]);
     expect(rows.map((x) => x.keep)).toEqual([true]);
   });
+
+  it('restoring a link severed for age gives it the full 48h, so it stays restored', async () => {
+    const a = await system(), b = await system();
+    const id = crypto.randomUUID();
+    await db.query(
+      `INSERT INTO map_connections (id, map_id, source_id, target_id, broken, broken_at, created_at)
+       VALUES ($1, $2, $3, $4, TRUE, NOW(), NOW() - interval '30 hours')`, [id, mapId, a, b]);
+    expect((await request(app).patch(`/api/maps/${mapId}/connections/${id}`).send({ broken: false })).status).toBe(200);
+    const { rows: [c] } = await db.query<{ broken: boolean; h: number }>(
+      `SELECT broken, EXTRACT(EPOCH FROM lifetime_expires_at - created_at) / 3600 AS h FROM map_connections WHERE id = $1`, [id]);
+    expect(c.broken).toBe(false);
+    expect(Number(c.h)).toBeCloseTo(48, 2);
+  });
 });

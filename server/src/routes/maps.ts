@@ -48,7 +48,7 @@ import { copyMap } from '../services/mapCopy.js';
 import { notifyDiscord, k162Embed, connectionEmbed, chainEmbed, kspaceExitEmbed, eolEmbed, theraEmbed } from '../services/discord.js';
 import { shortestRoutes } from '../services/routeGraph.js';
 import { whSizeForCode } from './wormholes.js';
-import { effectiveExpiryMs, lifeBucket } from '../data/whLifetimes.js';
+import { effectiveExpiryMs, lifeBucket, MAX_WH_LIFETIME_HOURS, UNTYPED_SEVER_HOURS } from '../data/whLifetimes.js';
 import { buildKillRow } from '../services/killFeed.js';
 import { recentKillsForSystems } from '../services/killBuffer.js';
 import { storedKills, windowSeconds } from './killboard.js';
@@ -4265,6 +4265,18 @@ mapsRouter.patch('/:mapId/connections/:connectionId', async (req, res) => {
   // its grace period if it breaks again later.
   if ('broken' in updates) {
     updates.brokenAt = updates.broken === true ? new Date().toISOString() : null;
+  }
+  // Restoring a link the sweep severed for age, one with no lifetime of its own:
+  // it's still open, so it may be one of the 48h holes. Give it that full life,
+  // or the next sweep would sever it again.
+  if (updates.broken === false && !('lifetimeExpiresAt' in updates)) {
+    const { rows: [cur] } = await db.query<{ whType: string | null; eolAt: Date | null; lifetimeExpiresAt: Date | null; createdAt: Date }>(
+      `SELECT wh_type AS "whType", eol_at AS "eolAt", lifetime_expires_at AS "lifetimeExpiresAt", created_at AS "createdAt"
+         FROM map_connections WHERE id = $1 AND map_id = $2`, [connectionId, mapId]);
+    const typed = cur && effectiveExpiryMs({ ...cur, whType: 'type' in updates ? updates.type as string | null : cur.whType }) !== null;
+    if (cur && !typed && Date.now() - cur.createdAt.getTime() > UNTYPED_SEVER_HOURS * 3_600_000) {
+      updates.lifetimeExpiresAt = new Date(cur.createdAt.getTime() + MAX_WH_LIFETIME_HOURS * 3_600_000).toISOString();
+    }
   }
 
   const sets: string[] = [];

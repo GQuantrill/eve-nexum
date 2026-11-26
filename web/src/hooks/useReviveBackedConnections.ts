@@ -26,18 +26,19 @@ import type { WhSig } from '../utils/undivedWormholes';
 type WhTypeInfo = Record<string, { dest?: string; totalMass?: number; lifetimeHours?: number } | undefined>;
 
 const HOUR_MS = 3_600_000;
-/** The longest any wormhole lives (server: MAX_WH_LIFETIME_HOURS). */
-const MAX_LIFE_HOURS = 48;
+/** A connection with no lifetime of its own is severed at this age
+ *  (server: UNTYPED_SEVER_HOURS); restoring it by hand gives it a lifetime. */
+const UNTYPED_LIFE_HOURS = 24;
 
-/** Past the latest it could still be open: its set lifetime, else its type's
- *  life (or the 48h ceiling) from when it was found. The server severs these
- *  (connLifetimeSweep), and on a map that keeps its sigs they'd still look
- *  backed, so reviving them would undo that every hour. */
+/** Aged out: past its set lifetime, else its type's life (or, with no type,
+ *  24h) from when it was found. The server severs these (connLifetimeSweep),
+ *  and on a map that keeps its sigs they'd still look backed, so reviving them
+ *  would undo that every hour. */
 function agedOut(c: MapConnection, whTypes: WhTypeInfo, now: number): boolean {
   if (c.lifetimeExpiresAt) return new Date(c.lifetimeExpiresAt).getTime() < now;
   if (c.eolAt) return new Date(c.eolAt).getTime() + 4 * HOUR_MS < now;
   const code = (c.type ?? '').trim().toUpperCase();
-  const life = (code && code !== 'K162' ? whTypes[code]?.lifetimeHours : undefined) || MAX_LIFE_HOURS;
+  const life = code === 'K162' ? 48 : (code ? whTypes[code]?.lifetimeHours : undefined) || UNTYPED_LIFE_HOURS;
   return new Date(c.createdAt).getTime() + life * HOUR_MS < now;
 }
 

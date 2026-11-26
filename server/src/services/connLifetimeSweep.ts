@@ -2,7 +2,7 @@ import { db } from '../db.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { publishToMap } from './mapEvents.js';
-import { effectiveExpiryMs, lifeBucket, MAX_WH_LIFETIME_HOURS, type TimeBucket } from '../data/whLifetimes.js';
+import { effectiveExpiryMs, lifeBucket, UNTYPED_SEVER_HOURS, type TimeBucket } from '../data/whLifetimes.js';
 
 const log = createLogger('connLifetimeSweep');
 
@@ -37,8 +37,10 @@ export type LifetimeAction =
  *     deleted), so Remove orphans can find what's behind it;
  *   - otherwise re-bucket if the stored status has drifted from the live one.
  * Every wormhole dies: one with no lifetime of its own (untyped, or a code we
- * don't know) is given the longest any hole can live, counted from when it
- * was found, so a live hole is never cut early. It has no bucket to show.
+ * don't know) is severed UNTYPED_SEVER_HOURS after it was found (plus grace),
+ * on any map, but its sigs are kept and it isn't deleted before the 48h
+ * ceiling (removeStaleBrokenConnections), so a live 48h hole can be restored.
+ * It has no bucket to show.
  * Collapse takes priority over re-bucketing so an over-grace hole doesn't first
  * get stamped 'expired' only to be severed the same tick.
  */
@@ -48,9 +50,11 @@ export function connLifetimeAction(
   graceMs: number,
 ): LifetimeAction {
   const expiry = effectiveExpiryMs(row);
-  const dies = expiry ?? new Date(row.createdAt).getTime() + MAX_WH_LIFETIME_HOURS * 3_600_000;
-  if (now - dies > graceMs) return { kind: row.lazyRemove ? 'collapse' : 'sever' };
-  if (expiry === null) return { kind: 'none' };
+  if (expiry === null) {
+    const aged = now - new Date(row.createdAt).getTime() - UNTYPED_SEVER_HOURS * 3_600_000;
+    return aged > graceMs ? { kind: 'sever' } : { kind: 'none' };
+  }
+  if (now - expiry > graceMs) return { kind: row.lazyRemove ? 'collapse' : 'sever' };
   const bucket = lifeBucket(expiry - now);
   return bucket === row.timeStatus ? { kind: 'none' } : { kind: 'rebucket', bucket };
 }
@@ -99,7 +103,7 @@ async function collapseMap(mapId: string, conns: Row[], dropSigs: boolean): Prom
  * dying (sig gone, connection severed) and only fires where the map opted in.
  *
  * Every live wormhole connection is a candidate: one without a lifetime of its
- * own still dies at the 48h ceiling (connLifetimeAction).
+ * own is still severed by age (connLifetimeAction).
  */
 async function sweepConnLifetimes(): Promise<void> {
   let rows: Row[];

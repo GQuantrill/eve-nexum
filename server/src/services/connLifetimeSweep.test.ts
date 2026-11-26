@@ -21,17 +21,17 @@ describe('connLifetimeAction', () => {
   const now = Date.now();
 
   it('does nothing to a young connection with no lifetime of its own', () => {
-    const row = { timeStatus: null, whType: null, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(now - 47 * H), lazyRemove: true };
+    const row = { timeStatus: null, whType: null, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(now - 23 * H), lazyRemove: true };
     expect(connLifetimeAction(row, now, GRACE)).toEqual({ kind: 'none' });
   });
 
-  it('an untyped connection still dies at the 48h ceiling plus grace', () => {
+  it('an untyped connection is severed (never collapsed) at 24h plus grace', () => {
     const row = (lazyRemove: boolean, ageH: number, whType: string | null = null) =>
       ({ timeStatus: null, whType, eolAt: null, lifetimeExpiresAt: null, createdAt: new Date(now - ageH * H), lazyRemove });
-    expect(connLifetimeAction(row(true, 49), now, GRACE)).toEqual({ kind: 'none' });   // within grace
-    expect(connLifetimeAction(row(true, 51), now, GRACE)).toEqual({ kind: 'collapse' });
-    expect(connLifetimeAction(row(false, 51), now, GRACE)).toEqual({ kind: 'sever' });
-    expect(connLifetimeAction(row(true, 51, 'ZZZ9'), now, GRACE)).toEqual({ kind: 'collapse' }); // unknown code
+    expect(connLifetimeAction(row(true, 25), now, GRACE)).toEqual({ kind: 'none' });   // within grace
+    expect(connLifetimeAction(row(true, 27), now, GRACE)).toEqual({ kind: 'sever' });
+    expect(connLifetimeAction(row(false, 27), now, GRACE)).toEqual({ kind: 'sever' });
+    expect(connLifetimeAction(row(true, 60, 'ZZZ9'), now, GRACE)).toEqual({ kind: 'sever' }); // unknown code
   });
 
   it('a manual override past the ceiling keeps an untyped connection alive', () => {

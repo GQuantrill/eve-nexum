@@ -12,7 +12,7 @@ vi.mock('../config.js', async (importActual) => {
 
 import { ensureIntegrationDb, truncateAll, seedUser } from '../test/integrationDb.js';
 import { db } from '../db.js';
-import { sweepAll } from './whSweep.js';
+import { sweepAll, removeStaleBrokenConnections } from './whSweep.js';
 
 const dbReady = await ensureIntegrationDb();
 
@@ -152,5 +152,23 @@ describe.skipIf(!dbReady)('whSweep + connLifetime reconciliation (integration)',
     const fresh = await seedAgedSig(a, 2); // 2h old, well within a 16h life
     await sweepAll();
     expect(await sigExists(fresh)).toBe(true);
+  });
+
+  it('holds a severed link with no lifetime of its own until the 48h ceiling', async () => {
+    const userId = await seedUser({ characterId: 9101 });
+    const mapId = await seedMap(userId);
+    const a = await seedSystem(mapId, 'J1'), b = await seedSystem(mapId, 'J2');
+    const young = await seedUntypedConn(mapId, a, b, null), old = await seedUntypedConn(mapId, b, a, null);
+    const typed = crypto.randomUUID();
+    await db.query(
+      `INSERT INTO map_connections (id, map_id, source_id, target_id, connection_type, wh_type) VALUES ($1, $2, $3, $4, 'standard', 'D382')`,
+      [typed, mapId, a, b]);
+    await db.query(`UPDATE map_connections SET broken = TRUE, broken_at = NOW() - interval '5 hours',
+                      created_at = NOW() - interval '30 hours' WHERE id = ANY($1::uuid[])`, [[young, typed]]);
+    await db.query(`UPDATE map_connections SET broken = TRUE, broken_at = NOW() - interval '5 hours',
+                      created_at = NOW() - interval '60 hours' WHERE id = $1`, [old]);
+    await removeStaleBrokenConnections();
+    const { rows } = await db.query<{ id: string }>(`SELECT id FROM map_connections WHERE map_id = $1`, [mapId]);
+    expect(rows.map((r) => r.id)).toEqual([young]);
   });
 });
