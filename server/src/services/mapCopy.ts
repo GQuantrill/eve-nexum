@@ -58,15 +58,16 @@ export async function copyMap(params: {
 
     // Carry the source's "Don't track K-space" policy over, but it only applies
     // to corp/alliance maps — force false when copying into a personal map.
-    const { rows: srcRows } = await client.query<{ skipKspace: boolean }>(
-      `SELECT skip_kspace AS "skipKspace" FROM maps WHERE id = $1`,
+    const { rows: srcRows } = await client.query<{ skipKspace: boolean; chainNumbering: boolean }>(
+      `SELECT skip_kspace AS "skipKspace", chain_numbering AS "chainNumbering" FROM maps WHERE id = $1`,
       [sourceMapId],
     );
     const skipKspace = (corpId !== null || allianceId !== null) && srcRows[0]?.skipKspace === true;
 
     const { rows: mapRows } = await client.query<{ id: string }>(
-      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [userId, ownerId, name, corpId, allianceId, skipKspace],
+      `INSERT INTO maps (user_id, owner_id, name, corp_id, alliance_id, skip_kspace, chain_numbering)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+      [userId, ownerId, name, corpId, allianceId, skipKspace, srcRows[0]?.chainNumbering === true],
     );
     const newMapId = mapRows[0].id;
 
@@ -76,10 +77,12 @@ export async function copyMap(params: {
       statics: string[]; regionName: string | null; npcType: string | null; x: number; y: number;
       status: string; isHome: boolean; locked: boolean; notes: string; intel: string | null;
       labels: string[]; customLabels: string[]; tag: string | null; alias: string | null;
+      chainLabel: string | null;
     }>(
       `SELECT id, eve_system_id AS "eveSystemId", name, system_class AS "systemClass", effect, statics,
               region_name AS "regionName", npc_type AS "npcType", position_x AS x, position_y AS y,
-              status, is_home AS "isHome", locked, notes, intel, labels, custom_labels AS "customLabels", tag, alias
+              status, is_home AS "isHome", locked, notes, intel, labels, custom_labels AS "customLabels", tag, alias,
+              chain_label AS "chainLabel"
          FROM map_systems WHERE map_id = $1`,
       [sourceMapId],
     );
@@ -89,11 +92,11 @@ export async function copyMap(params: {
     await insertBatch(client, 'map_systems',
       ['id', 'map_id', 'eve_system_id', 'name', 'system_class', 'effect', 'statics', 'region_name',
        'npc_type', 'position_x', 'position_y', 'status', 'is_home', 'locked', 'notes', 'intel',
-       'labels', 'custom_labels', 'tag', 'alias'],
+       'labels', 'custom_labels', 'tag', 'alias', 'chain_label'],
       sysRes.rows.map((s) => [
         sysIdMap.get(s.id), newMapId, s.eveSystemId, s.name, s.systemClass, s.effect, s.statics,
         s.regionName, s.npcType, s.x, s.y, s.status, s.isHome, s.locked,
-        include.notes ? s.notes : '', s.intel, s.labels, s.customLabels, s.tag, s.alias,
+        include.notes ? s.notes : '', s.intel, s.labels, s.customLabels, s.tag, s.alias, s.chainLabel,
       ]),
     );
 
@@ -104,9 +107,11 @@ export async function copyMap(params: {
       const sigRes = await client.query<{
         id: string; systemId: string; sigId: string; sigType: string; name: string;
         notes: string; whType: string; whLeadsTo: string; ghostType: string;
+        chainLabel: string | null; chainReservedAt: Date | null;
       }>(
         `SELECT id, system_id AS "systemId", sig_id AS "sigId", sig_type AS "sigType", name, notes,
-                wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType"
+                wh_type AS "whType", wh_leads_to AS "whLeadsTo", ghost_type AS "ghostType",
+                chain_label AS "chainLabel", chain_reserved_at AS "chainReservedAt"
            FROM map_signatures
           WHERE system_id = ANY($1::uuid[])`,
         [[...sysIdMap.keys()]],
@@ -114,10 +119,10 @@ export async function copyMap(params: {
       for (const g of sigRes.rows) sigIdMap.set(g.id, crypto.randomUUID());
       await insertBatch(client, 'map_signatures',
         ['id', 'system_id', 'sig_id', 'sig_type', 'name', 'notes', 'wh_type', 'wh_leads_to', 'ghost_type',
-         'created_by_user_id', 'from_merge'],
+         'created_by_user_id', 'from_merge', 'chain_label', 'chain_reserved_at'],
         sigRes.rows.map((g) => [
           sigIdMap.get(g.id), sysIdMap.get(g.systemId), g.sigId, g.sigType, g.name, g.notes,
-          g.whType, g.whLeadsTo, g.ghostType, userId, true,
+          g.whType, g.whLeadsTo, g.ghostType, userId, true, g.chainLabel, g.chainReservedAt,
         ]),
       );
     }

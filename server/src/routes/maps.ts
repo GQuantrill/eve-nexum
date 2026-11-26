@@ -23,7 +23,7 @@ import { parseMapBackup, restoreMapBackup, buildMapBackup, BackupError, MAX_BACK
 import { selectClip, pasteIntoMap, MAX_PASTE_CHAINS } from '../services/mapPaste.js';
 import {
   assignChainNumber, reserveChainNumbers, clearChainReservation, dropStaleReservations, dropOrphanedChainNumbers,
-  chainLabelFree, moveChainNumbers,
+  chainLabelCheck, moveChainNumbers, clearReservationsFor,
   CHAIN_LABEL_RE, MAX_CHAIN_LABEL_LEN,
 } from '../services/chainNumber.js';
 import { resolveEntityNames } from '../services/entityNames.js';
@@ -3388,9 +3388,11 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
     : null;
   // A number someone else has, or with numbers beneath it still on the map:
   // refused, so no two holes ever share a number.
-  if (typeof updates.chainLabel === 'string' && updates.chainLabel !== oldChain
-      && !(await chainLabelFree(mapId, systemId, oldChain, updates.chainLabel))) {
-    res.status(409).json({ error: 'chain_label_in_use' }); return;
+  if (typeof updates.chainLabel === 'string' && updates.chainLabel !== oldChain) {
+    const check = await chainLabelCheck(mapId, systemId, oldChain, updates.chainLabel);
+    if (check !== 'ok') {
+      res.status(409).json({ error: check === 'beneath' ? 'chain_label_beneath_own' : 'chain_label_in_use' }); return;
+    }
   }
 
   // Append last_activity_at = NOW() to mark this system as active.
@@ -3410,6 +3412,7 @@ mapsRouter.patch('/:mapId/systems/:systemId', async (req, res) => {
       for (const id of moved.sigSystems) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId: id });
     } else {
       await publishOrphanDrop(mapId, oldChain);
+      for (const id of await clearReservationsFor(mapId, oldChain)) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId: id });
     }
   }
   // Holes reserved here that still don't fit its number lose it.

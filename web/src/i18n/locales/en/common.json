@@ -3157,6 +3157,7 @@
     "setMessage": "Chain number for {{name}}. The numbers beneath it change with it (7 to 3 makes 71 into 31). Leave it empty to clear it and the numbers beneath it.",
     "invalid": "A chain number is digits only, like 51, with a dot before any part over 9, like 5.10.",
     "inUse": "{{label}} is already in use on this map, or something beneath it is.",
+    "beneathOwn": "{{label}} would put {{from}} beneath itself: each digit is one hole further from home, so {{label}} is a hole out of {{from}}.",
     "saveFailed": "Couldn't save the chain number."
   }
 }

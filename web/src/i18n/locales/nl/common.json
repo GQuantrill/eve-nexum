@@ -3157,6 +3157,7 @@
     "setMessage": "Ketennummer voor {{name}}. De nummers eronder veranderen mee (7 naar 3 maakt van 71 een 31). Laat leeg om het en de nummers eronder te wissen.",
     "invalid": "Een ketennummer bestaat alleen uit cijfers, zoals 51, met een punt voor elk deel boven 9, zoals 5.10.",
     "inUse": "{{label}} is al in gebruik op deze kaart, of een nummer eronder.",
+    "beneathOwn": "{{label}} zou {{from}} onder zichzelf plaatsen: elk cijfer is één hole verder van home, dus {{label}} is een hole vanuit {{from}}.",
     "saveFailed": "Het ketennummer kon niet worden opgeslagen."
   }
 }

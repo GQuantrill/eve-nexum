@@ -355,29 +355,33 @@ async function mapLabels(mapId: string) {
 }
 
 /**
- * Can `systemId` be renumbered from `from` to `to` by hand? Not when another
- * system or reservation has `to` or a number beneath it (outside what moves
- * with it), and not to a number beneath its own.
+ * Can `systemId` be renumbered from `from` to `to` by hand? Not to a number
+ * beneath its own ('beneath'), and not when another system or reservation has
+ * `to` or a number beneath it, outside what moves with it ('inUse').
  */
-export async function chainLabelFree(mapId: string, systemId: string, from: string | null, to: string): Promise<boolean> {
-  if (from && isBeneath(to, from)) return false;
+export async function chainLabelCheck(
+  mapId: string, systemId: string, from: string | null, to: string,
+): Promise<'ok' | 'beneath' | 'inUse'> {
+  if (from && isBeneath(to, from)) return 'beneath';
   for (const r of await mapLabels(mapId)) {
     if (!r.sig && r.id === systemId) continue;
     if (from && (r.label === from || isBeneath(r.label, from))) continue; // moves with it
-    if (r.label === to || isBeneath(r.label, to)) return false;
+    if (r.label === to || isBeneath(r.label, to)) return 'inUse';
   }
-  return true;
+  return 'ok';
 }
 
 /**
  * A system renumbered by hand from `from` to `to`: the numbers beneath it move
  * with it, on systems and reservations (7 to 3 takes 71 to 31 and 737 to 337).
+ * So does the reservation on the hole that gave it `from`, else that hole
+ * would still hold the old number and keep it from being used again.
  * Returns what moved, for live updates.
  */
 export async function moveChainNumbers(
   mapId: string, from: string, to: string,
 ): Promise<{ systems: { id: string; label: string }[]; sigSystems: string[] }> {
-  const rows = (await mapLabels(mapId)).filter((r) => isBeneath(r.label, from));
+  const rows = (await mapLabels(mapId)).filter((r) => isBeneath(r.label, from) || (r.sig && r.label === from));
   const systems: { id: string; label: string }[] = [];
   const sigSystems = new Set<string>();
   for (const r of rows) {
@@ -392,4 +396,19 @@ export async function moveChainNumbers(
     }
   }
   return { systems, sigSystems: [...sigSystems] };
+}
+
+/**
+ * A system's number was cleared by hand: the reservation on the hole that gave
+ * it that number goes too, so the hole doesn't still show it. Returns the
+ * systems whose signatures changed, for live updates.
+ */
+export async function clearReservationsFor(mapId: string, label: string): Promise<string[]> {
+  const { rows } = await db.query<{ systemId: string }>(
+    `UPDATE map_signatures s SET chain_label = NULL, chain_reserved_at = NULL
+       FROM map_systems y
+      WHERE y.id = s.system_id AND y.map_id = $1 AND s.chain_label = $2
+        AND NOT EXISTS (SELECT 1 FROM map_systems z WHERE z.map_id = $1 AND z.chain_label = $2)
+      RETURNING s.system_id AS "systemId"`, [mapId, label]);
+  return [...new Set(rows.map((r) => r.systemId))];
 }

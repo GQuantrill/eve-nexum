@@ -2176,7 +2176,9 @@ export function MapCanvas() {
               }).then(() => {
                 useMapStore.getState().applyRemote({ type: 'system.update', id, updates: { chainLabel: v || null } });
               }).catch((err: unknown) => {
-                toast.error(t(err instanceof ApiError && err.status === 409 ? 'chainNumber.inUse' : 'chainNumber.saveFailed', { label: v }));
+                const key = !(err instanceof ApiError) || err.status !== 409 ? 'chainNumber.saveFailed'
+                  : err.code === 'chain_label_beneath_own' ? 'chainNumber.beneathOwn' : 'chainNumber.inUse';
+                toast.error(t(key, { label: v, from: sys.chainLabel ?? '' }));
               });
             }}
             onCancel={() => setChainDialogFor(null)}
