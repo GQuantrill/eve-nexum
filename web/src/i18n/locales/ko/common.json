@@ -246,7 +246,8 @@
       "tabs": {
         "users": "사용자",
         "systems": "성계",
-        "ghostSites": "고스트 사이트"
+        "ghostSites": "고스트 사이트",
+        "usage": "사용량"
       },
       "filter": "필터",
       "window": "기간",
@@ -3158,5 +3159,70 @@
     "inUse": "{{label}}은(는) 이 지도에서 이미 사용 중이거나, 그 아래 번호가 사용 중입니다.",
     "beneathOwn": "{{label}}(으)로 하면 {{from}}이(가) 자기 아래에 놓입니다. 숫자 하나가 home에서 한 홀 더 멀다는 뜻이므로 {{label}}은(는) {{from}}에서 나가는 홀입니다.",
     "saveFailed": "체인 번호를 저장하지 못했습니다."
+  },
+  "usage": {
+    "title": "Nexum 사용량",
+    "subtitle": "eve-nexum.com과 자체 호스팅 Nexum 설치의 월간 활성 사용자.",
+    "updated": "업데이트: {{time}}",
+    "loading": "불러오는 중...",
+    "failed": "사용량 수치를 불러오지 못했습니다.",
+    "notFound": "이 링크는 꺼졌거나 존재하지 않습니다.",
+    "kpi": {
+      "total": "활성 사용자(최근 30일)",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "로그인한 파일럿",
+      "selfHosted": "자체 호스팅",
+      "installs": "설치 수: {{count}}",
+      "desktop": "데스크톱 앱",
+      "desktopNote": "파일럿(최근 30일)"
+    },
+    "chart": {
+      "title": "월간 활성 사용자"
+    },
+    "table": {
+      "month": "월",
+      "live": "eve-nexum.com(Analytics)",
+      "signedIn": "eve-nexum.com(로그인)",
+      "selfHosted": "자체 호스팅",
+      "installs": "설치 수",
+      "total": "합계"
+    },
+    "breakdown": {
+      "title": "설치",
+      "modes": "서버 모드",
+      "versions": "버전",
+      "languages": "언어(활성 파일럿)",
+      "features": "사용 중인 기능"
+    },
+    "modes": {
+      "solo": "개인",
+      "corp": "코퍼레이션",
+      "alliance": "얼라이언스"
+    },
+    "features": {
+      "chainNumbering": "체인 번호(L+1)를 쓰는 맵",
+      "autoRemove": "자동 제거를 쓰는 맵",
+      "crossMapSync": "맵 간 동기화를 쓰는 맵",
+      "discord": "Discord 알림을 쓰는 조직"
+    },
+    "notes": {
+      "title": "집계 방법",
+      "live": "eve-nexum.com: Google Analytics가 집계한 활성 사용자입니다. 로그인한 파일럿은 최근 30일 동안 사이트를 사용한 캐릭터입니다.",
+      "selfHosted": "자체 호스팅: 각 설치가 최근 30일 활성 파일럿 수를 매일 익명으로 보내며, 월별 수치는 그 달 각 설치의 마지막 값입니다. 설치별 수치를 더하므로 두 설치를 쓰는 파일럿은 두 번 집계됩니다.",
+      "noGa": "Google Analytics가 연결되지 않아 eve-nexum.com은 로그인한 파일럿 수를 표시합니다.",
+      "old": "버전이 오래되어 수치를 보내지 않아 제외된 설치: {{count}}."
+    },
+    "share": {
+      "title": "공유 링크",
+      "hint": "링크가 있는 누구나 로그인 없이 이 페이지를 볼 수 있습니다. 새 링크를 만들면 이전 링크는 꺼집니다.",
+      "create": "링크 만들기",
+      "replace": "새 링크 만들기",
+      "remove": "링크 끄기",
+      "copy": "복사",
+      "copied": "링크를 복사했습니다",
+      "active": "링크가 켜져 있습니다({{time}}에 생성). 링크는 만들 때만 표시되므로 다시 필요하면 새로 만드세요.",
+      "none": "아직 링크가 없습니다."
+    }
   }
 }

@@ -246,7 +246,8 @@
       "tabs": {
         "users": "Utilisateurs",
         "systems": "Systèmes",
-        "ghostSites": "Sites fantômes"
+        "ghostSites": "Sites fantômes",
+        "usage": "Utilisation"
       },
       "filter": "Filtre",
       "window": "Période",
@@ -3162,5 +3163,70 @@
     "inUse": "{{label}} est déjà utilisé sur cette carte, ou un numéro en dessous.",
     "beneathOwn": "{{label}} placerait {{from}} sous lui-même : chaque chiffre est un trou de plus depuis home, donc {{label}} est un trou partant de {{from}}.",
     "saveFailed": "Impossible d'enregistrer le numéro de chaîne."
+  },
+  "usage": {
+    "title": "Utilisation de Nexum",
+    "subtitle": "Utilisateurs actifs mensuels sur eve-nexum.com et sur les installations Nexum auto-hébergées.",
+    "updated": "Mis à jour {{time}}",
+    "loading": "Chargement...",
+    "failed": "Impossible de charger les chiffres d'utilisation.",
+    "notFound": "Ce lien a été désactivé ou n'existe pas.",
+    "kpi": {
+      "total": "Utilisateurs actifs, 30 derniers jours",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Pilotes connectés",
+      "selfHosted": "Auto-hébergé",
+      "installs": "Installations : {{count}}",
+      "desktop": "Application de bureau",
+      "desktopNote": "Pilotes, 30 derniers jours"
+    },
+    "chart": {
+      "title": "Utilisateurs actifs mensuels"
+    },
+    "table": {
+      "month": "Mois",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (connectés)",
+      "selfHosted": "Auto-hébergé",
+      "installs": "Installations",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Installations",
+      "modes": "Mode du serveur",
+      "versions": "Versions",
+      "languages": "Langues (pilotes actifs)",
+      "features": "Fonctions utilisées"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corpo",
+      "alliance": "Alliance"
+    },
+    "features": {
+      "chainNumbering": "Cartes avec numéros de chaîne (L+1)",
+      "autoRemove": "Cartes avec suppression automatique",
+      "crossMapSync": "Cartes avec synchronisation inter-cartes",
+      "discord": "Organisations avec alertes Discord"
+    },
+    "notes": {
+      "title": "Méthode de calcul",
+      "live": "eve-nexum.com : utilisateurs actifs selon Google Analytics. Les pilotes connectés sont les personnages ayant utilisé le site au cours des 30 derniers jours.",
+      "selfHosted": "Auto-hébergé : chaque installation envoie chaque jour, de façon anonyme, le nombre de pilotes actifs sur les 30 derniers jours ; un mois retient le dernier chiffre de chaque installation ce mois-là. Les installations sont additionnées : un pilote utilisant deux installations compte deux fois.",
+      "noGa": "Google Analytics n'est pas connecté, eve-nexum.com affiche donc les pilotes connectés.",
+      "old": "Installations sur une version trop ancienne pour envoyer des chiffres, donc non incluses : {{count}}."
+    },
+    "share": {
+      "title": "Lien de partage",
+      "hint": "Toute personne disposant du lien peut voir cette page sans se connecter. Créer un nouveau lien désactive l'ancien.",
+      "create": "Créer un lien",
+      "replace": "Créer un nouveau lien",
+      "remove": "Désactiver le lien",
+      "copy": "Copier",
+      "copied": "Lien copié",
+      "active": "Un lien est actif (créé {{time}}). Il n'est affiché qu'à sa création ; créez-en un nouveau si besoin.",
+      "none": "Aucun lien pour l'instant."
+    }
   }
 }

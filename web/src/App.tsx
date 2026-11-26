@@ -31,6 +31,8 @@ const AdminPage     = lazy(() => import('./components/ui/AdminPage').then((m) =>
 const SharedMapView = lazy(() => import('./components/ui/SharedMapView').then((m) => ({ default: m.SharedMapView })));
 // The public d-scan analyser page (#/dscan, #/dscan/<id>).
 const DscanPage     = lazy(() => import('./components/dscan/DscanPage').then((m) => ({ default: m.DscanPage })));
+// The public usage figures (#/usage/<token>), the link made in Reports.
+const UsagePage     = lazy(() => import('./components/usage/UsagePage').then((m) => ({ default: m.UsagePage })));
 
 // The same screen the auth check already shows while it waits, reused so a
 // route chunk arriving looks like loading rather than like a flicker.
@@ -235,6 +237,7 @@ function AppShell() {
   const shareMatch = path.match(/^\/share\/([0-9a-fA-F-]{36})$/);
   // The d-scan analyser is public too: anyone can paste a scan or open a link.
   const dscanMatch = SCAN_ROUTE_RE.exec(path);
+  const usageMatch = path.match(/^\/usage\/([A-Za-z0-9_-]{20,64})$/);
 
   // Logical page for GA4. Landing and map share the same '/' URL, so we send a
   // view-derived path rather than the raw URL: '/landing' when signed out,
@@ -244,6 +247,8 @@ function AppShell() {
     ? null
     : shareMatch
       ? '/share'
+      : usageMatch
+        ? '/usage'
       : dscanMatch
         ? '/dscan'
         : !user
@@ -302,6 +307,7 @@ function AppShell() {
   // be able to load the map without ever seeing the landing page. Matched
   // (shareMatch is computed above) BEFORE the user/loading checks below.
   if (shareMatch) return <Suspense fallback={<RouteLoading />}><SharedMapView token={shareMatch[1]} /></Suspense>;
+  if (usageMatch) return <Suspense fallback={<RouteLoading />}><UsagePage token={usageMatch[1]} /></Suspense>;
 
   if (loading) return <RouteLoading />;
 

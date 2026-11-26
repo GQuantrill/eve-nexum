@@ -246,7 +246,8 @@
       "tabs": {
         "users": "ユーザー",
         "systems": "星系",
-        "ghostSites": "ゴーストサイト"
+        "ghostSites": "ゴーストサイト",
+        "usage": "利用状況"
       },
       "filter": "フィルター",
       "window": "期間",
@@ -3158,5 +3159,70 @@
     "inUse": "{{label}} はこのマップですでに使われているか、その下の番号が使われています。",
     "beneathOwn": "{{label}} だと {{from}} が自分の下に入ってしまいます。数字1桁がホームから1ホール先を表すので、{{label}} は {{from}} から出るホールです。",
     "saveFailed": "チェーン番号を保存できませんでした。"
+  },
+  "usage": {
+    "title": "Nexum 利用状況",
+    "subtitle": "eve-nexum.com とセルフホストの Nexum の月間アクティブユーザー。",
+    "updated": "更新：{{time}}",
+    "loading": "読み込み中...",
+    "failed": "利用状況を読み込めませんでした。",
+    "notFound": "このリンクは無効にされたか、存在しません。",
+    "kpi": {
+      "total": "アクティブユーザー（過去30日）",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "ログイン中のパイロット",
+      "selfHosted": "セルフホスト",
+      "installs": "インストール数：{{count}}",
+      "desktop": "デスクトップアプリ",
+      "desktopNote": "パイロット（過去30日）"
+    },
+    "chart": {
+      "title": "月間アクティブユーザー"
+    },
+    "table": {
+      "month": "月",
+      "live": "eve-nexum.com（Analytics）",
+      "signedIn": "eve-nexum.com（ログイン）",
+      "selfHosted": "セルフホスト",
+      "installs": "インストール数",
+      "total": "合計"
+    },
+    "breakdown": {
+      "title": "インストール",
+      "modes": "サーバーモード",
+      "versions": "バージョン",
+      "languages": "言語（アクティブなパイロット）",
+      "features": "使用中の機能"
+    },
+    "modes": {
+      "solo": "個人",
+      "corp": "コーポレーション",
+      "alliance": "アライアンス"
+    },
+    "features": {
+      "chainNumbering": "チェーン番号（L+1）を使うマップ",
+      "autoRemove": "自動削除を使うマップ",
+      "crossMapSync": "マップ間同期を使うマップ",
+      "discord": "Discord通知を使う組織"
+    },
+    "notes": {
+      "title": "集計方法",
+      "live": "eve-nexum.com：Google Analytics によるアクティブユーザー数。ログイン中のパイロットは過去30日にサイトを使ったキャラクターです。",
+      "selfHosted": "セルフホスト：各インストールが過去30日のアクティブなパイロット数を毎日匿名で送信し、各月はその月の各インストールの最後の値を使います。インストールごとに合算するため、2つのインストールを使うパイロットは2回数えられます。",
+      "noGa": "Google Analytics が未接続のため、eve-nexum.com はログイン中のパイロット数を表示しています。",
+      "old": "バージョンが古く数値を送信しないため含まれないインストール：{{count}}。"
+    },
+    "share": {
+      "title": "共有リンク",
+      "hint": "リンクを知っている人は誰でもログインなしでこのページを見られます。新しいリンクを作ると古いリンクは無効になります。",
+      "create": "リンクを作成",
+      "replace": "新しいリンクを作成",
+      "remove": "リンクを無効にする",
+      "copy": "コピー",
+      "copied": "リンクをコピーしました",
+      "active": "リンクは有効です（{{time}} に作成）。リンクは作成時にしか表示されないため、再び必要なら新しく作成してください。",
+      "none": "リンクはまだありません。"
+    }
   }
 }

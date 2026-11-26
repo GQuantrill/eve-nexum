@@ -932,7 +932,7 @@ Each tab is also reachable at its own hash route (`#/admin/maps`, `#/admin/audit
 
 ## Analytics & telemetry
 
-**By default a self-hosted Nexum reports to no one.** No analytics, no tracking, no phone-home. Both of the following are off until *you* turn them on, and neither sends any user, character, or map data.
+Frontend analytics are off unless you set them up. The server's anonymous deployment ping is **on by default** and one setting turns it off. Neither sends any character, corp or map data.
 
 ### Frontend analytics (Google Tag Manager) — off by default
 
@@ -947,26 +947,23 @@ docker compose build web && docker compose up -d
 
 Only ever use a container ID you own. The ID is inlined at build time, so a rebuild is required to change it.
 
-### Deployment telemetry (version ping) — opt-in
+### Deployment telemetry (anonymous ping) — on by default
 
-So the project can gauge how many people self-host, which versions are live, and roughly how much they're used, the server can send a tiny **opt-in** ping. It is **off by default**, and when enabled it sends, once a day:
+So the project can see how many people use Nexum, self-hosted installs included, the server sends a small anonymous ping. It is **on by default**. Once a day it sends:
 
-- the app **version** (e.g. `0.1.0`)
+- the app **version** (e.g. `6.4.0`)
 - a **random per-instance id** (generated once, stored locally), so repeat pings count as one install
-- two **aggregate counts**: the number of **maps** and the number of **users** on the install
+- **aggregate counts**: maps, users, users active in the last day / week / month, accounts active in the last month, maps used in the last month, users of the desktop app, whether the server runs solo / corp / alliance, how many maps use each optional feature, and how many users use each language
 
-That's the entire payload. The counts are plain totals — it contains **no** character names, corp IDs, map contents, per-user detail, or settings, and the receiver **does not store your IP**. There are two ways to opt in:
+That's the entire payload. Everything is a plain total: **no** character, corp or map names or ids, no map contents, no per-user detail, and the receiver **does not store your IP**.
+
+To turn it off:
 
 ```bash
-# 1. the flag — sends to the project's default collector
-NEXUM_TELEMETRY=1                                  # in .env
-
-# 2. …or just set a collector URL. Populating this is itself treated as opt-in,
-#    so you don't also need the flag. Point it at the project's or your own.
-NEXUM_TELEMETRY_URL=https://eve-nexum.com/api/telemetry
+NEXUM_TELEMETRY=0                                  # in .env
 ```
 
-Leave **both** unset (the default) and the server never makes the call. The receiving endpoint (`POST /api/telemetry`) exists on every deployment but stays empty unless instances are pointed at it.
+To send it to your own collector instead, set `NEXUM_TELEMETRY_URL`. The receiving endpoint (`POST /api/telemetry`) exists on every deployment.
 
 ---
 

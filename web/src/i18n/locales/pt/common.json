@@ -246,7 +246,8 @@
       "tabs": {
         "users": "Utilizadores",
         "systems": "Sistemas",
-        "ghostSites": "Sites fantasma"
+        "ghostSites": "Sites fantasma",
+        "usage": "Uso"
       },
       "filter": "Filtro",
       "window": "Período",
@@ -3162,5 +3163,70 @@
     "inUse": "{{label}} já está em uso neste mapa, ou algum número abaixo dele.",
     "beneathOwn": "{{label}} colocaria {{from}} abaixo de si mesmo: cada dígito é um buraco mais longe de home, então {{label}} é um buraco saindo de {{from}}.",
     "saveFailed": "Não foi possível salvar o número de cadeia."
+  },
+  "usage": {
+    "title": "Uso do Nexum",
+    "subtitle": "Utilizadores ativos mensais em eve-nexum.com e em instalações Nexum auto-hospedadas.",
+    "updated": "Atualizado {{time}}",
+    "loading": "A carregar...",
+    "failed": "Não foi possível carregar os números de uso.",
+    "notFound": "Este link foi desativado ou não existe.",
+    "kpi": {
+      "total": "Utilizadores ativos, últimos 30 dias",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Pilotos com sessão iniciada",
+      "selfHosted": "Auto-hospedado",
+      "installs": "Instalações: {{count}}",
+      "desktop": "App de desktop",
+      "desktopNote": "Pilotos, últimos 30 dias"
+    },
+    "chart": {
+      "title": "Utilizadores ativos mensais"
+    },
+    "table": {
+      "month": "Mês",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (com sessão)",
+      "selfHosted": "Auto-hospedado",
+      "installs": "Instalações",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Instalações",
+      "modes": "Modo do servidor",
+      "versions": "Versões",
+      "languages": "Idiomas (pilotos ativos)",
+      "features": "Funcionalidades em uso"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Aliança"
+    },
+    "features": {
+      "chainNumbering": "Mapas com números de cadeia (L+1)",
+      "autoRemove": "Mapas com remoção automática",
+      "crossMapSync": "Mapas com sincronização entre mapas",
+      "discord": "Organizações com alertas do Discord"
+    },
+    "notes": {
+      "title": "Como é contado",
+      "live": "eve-nexum.com: utilizadores ativos segundo o Google Analytics. Pilotos com sessão são personagens que usaram o site nos últimos 30 dias.",
+      "selfHosted": "Auto-hospedado: cada instalação envia diariamente, de forma anónima, o número de pilotos ativos nos últimos 30 dias; um mês usa o último valor de cada instalação nesse mês. As instalações são somadas, por isso um piloto em duas instalações conta duas vezes.",
+      "noGa": "O Google Analytics não está ligado, por isso eve-nexum.com mostra pilotos com sessão iniciada.",
+      "old": "Instalações numa versão demasiado antiga para enviar números, por isso não incluídas: {{count}}."
+    },
+    "share": {
+      "title": "Link partilhável",
+      "hint": "Qualquer pessoa com o link pode ver esta página sem iniciar sessão. Criar um link novo desativa o antigo.",
+      "create": "Criar link",
+      "replace": "Criar um link novo",
+      "remove": "Desativar link",
+      "copy": "Copiar",
+      "copied": "Link copiado",
+      "active": "Há um link ativo (criado {{time}}). Só é mostrado ao ser criado; crie um novo se voltar a precisar dele.",
+      "none": "Ainda não há link."
+    }
   }
 }

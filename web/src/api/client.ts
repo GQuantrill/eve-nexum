@@ -1,4 +1,6 @@
+import i18n from 'i18next';
 import { CLIENT_ID } from './clientId';
+import { isDesktop } from '../desktop/bridge';
 
 const BASE = import.meta.env.VITE_API_URL ?? '';
 
@@ -38,6 +40,15 @@ export function setUnauthorizedHandler(fn: (() => void) | null): void {
 // form for backward compatibility (existing callers show it), while `.status`,
 // `.code` (the server's `error` field) and `.serverMessage` (its `message` field)
 // let callers surface a specific, human-readable reason instead of a generic one.
+/** On the /auth/me check only: whether this is the desktop app and which
+ *  language is in use, for the server's anonymous usage counts. */
+function usageHeaders(path: string): Record<string, string> {
+  if (!path.startsWith('/auth/me')) return {};
+  const h: Record<string, string> = { 'X-Nexum-Lang': (i18n.language || 'en').slice(0, 2) };
+  if (isDesktop()) h['X-Nexum-Desktop'] = '1';
+  return h;
+}
+
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;
@@ -104,7 +115,7 @@ export async function api<T = unknown>(path: string, options?: ApiOptions): Prom
       ...(controller ? { signal: controller.signal } : {}),
       // Merge last so Content-Type / client id survive even when a caller passes
       // its own headers (previously `...options` could replace them wholesale).
-      headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...optHeaders },
+      headers: { 'Content-Type': 'application/json', 'X-Client-Id': CLIENT_ID, ...usageHeaders(path), ...optHeaders },
     });
   } finally {
     if (abortTimer) clearTimeout(abortTimer);

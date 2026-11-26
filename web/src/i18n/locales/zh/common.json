@@ -246,7 +246,8 @@
       "tabs": {
         "users": "用户",
         "systems": "星系",
-        "ghostSites": "幽灵站点"
+        "ghostSites": "幽灵站点",
+        "usage": "使用情况"
       },
       "filter": "筛选",
       "window": "时间段",
@@ -3158,5 +3159,70 @@
     "inUse": "{{label}} 在此地图上已被使用，或其下已有编号。",
     "beneathOwn": "{{label}} 会把 {{from}} 放到它自己下面：每一位数字代表离 home 再远一个洞，所以 {{label}} 是从 {{from}} 出去的洞。",
     "saveFailed": "无法保存链编号。"
+  },
+  "usage": {
+    "title": "Nexum 使用情况",
+    "subtitle": "eve-nexum.com 与自托管 Nexum 实例的月活跃用户。",
+    "updated": "更新于 {{time}}",
+    "loading": "加载中...",
+    "failed": "无法加载使用数据。",
+    "notFound": "此链接已关闭或不存在。",
+    "kpi": {
+      "total": "活跃用户（近 30 天）",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "已登录飞行员",
+      "selfHosted": "自托管",
+      "installs": "实例数：{{count}}",
+      "desktop": "桌面应用",
+      "desktopNote": "飞行员（近 30 天）"
+    },
+    "chart": {
+      "title": "月活跃用户"
+    },
+    "table": {
+      "month": "月份",
+      "live": "eve-nexum.com（Analytics）",
+      "signedIn": "eve-nexum.com（已登录）",
+      "selfHosted": "自托管",
+      "installs": "实例数",
+      "total": "合计"
+    },
+    "breakdown": {
+      "title": "实例",
+      "modes": "服务器模式",
+      "versions": "版本",
+      "languages": "语言（活跃飞行员）",
+      "features": "使用中的功能"
+    },
+    "modes": {
+      "solo": "个人",
+      "corp": "军团",
+      "alliance": "联盟"
+    },
+    "features": {
+      "chainNumbering": "启用链编号（L+1）的地图",
+      "autoRemove": "启用自动移除的地图",
+      "crossMapSync": "启用跨地图同步的地图",
+      "discord": "启用 Discord 提醒的组织"
+    },
+    "notes": {
+      "title": "统计方式",
+      "live": "eve-nexum.com：Google Analytics 统计的活跃用户。已登录飞行员指近 30 天使用过本站的角色。",
+      "selfHosted": "自托管：每个实例每天匿名发送近 30 天活跃飞行员数；每月取各实例当月最后一次的数值。各实例相加，因此同时使用两个实例的飞行员会被计算两次。",
+      "noGa": "未连接 Google Analytics，因此 eve-nexum.com 显示已登录飞行员。",
+      "old": "版本过旧、无法发送数据而未计入的实例：{{count}}。"
+    },
+    "share": {
+      "title": "分享链接",
+      "hint": "任何拿到链接的人无需登录即可查看此页面。生成新链接会关闭旧链接。",
+      "create": "生成链接",
+      "replace": "生成新链接",
+      "remove": "关闭链接",
+      "copy": "复制",
+      "copied": "链接已复制",
+      "active": "链接已开启（生成于 {{time}}）。链接只在生成时显示，如需再次使用请生成新链接。",
+      "none": "尚无链接。"
+    }
   }
 }

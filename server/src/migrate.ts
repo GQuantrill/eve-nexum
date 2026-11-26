@@ -674,7 +674,7 @@ export async function migrate() {
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS belt_count     INTEGER;
     ALTER TABLE IF EXISTS solar_systems ADD COLUMN IF NOT EXISTS stargate_count INTEGER;
 
-    -- Opt-in anonymous deployment pings (NEXUM_TELEMETRY). One row per install,
+    -- Anonymous deployment pings (NEXUM_TELEMETRY, on by default). One row per install,
     -- keyed by a random per-instance id; stores the app version, seen timestamps
     -- and two AGGREGATE counts (# maps, # users) for vague scale analytics —
     -- deliberately NO IP and no identifying user/map data. On most installs this
@@ -1511,6 +1511,28 @@ export async function migrate() {
     -- Keep: any editor's "leave this alone" for the cleanup actions (Remove
     -- orphans / stranded). Lighter than locked: it can still be moved and removed.
     ALTER TABLE map_systems ADD COLUMN IF NOT EXISTS keep BOOLEAN NOT NULL DEFAULT FALSE;
+
+    -- Usage counts for the anonymous ping (services/telemetry.ts): when a pilot
+    -- last opened Nexum, last did so in the desktop app, and in which language.
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active_at  TIMESTAMPTZ;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_desktop_at TIMESTAMPTZ;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS ui_lang         TEXT;
+    -- The collector's daily history: one row per install per day, so monthly
+    -- active users can be summed across installs (telemetry_pings only keeps
+    -- each install's latest).
+    CREATE TABLE IF NOT EXISTS telemetry_daily (
+      instance_id TEXT  NOT NULL,
+      day         DATE  NOT NULL DEFAULT CURRENT_DATE,
+      version     TEXT,
+      stats       JSONB NOT NULL DEFAULT '{}'::jsonb,
+      PRIMARY KEY (instance_id, day)
+    );
+    -- The public usage page's link (#/usage/<token>); only a hash is kept.
+    CREATE TABLE IF NOT EXISTS usage_share (
+      id          BOOLEAN     PRIMARY KEY DEFAULT TRUE CHECK (id),
+      token_hash  TEXT        NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
     CREATE TABLE IF NOT EXISTS map_chain_counters (
       map_id     UUID    NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
       parent     TEXT    NOT NULL,
