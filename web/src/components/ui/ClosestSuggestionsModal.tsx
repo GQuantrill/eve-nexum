@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { XIcon, PlusIcon } from '../../icons';
+import { XIcon, PlusIcon, MinusIcon } from '../../icons';
 import { api } from '../../api/client';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
 import { useRouteOptions, type RoutePathNode } from '../../hooks/useRoute';
@@ -57,12 +57,13 @@ interface CorpStructure { solarSystemId: number | null; source: 'corp' | 'map' }
 const LIMIT = 3;
 
 export function ClosestSuggestionsModal({
-  from, whScope, onList, onAdd, onClose,
+  from, whScope, onList, onAdd, onRemove, onClose,
 }: {
   from:    number;
   whScope: 'active' | 'all';
   onList:  ReadonlySet<number>;
-  onAdd:   (id: number, name: string) => void;
+  onAdd:    (id: number, name: string) => void;
+  onRemove: (id: number) => void;
   onClose: () => void;
 }) {
   useEscapeClose(onClose);
@@ -184,9 +185,11 @@ export function ClosestSuggestionsModal({
                           {r.detail && r.detail.length > 0 && r.detail.length < Object.keys(BLUE_LOOT).length && (
                             <span className={styles.detail}>{r.detail.map((id) => BLUE_LOOT[id] ?? id).join(', ')}</span>
                           )}
-                          <button type="button" className={`sys-btn ${styles.add}`} disabled={already}
-                            onClick={() => onAdd(r.id, name)}>
-                            {already ? t('closest.onList') : <><PlusIcon size={12} weight="bold" /> {t('addSystem.add')}</>}
+                          <button type="button" className={`sys-btn ${styles.add}`}
+                            onClick={() => (already ? onRemove(r.id) : onAdd(r.id, name))}>
+                            {already
+                              ? <><MinusIcon size={12} weight="bold" /> {t('closest.removeFromList')}</>
+                              : <><PlusIcon size={12} weight="bold" /> {t('addSystem.add')}</>}
                           </button>
                         </li>
                       );

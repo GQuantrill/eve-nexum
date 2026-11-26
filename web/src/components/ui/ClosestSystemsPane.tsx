@@ -393,6 +393,7 @@ export function ClosestSystemsPane() {
           whScope={allMaps ? 'all' : 'active'}
           onList={existingIds}
           onAdd={addSystem}
+          onRemove={removeRow}
           onClose={() => setSuggesting(false)}
         />
       )}
