@@ -3157,6 +3157,7 @@
     "setMessage": "Numéro de chaîne pour {{name}}. Les numéros en dessous suivent (7 en 3 fait de 71 un 31). Laissez vide pour l'effacer, ainsi que les numéros en dessous.",
     "invalid": "Un numéro de chaîne ne contient que des chiffres, comme 51, avec un point avant toute partie au-delà de 9, comme 5.10.",
     "inUse": "{{label}} est déjà utilisé sur cette carte, ou un numéro en dessous.",
+    "beneathOwn": "{{label}} placerait {{from}} sous lui-même : chaque chiffre est un trou de plus depuis home, donc {{label}} est un trou partant de {{from}}.",
     "saveFailed": "Impossible d'enregistrer le numéro de chaîne."
   }
 }

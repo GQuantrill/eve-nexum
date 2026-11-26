@@ -3157,6 +3157,7 @@
     "setMessage": "Número de cadeia para {{name}}. Os números abaixo mudam junto (de 7 para 3, o 71 vira 31). Deixe vazio para apagá-lo junto com os números abaixo.",
     "invalid": "Um número da cadeia só tem algarismos, como 51, com um ponto antes de qualquer parte acima de 9, como 5.10.",
     "inUse": "{{label}} já está em uso neste mapa, ou algum número abaixo dele.",
+    "beneathOwn": "{{label}} colocaria {{from}} abaixo de si mesmo: cada dígito é um buraco mais longe de home, então {{label}} é um buraco saindo de {{from}}.",
     "saveFailed": "Não foi possível salvar o número de cadeia."
   }
 }

@@ -308,4 +308,53 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
     expect(await sysLabel(y)).toBeNull();
     expect(await sysLabel(z)).toBe('.110');
   });
+
+  it('a system numbered from a reservation can be renumbered down and back', async () => {
+    const home = await system(true);
+    const a = await system(), b = await system();
+    for (const s of [a, b]) await link(home, s);
+    const sa = await sig(home), sb = await sig(home);
+    await reserve(home, [sa, sb]); // 1, 2
+    await leadTo(sa, home, a); await leadTo(sb, home, b);
+    await new Promise((r) => setTimeout(r, 100));
+    expect([await sysLabel(a), await sysLabel(b)]).toEqual(['1', '2']);
+    const patch = (id: string, chainLabel: string | null) =>
+      request(app).patch(`/api/maps/${mapId}/systems/${id}`).send({ chainLabel });
+    // 2 to 3 and back: the hole's reservation follows, so 2 is free again.
+    expect((await patch(b, '3')).status).toBe(200);
+    expect(await sigLabel(sb)).toBe('3');
+    expect((await patch(b, '2')).status).toBe(200);
+    expect(await sigLabel(sb)).toBe('2');
+    // Cleared by hand: the hole's reservation goes too.
+    expect((await patch(b, null)).status).toBe(200);
+    expect(await sigLabel(sb)).toBeNull();
+    expect(await sigLabel(sa)).toBe('1');
+  });
+
+  it('says why a number beneath its own is refused', async () => {
+    const a = await system();
+    await db.query(`UPDATE map_systems SET chain_label = '31' WHERE id = $1`, [a]);
+    const r = await request(app).patch(`/api/maps/${mapId}/systems/${a}`).send({ chainLabel: '3132' });
+    expect(r.status).toBe(409);
+    expect(r.body.error).toBe('chain_label_beneath_own');
+  });
+
+  it('a copied map keeps its chain numbers and reservations', async () => {
+    const home = await system(true);
+    const a = await system();
+    await link(home, a);
+    await jump(home, a); // 1
+    const x = await sig(a);
+    await reserve(a, [x]); // 11
+    const r = await request(app).post(`/api/maps/${mapId}/copy`).send({ name: 'C', include: { signatures: true } });
+    expect(r.status).toBe(201);
+    const { rows: [m] } = await db.query<{ on: boolean }>(`SELECT chain_numbering AS on FROM maps WHERE id = $1`, [r.body.id]);
+    expect(m.on).toBe(true);
+    const { rows } = await db.query<{ l: string }>(
+      `SELECT chain_label AS l FROM map_systems WHERE map_id = $1 AND chain_label IS NOT NULL
+       UNION ALL
+       SELECT s.chain_label FROM map_signatures s JOIN map_systems y ON y.id = s.system_id
+        WHERE y.map_id = $1 AND s.chain_reserved_at IS NOT NULL`, [r.body.id]);
+    expect(rows.map((x) => x.l).sort()).toEqual(['1', '11']);
+  });
 });

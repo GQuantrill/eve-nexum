@@ -3157,6 +3157,7 @@
     "setMessage": "Número de cadena para {{name}}. Los números por debajo cambian con él (de 7 a 3, el 71 pasa a 31). Déjalo vacío para borrarlo junto con los números por debajo.",
     "invalid": "Un número de cadena solo tiene dígitos, como 51, con un punto antes de cualquier parte mayor de 9, como 5.10.",
     "inUse": "{{label}} ya está en uso en este mapa, o algún número por debajo.",
+    "beneathOwn": "{{label}} pondría {{from}} debajo de sí mismo: cada dígito es un agujero más lejos de home, así que {{label}} es un agujero que sale de {{from}}.",
     "saveFailed": "No se pudo guardar el número de cadena."
   }
 }

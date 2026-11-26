@@ -93,6 +93,7 @@ export { NavigationArrowIcon } from '@phosphor-icons/react/dist/csr/NavigationAr
 export { PathIcon } from '@phosphor-icons/react/dist/csr/Path';
 export { PlanetIcon } from '@phosphor-icons/react/dist/csr/Planet';
 export { PlusIcon } from '@phosphor-icons/react/dist/csr/Plus';
+export { MinusIcon } from '@phosphor-icons/react/dist/csr/Minus';
 export { ProhibitIcon } from '@phosphor-icons/react/dist/csr/Prohibit';
 export { PulseIcon } from '@phosphor-icons/react/dist/csr/Pulse';
 export { PushPinIcon } from '@phosphor-icons/react/dist/csr/PushPin';

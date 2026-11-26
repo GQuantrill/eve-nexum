@@ -3157,6 +3157,7 @@
     "setMessage": "Kettennummer für {{name}}. Die Nummern darunter ändern sich mit (aus 7 wird 3, aus 71 wird 31). Leer lassen, um sie und die Nummern darunter zu entfernen.",
     "invalid": "Eine Kettennummer besteht nur aus Ziffern, etwa 51, mit einem Punkt vor jedem Teil über 9, etwa 5.10.",
     "inUse": "{{label}} ist auf dieser Karte schon vergeben, oder eine Nummer darunter.",
+    "beneathOwn": "{{label}} würde {{from}} unter sich selbst setzen: Jede Ziffer ist ein Loch weiter von Home, also ist {{label}} ein Loch aus {{from}}.",
     "saveFailed": "Die Kettennummer konnte nicht gespeichert werden."
   }
 }
