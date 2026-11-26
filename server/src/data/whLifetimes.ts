@@ -27,6 +27,13 @@ const WH_LIFETIME_HOURS: Record<string, number> = {
 // hole's type — so it's aged against this conservative maximum.
 export const MAX_WH_LIFETIME_HOURS = 48;
 
+// A connection with no lifetime of its own (no type we know, no EOL mark, no
+// lifetime set by hand) is severed (greyed out) at this age, since most holes
+// are gone by then, but never deleted before MAX_WH_LIFETIME_HOURS: the few
+// 48h holes (C6 statics among them) may still be open, and restoring it then
+// gives it that full life.
+export const UNTYPED_SEVER_HOURS = 24;
+
 /**
  * Maximum lifetime in hours for a wormhole sig of the given type code, or
  * `null` if the code is unknown (in which case the sweep leaves it alone — we

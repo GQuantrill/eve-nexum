@@ -12,6 +12,7 @@ import { useMapStore, getPlacementCell } from '../../store/mapStore';
 import { useAuth } from '../../context/AuthContext';
 import { useAccountLocations } from '../../hooks/useAccountLocations';
 import { useWatchlistAlerts } from '../../hooks/useWatchlistAlerts';
+import { useWatchlist } from '../../hooks/useWatchlist';
 import { useExitAlerts } from '../../hooks/useExitAlerts';
 import { useMapSignatureIndex } from '../../hooks/useMapSignatureIndex';
 import { useUndivedWormholeIndex } from '../../hooks/useUndivedWormholeIndex';
@@ -42,6 +43,7 @@ import {
   DownloadSimpleIcon,
   UploadSimpleIcon,
   UsersThreeIcon,
+  PushPinIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -193,6 +195,17 @@ export function MapCanvas() {
   useWatchlistAlerts();
   useExitAlerts();
   const systems              = useMapStore((s) => s.map.systems);
+  // Systems your own watchlist names (entries that match by name only), which
+  // the cleanup actions leave alone.
+  const [watchEntries]       = useWatchlist();
+  const watchedNames = useMemo(() => new Set(watchEntries
+    .filter((e) => e.match.by === 'system' && !e.criteria?.length)
+    .map((e) => (e.match as { query: string }).query.trim().toUpperCase())
+    .filter(Boolean)), [watchEntries]);
+  const namesOf = (ids: string[]) => ids
+    .map((id) => systems.find((s) => s.id === id))
+    .filter((s): s is MapSystem => !!s)
+    .map((s) => systemDisplayName(s));
   const connections          = useMapStore((s) => s.map.connections);
   const selectedSystemId     = useMapStore((s) => s.selectedSystemId);
   const selectSystem         = useMapStore((s) => s.selectSystem);
@@ -1812,6 +1825,11 @@ export function MapCanvas() {
             : <LockIcon     size={16} weight="regular" color="#f5c518" />,
           action: () => lockSystem(contextMenu.nodeId!),
         },
+        {
+          label: sys?.keep ? t('ctxMenu.unkeepSystem') : t('ctxMenu.keepSystem'),
+          icon:  <PushPinIcon size={16} weight={sys?.keep ? 'fill' : 'regular'} color="#5a9af8" />,
+          action: () => { if (sys) updateSystem(sys.id, { keep: !sys.keep }); },
+        },
         ...(!sys?.locked ? [{
           label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
           icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
@@ -1887,9 +1905,12 @@ export function MapCanvas() {
     // past the severed hole goes too, though its own links are still live
     // because nobody has scanned out there. Home, locked and occupied systems
     // are protected.
+    // Kept, locked or named on your own watchlist: left alone. Only entries
+    // naming a system count; a rule like "every C5" would protect half the map.
+    const protectedSys = (s: MapSystem) => s.locked || !!s.keep || watchedNames.has(s.name.trim().toUpperCase());
     const orphanIds = systems
       .filter((s) =>
-        !s.isHome && !s.locked && !occupied(s) && (
+        !s.isHome && !protectedSys(s) && !occupied(s) && (
           !connections.some((c) => !c.broken && (c.sourceId === s.id || c.targetId === s.id)) ||
           (reachedAny.has(s.id) && !reachedLive.has(s.id))
         ),
@@ -1901,7 +1922,7 @@ export function MapCanvas() {
     // up. Locked and occupied systems are protected, same as the orphan sweep —
     // locking one is how you say "leave this alone".
     const strandedIds = homeSystem
-      ? systems.filter((sys) => !reachedAny.has(sys.id) && !sys.locked && !occupied(sys)).map((sys) => sys.id)
+      ? systems.filter((sys) => !reachedAny.has(sys.id) && !sys.isHome && !protectedSys(sys) && !occupied(sys)).map((sys) => sys.id)
       : [];
 
     return [
@@ -2208,6 +2229,7 @@ export function MapCanvas() {
             count: strandedConfirm.ids.length,
             home:  strandedConfirm.home,
           })}
+          items={namesOf(strandedConfirm.ids)}
           onConfirm={() => {
             strandedConfirm.ids.forEach((id) => removeSystem(id));
             setStrandedConfirm(null);
@@ -2238,6 +2260,7 @@ export function MapCanvas() {
       {orphanConfirm && (
         <ConfirmModal
           message={t('ctxMenu.removeOrphansConfirm', { count: orphanConfirm.ids.length })}
+          items={namesOf(orphanConfirm.ids)}
           onConfirm={() => {
             orphanConfirm.ids.forEach((id) => removeSystem(id));
             setOrphanConfirm(null);

@@ -44,4 +44,13 @@ describe('connectionsToRevive', () => {
     const c = conn('c2', 'home', 'j2', { sourceSignatureId: 's1', targetSignatureId: 's2' });
     expect(connectionsToRevive(systems, [c], sigs, types)).toEqual(['c2']);
   });
+
+  it('never revives a link past the longest it could live', () => {
+    const sigs = { home: [sig('s1', 'H296', 'J2')], j2: [sig('s2', 'K162', 'J0')] };
+    const at = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+    expect(connectionsToRevive(systems, [conn('c2', 'home', 'j2', { createdAt: at(10) })], sigs, types)).toEqual(['c2']);
+    expect(connectionsToRevive(systems, [conn('c2', 'home', 'j2', { createdAt: at(26) })], sigs, types)).toEqual([]);
+    const typed = { H296: { dest: 'c5', lifetimeHours: 24 } };
+    expect(connectionsToRevive(systems, [conn('c2', 'home', 'j2', { type: 'H296', createdAt: at(30) })], sigs, typed)).toEqual([]);
+  });
 });

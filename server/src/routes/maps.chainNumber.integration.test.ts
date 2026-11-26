@@ -357,4 +357,30 @@ describe.skipIf(!dbReady)('chain numbers (integration)', () => {
         WHERE y.map_id = $1 AND s.chain_reserved_at IS NOT NULL`, [r.body.id]);
     expect(rows.map((x) => x.l).sort()).toEqual(['1', '11']);
   });
+
+  // Not a chain number, but the same PATCH and copy paths.
+  it('keep can be set by any editor, survives a copy, and must be a boolean', async () => {
+    const a = await system();
+    const patch = (body: object) => request(app).patch(`/api/maps/${mapId}/systems/${a}`).send(body);
+    expect((await patch({ keep: 'yes' })).status).toBe(400);
+    await db.query(`UPDATE maps SET locked = TRUE WHERE id = $1`, [mapId]);
+    expect((await patch({ keep: true })).status).toBe(200); // content, like notes: allowed on a locked map
+    await db.query(`UPDATE maps SET locked = FALSE WHERE id = $1`, [mapId]);
+    const r = await request(app).post(`/api/maps/${mapId}/copy`).send({ name: 'C', include: {} });
+    const { rows } = await db.query<{ keep: boolean }>(`SELECT keep FROM map_systems WHERE map_id = $1`, [r.body.id]);
+    expect(rows.map((x) => x.keep)).toEqual([true]);
+  });
+
+  it('restoring a link severed for age gives it the full 48h, so it stays restored', async () => {
+    const a = await system(), b = await system();
+    const id = crypto.randomUUID();
+    await db.query(
+      `INSERT INTO map_connections (id, map_id, source_id, target_id, broken, broken_at, created_at)
+       VALUES ($1, $2, $3, $4, TRUE, NOW(), NOW() - interval '30 hours')`, [id, mapId, a, b]);
+    expect((await request(app).patch(`/api/maps/${mapId}/connections/${id}`).send({ broken: false })).status).toBe(200);
+    const { rows: [c] } = await db.query<{ broken: boolean; h: number }>(
+      `SELECT broken, EXTRACT(EPOCH FROM lifetime_expires_at - created_at) / 3600 AS h FROM map_connections WHERE id = $1`, [id]);
+    expect(c.broken).toBe(false);
+    expect(Number(c.h)).toBeCloseTo(48, 2);
+  });
 });

@@ -1508,6 +1508,9 @@ export async function migrate() {
     -- pilots numbering at once apart (last_index is no longer used).
     ALTER TABLE maps ADD COLUMN IF NOT EXISTS chain_numbering BOOLEAN NOT NULL DEFAULT FALSE;
     ALTER TABLE map_systems ADD COLUMN IF NOT EXISTS chain_label TEXT;
+    -- Keep: any editor's "leave this alone" for the cleanup actions (Remove
+    -- orphans / stranded). Lighter than locked: it can still be moved and removed.
+    ALTER TABLE map_systems ADD COLUMN IF NOT EXISTS keep BOOLEAN NOT NULL DEFAULT FALSE;
     CREATE TABLE IF NOT EXISTS map_chain_counters (
       map_id     UUID    NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
       parent     TEXT    NOT NULL,

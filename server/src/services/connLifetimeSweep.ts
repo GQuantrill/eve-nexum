@@ -2,7 +2,7 @@ import { db } from '../db.js';
 import { config } from '../config.js';
 import { createLogger } from '../utils/logger.js';
 import { publishToMap } from './mapEvents.js';
-import { effectiveExpiryMs, lifeBucket, type TimeBucket } from '../data/whLifetimes.js';
+import { effectiveExpiryMs, lifeBucket, UNTYPED_SEVER_HOURS, type TimeBucket } from '../data/whLifetimes.js';
 
 const log = createLogger('connLifetimeSweep');
 
@@ -25,15 +25,22 @@ interface Row {
 export type LifetimeAction =
   | { kind: 'none' }
   | { kind: 'rebucket'; bucket: TimeBucket }
-  | { kind: 'collapse' };
+  | { kind: 'collapse' }
+  | { kind: 'sever' };
 
 /**
  * Decide what the sweep should do with one connection (pure, so it's unit
  * tested without a DB):
- *   - unknown lifetime → nothing;
- *   - expired for longer than the grace period on a lazy-removal map → collapse
- *     (sever + drop its backing sigs — a dead hole has no sig on the scanner);
+ *   - expired for longer than the grace period: on a lazy-removal map,
+ *     collapse it (sever + drop its backing sigs: a dead hole has no sig on
+ *     the scanner); on any other map, only sever it (greyed out, nothing
+ *     deleted), so Remove orphans can find what's behind it;
  *   - otherwise re-bucket if the stored status has drifted from the live one.
+ * Every wormhole dies: one with no lifetime of its own (untyped, or a code we
+ * don't know) is severed UNTYPED_SEVER_HOURS after it was found (plus grace),
+ * on any map, but its sigs are kept and it isn't deleted before the 48h
+ * ceiling (removeStaleBrokenConnections), so a live 48h hole can be restored.
+ * It has no bucket to show.
  * Collapse takes priority over re-bucketing so an over-grace hole doesn't first
  * get stamped 'expired' only to be severed the same tick.
  */
@@ -43,8 +50,11 @@ export function connLifetimeAction(
   graceMs: number,
 ): LifetimeAction {
   const expiry = effectiveExpiryMs(row);
-  if (expiry === null) return { kind: 'none' };
-  if (row.lazyRemove && now - expiry > graceMs) return { kind: 'collapse' };
+  if (expiry === null) {
+    const aged = now - new Date(row.createdAt).getTime() - UNTYPED_SEVER_HOURS * 3_600_000;
+    return aged > graceMs ? { kind: 'sever' } : { kind: 'none' };
+  }
+  if (now - expiry > graceMs) return { kind: row.lazyRemove ? 'collapse' : 'sever' };
   const bucket = lifeBucket(expiry - now);
   return bucket === row.timeStatus ? { kind: 'none' } : { kind: 'rebucket', bucket };
 }
@@ -54,9 +64,11 @@ export function connLifetimeAction(
  * wormhole sigs backing them, sever the connections (broken = true), then
  * broadcast so open clients drop the sigs and render the severed edge live.
  */
-async function collapseMap(mapId: string, conns: Row[]): Promise<void> {
+async function collapseMap(mapId: string, conns: Row[], dropSigs: boolean): Promise<void> {
   const connIds = conns.map((c) => c.id);
-  const sigIds = conns.flatMap((c) => [c.sourceSignatureId, c.targetSignatureId]).filter((x): x is string => !!x);
+  const sigIds = dropSigs
+    ? conns.flatMap((c) => [c.sourceSignatureId, c.targetSignatureId]).filter((x): x is string => !!x)
+    : [];
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -73,10 +85,14 @@ async function collapseMap(mapId: string, conns: Row[]): Promise<void> {
     client.release();
   }
 
-  const affectedSystems = new Set(conns.flatMap((c) => [c.sourceId, c.targetId]));
-  for (const systemId of affectedSystems) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+  if (sigIds.length) {
+    const affectedSystems = new Set(conns.flatMap((c) => [c.sourceId, c.targetId]));
+    for (const systemId of affectedSystems) publishToMap(mapId, { type: 'sig.changed', actor: null, systemId });
+  }
   for (const id of connIds) publishToMap(mapId, { type: 'connection.update', actor: null, id, updates: { broken: true } });
-  log.info(`map ${mapId}: collapsed ${connIds.length} expired connection(s), removed ${sigIds.length} sig(s)`);
+  log.info(dropSigs
+    ? `map ${mapId}: collapsed ${connIds.length} expired connection(s), removed ${sigIds.length} sig(s)`
+    : `map ${mapId}: severed ${connIds.length} expired connection(s)`);
 }
 
 /**
@@ -86,9 +102,8 @@ async function collapseMap(mapId: string, conns: Row[]): Promise<void> {
  * display/state work: re-bucketing never deletes; collapse mirrors a real hole
  * dying (sig gone, connection severed) and only fires where the map opted in.
  *
- * The prefilter keeps the candidate set to holes with a determinable lifetime
- * (a manual/legacy timestamp, or any typed hole — K162 decays against the 48h
- * ceiling). Untyped connections have no computable expiry and are skipped in JS.
+ * Every live wormhole connection is a candidate: one without a lifetime of its
+ * own is still severed by age (connLifetimeAction).
  */
 async function sweepConnLifetimes(): Promise<void> {
   let rows: Row[];
@@ -102,10 +117,7 @@ async function sweepConnLifetimes(): Promise<void> {
          FROM map_connections c
          JOIN maps m ON m.id = c.map_id
         WHERE c.connection_type = 'standard'
-          AND c.broken = FALSE
-          AND (c.lifetime_expires_at IS NOT NULL
-            OR c.eol_at IS NOT NULL
-            OR (c.wh_type IS NOT NULL AND c.wh_type <> ''))`,
+          AND c.broken = FALSE`,
     );
     rows = res.rows;
   } catch (err) {
@@ -119,13 +131,15 @@ async function sweepConnLifetimes(): Promise<void> {
   const changedByBucket = new Map<TimeBucket, string[]>();
   const rebucketed: { id: string; mapId: string; bucket: TimeBucket }[] = [];
   const collapseByMap = new Map<string, Row[]>();
+  const severByMap = new Map<string, Row[]>();
 
   for (const r of rows) {
     // Grace is per-map (map settings). Each connection carries its map's value.
     const action = connLifetimeAction(r, now, r.graceHours * 3_600_000);
-    if (action.kind === 'collapse') {
-      const list = collapseByMap.get(r.mapId);
-      if (list) list.push(r); else collapseByMap.set(r.mapId, [r]);
+    if (action.kind === 'collapse' || action.kind === 'sever') {
+      const byMap = action.kind === 'collapse' ? collapseByMap : severByMap;
+      const list = byMap.get(r.mapId);
+      if (list) list.push(r); else byMap.set(r.mapId, [r]);
     } else if (action.kind === 'rebucket') {
       const list = changedByBucket.get(action.bucket);
       if (list) list.push(r.id); else changedByBucket.set(action.bucket, [r.id]);
@@ -151,9 +165,8 @@ async function sweepConnLifetimes(): Promise<void> {
     }
   }
 
-  for (const [mapId, conns] of collapseByMap) {
-    await collapseMap(mapId, conns);
-  }
+  for (const [mapId, conns] of collapseByMap) await collapseMap(mapId, conns, true);
+  for (const [mapId, conns] of severByMap) await collapseMap(mapId, conns, false);
 }
 
 /**

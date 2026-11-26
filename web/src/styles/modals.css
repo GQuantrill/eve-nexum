@@ -196,6 +196,17 @@
   margin: 0;
 }
 
+.confirm-modal__items {
+  max-height: 180px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px 10px 6px 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: calc(12px * var(--font-scale, 1));
+  color: var(--text-secondary);
+}
+
 .confirm-modal__skip {
   display: flex;
   align-items: center;

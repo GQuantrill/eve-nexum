@@ -135,7 +135,7 @@ export async function loadFullMap(mapId: string) {
       `SELECT ms.id, ms.eve_system_id AS "eveSystemId", ms.name, ms.system_class AS "systemClass",
               ms.effect, ms.statics, ms.region_name AS "regionName", ms.npc_type AS "npcType",
               ms.position_x AS x, ms.position_y AS y,
-              ms.status, ms.intel, ms.is_home AS "isHome", ms.locked, ms.notes,
+              ms.status, ms.intel, ms.is_home AS "isHome", ms.locked, ms.keep, ms.notes,
               ms.labels, ms.custom_labels AS "customLabels", ms.tag, ms.alias,
               ms.chain_label AS "chainLabel",
               ss.security::float8 AS "security",
