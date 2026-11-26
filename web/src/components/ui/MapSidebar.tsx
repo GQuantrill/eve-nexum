@@ -2223,6 +2223,20 @@ export function MapSidebar() {
                     </div>
                   )}
                   <div className="map-sidebar__row">
+                    <label className="map-sidebar__label" htmlFor="placement-dir">{t("mapSidebar.placement")}</label>
+                    <Select id="placement-dir" value={normalizePlacement(placement)} onChange={(v) => setPlacement(v)} options={[
+                      { value: "east", label: t("mapSidebar.placementOptions.east") },
+                      { value: "south", label: t("mapSidebar.placementOptions.south") },
+                      { value: "west", label: t("mapSidebar.placementOptions.west") },
+                      { value: "north", label: t("mapSidebar.placementOptions.north") },
+                    ]} />
+                  </div>
+                </>
+              )}
+
+              {settingsTab === "appearance" && (
+                <>
+                  <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="ui-zoom">{t("mapSidebar.fontSize")}</label>
                     <div className="map-sidebar__zoom">
                       <input id="ui-zoom" type="range" min={0.8} max={1.5} step={0.05} value={uiZoom} onChange={(e) => setUiZoom(parseFloat(e.target.value))} className="map-sidebar__zoom-slider" />
@@ -2242,20 +2256,6 @@ export function MapSidebar() {
                   <div className="map-sidebar__hint">
                     {t("mapSidebar.densityHint")}
                   </div>
-                  <div className="map-sidebar__row">
-                    <label className="map-sidebar__label" htmlFor="placement-dir">{t("mapSidebar.placement")}</label>
-                    <Select id="placement-dir" value={normalizePlacement(placement)} onChange={(v) => setPlacement(v)} options={[
-                      { value: "east", label: t("mapSidebar.placementOptions.east") },
-                      { value: "south", label: t("mapSidebar.placementOptions.south") },
-                      { value: "west", label: t("mapSidebar.placementOptions.west") },
-                      { value: "north", label: t("mapSidebar.placementOptions.north") },
-                    ]} />
-                  </div>
-                </>
-              )}
-
-              {settingsTab === "appearance" && (
-                <>
                   <ThemePicker />
                   <div className="map-sidebar__row">
                     <label className="map-sidebar__label" htmlFor="color-vision">{t("mapSidebar.colorVision")}</label>
