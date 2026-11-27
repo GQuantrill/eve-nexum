@@ -59,10 +59,26 @@ async function stationSystems(where = 'TRUE', params: unknown[] = []): Promise<S
   return new Set(rows.map((r) => r.solar_system_id));
 }
 
-/** The kind's systems, and for blue loot the items each buys. */
-export async function serverKindTargets(
-  kind: ServerKind,
-): Promise<{ ids: Set<number>; detail?: Map<number, number[]> }> {
+type KindTargets = { ids: ReadonlySet<number>; detail?: ReadonlyMap<number, number[]> };
+
+// Each kind's answer, kept for a while: Useful Systems asks on every jump, and
+// these barely change (NPC stations with a game update, blue loot buyers every
+// few hours), so a refresh shows up here within TTL_MS. The promise is kept, so
+// requests arriving together share one query; a failed one isn't kept.
+const TTL_MS = 10 * 60_000;
+const cache = new Map<ServerKind, { at: number; value: Promise<KindTargets> }>();
+
+/** The kind's systems, and for blue loot the items each buys. Read-only: shared between requests. */
+export function serverKindTargets(kind: ServerKind): Promise<KindTargets> {
+  const hit = cache.get(kind);
+  if (hit && Date.now() - hit.at < TTL_MS) return hit.value;
+  const value = loadKindTargets(kind);
+  cache.set(kind, { at: Date.now(), value });
+  value.catch(() => { if (cache.get(kind)?.value === value) cache.delete(kind); });
+  return value;
+}
+
+async function loadKindTargets(kind: ServerKind): Promise<KindTargets> {
   const all = await kspaceSystems();
   switch (kind) {
     case 'hub':
@@ -88,4 +104,4 @@ export async function serverKindTargets(
 }
 
 /** Tests only. */
-export function resetNearestSetsForTest(): void { systems = null; }
+export function resetNearestSetsForTest(): void { systems = null; cache.clear(); }

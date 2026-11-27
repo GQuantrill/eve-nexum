@@ -150,7 +150,7 @@ router.post('/nearest', async (req, res) => {
     for (const [name, spec] of sets) {
       if (!/^[a-z0-9:-]{1,40}$/i.test(name)) continue;
       let ids: Iterable<number>;
-      let detail: Map<number, number[]> | undefined;
+      let detail: ReadonlyMap<number, number[]> | undefined;
       let exclude: Set<number> | undefined;
       const kind = typeof spec === 'string' ? spec
         : spec && typeof spec === 'object' && !Array.isArray(spec) ? (spec as { kind?: unknown }).kind : undefined;
