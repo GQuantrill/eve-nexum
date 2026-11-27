@@ -2022,7 +2022,8 @@
       "shipKills": "艦船キル",
       "podKills": "ポッドキル",
       "npcKills": "NPCキル",
-      "jumps": "ジャンプ"
+      "jumps": "ジャンプ",
+      "pilot": "監視中のパイロット"
     },
     "hidePresence": "自分の位置を隠す",
     "hidePresenceHint": "このマップを見ている他の人からは、あなたの居場所が見えなくなります。自分自身の現在地マーカーはそのままで、ジャンプ追跡とは別の設定です。",
@@ -3268,5 +3269,36 @@
     "filter": "絞り込み...",
     "noMatch": "一致するものがありません。",
     "regionVia": "最寄りの星系: {{system}}"
+  },
+  "pilots": {
+    "feed": "インテルチャンネル",
+    "pasteLocal": "ローカルを貼り付け",
+    "mapFilter": "目撃情報の表示元",
+    "allMaps": "すべてのマップ",
+    "pastePlaceholder": "ローカルのメンバーリストをここに貼り付け",
+    "recordsIn": "リスト内の全員が {{system}} で目撃されたとして記録されます。",
+    "pickSystem": "まずマップ上で星系を選択してください。パイロットはそこに記録されます。",
+    "cantRecord": "このマップは閲覧のみで追加できないため、貼り付けをここに記録できません。",
+    "check": "確認",
+    "notLocal": "ローカルのメンバーリストではありません。ローカルチャットのメンバーリストから名前をコピーしてください。",
+    "inLocal": "{{system}} のローカル：{{count}}",
+    "seenElsewhere_other": "他の {{count}} 星系で目撃",
+    "lastSeen": "最終目撃：{{system}}、{{ago}}",
+    "notSeen": "過去 30 日間は目撃なし",
+    "sightings_other": "目撃 {{count}} 件",
+    "unknown_other": "{{count}} 件の名前が見つかりませんでした（入力ミスまたは削除されたキャラクター）。",
+    "watched": "監視中のパイロット（{{count}}）",
+    "watchedEmpty": "ローカルの貼り付けでパイロットにスターを付けるか、名前で追加すると、どこにいたかを確認できます。",
+    "showHeat": "{{name}} が目撃された場所をマップに表示",
+    "hideHeat": "マップから {{name}} を非表示",
+    "fromLocal": "ローカル",
+    "fromIntel": "インテル",
+    "addPlaceholder": "名前でパイロットを追加",
+    "add": "追加",
+    "noSuchPilot": "{{name}} という名前のパイロットはいません。",
+    "watch": "このパイロットを監視",
+    "unwatch": "監視をやめる",
+    "heatShowing": "{{name}} を表示中",
+    "heatPick": "インテルパネルでパイロットを選択してください"
   }
 }

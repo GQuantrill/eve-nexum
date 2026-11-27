@@ -2022,7 +2022,8 @@
       "shipKills": "船只击杀",
       "podKills": "逃生舱击杀",
       "npcKills": "NPC击杀",
-      "jumps": "跳跃"
+      "jumps": "跳跃",
+      "pilot": "关注的飞行员"
     },
     "hidePresence": "隐藏我的位置",
     "hidePresenceHint": "查看此星图的其他人将看不到你在哪里。你自己的所在位置标记不受影响，此设置与跳跃追踪无关。",
@@ -3268,5 +3269,36 @@
     "filter": "筛选...",
     "noMatch": "没有匹配项。",
     "regionVia": "最近的星系：{{system}}"
+  },
+  "pilots": {
+    "feed": "情报频道",
+    "pasteLocal": "粘贴本地",
+    "mapFilter": "显示目击记录来自",
+    "allMaps": "所有地图",
+    "pastePlaceholder": "在此粘贴本地成员列表",
+    "recordsIn": "列表中的每个人都会记录为在 {{system}} 被看到。",
+    "pickSystem": "请先在地图上选择一个星系：飞行员会记录在那里。",
+    "cantRecord": "你可以查看此地图但不能添加内容，因此无法在此记录粘贴。",
+    "check": "检查",
+    "notLocal": "这不是本地成员列表。请从本地聊天的成员列表中复制名字。",
+    "inLocal": "{{system}} 本地：{{count}}",
+    "seenElsewhere_other": "在另外 {{count}} 个星系见过",
+    "lastSeen": "最后见于 {{system}}，{{ago}}",
+    "notSeen": "过去 30 天内未见",
+    "sightings_other": "{{count}} 次目击",
+    "unknown_other": "有 {{count}} 个名字未找到（拼写错误或已删除的角色）。",
+    "watched": "关注的飞行员（{{count}}）",
+    "watchedEmpty": "在本地粘贴中为飞行员加星，或按名字添加，即可查看其去过的地方。",
+    "showHeat": "在地图上显示 {{name}} 被看到的位置",
+    "hideHeat": "从地图上隐藏 {{name}}",
+    "fromLocal": "本地",
+    "fromIntel": "情报",
+    "addPlaceholder": "按名字添加飞行员",
+    "add": "添加",
+    "noSuchPilot": "没有名为 {{name}} 的飞行员。",
+    "watch": "关注此飞行员",
+    "unwatch": "取消关注",
+    "heatShowing": "正在显示 {{name}}",
+    "heatPick": "请在情报面板中选择飞行员"
   }
 }

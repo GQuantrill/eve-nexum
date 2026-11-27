@@ -1569,6 +1569,24 @@ export async function migrate() {
     CREATE INDEX IF NOT EXISTS idx_org_backgrounds_scope ON org_backgrounds (scope_kind, scope_id);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_org_backgrounds_default
       ON org_backgrounds (scope_kind, scope_id) WHERE is_default;
+
+    -- Where a pilot has been seen (services/pilotSightings.ts): one row per
+    -- pilot per local paste pinned to a system, or per watched pilot named in
+    -- an intel line. Shared with everyone who can see the map, kept 30 days.
+    CREATE TABLE IF NOT EXISTS pilot_sightings (
+      id             BIGSERIAL   PRIMARY KEY,
+      map_id         UUID        NOT NULL REFERENCES maps(id) ON DELETE CASCADE,
+      eve_system_id  INTEGER     NOT NULL,
+      character_id   INTEGER     NOT NULL,
+      character_name TEXT        NOT NULL,
+      corp_id        INTEGER,
+      alliance_id    INTEGER,
+      source         TEXT        NOT NULL CHECK (source IN ('local', 'intel')),
+      seen_by        INTEGER     REFERENCES users(id) ON DELETE SET NULL,
+      seen_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_pilot_sightings_char ON pilot_sightings (character_id, seen_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_pilot_sightings_seen ON pilot_sightings (seen_at);
   `);
 
   await encryptLegacyTokens();

@@ -1,0 +1,146 @@
+/* Pilot tracking, at the top of the Intel panel. */
+.tracker { display: flex; flex-direction: column; gap: 8px; }
+
+.bar { display: flex; align-items: center; gap: 6px; }
+.pasteBtn { flex-shrink: 0; }
+.mapFilter { flex: 1; min-width: 0; }
+
+.paste { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  color: var(--text-default);
+  font: inherit;
+  font-size: 12px;
+}
+
+.hint { margin: 0; color: var(--text-faint); font-size: 11px; }
+.error { margin: 0; color: var(--cv-stand-hostile); font-size: 11px; }
+
+.section { display: flex; flex-direction: column; gap: 4px; }
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 2px 4px;
+  border-left: 2px solid var(--border);
+  background: var(--surface-sunken);
+  font-size: 12px;
+}
+.watchItem { display: flex; flex-direction: column; }
+
+/* Standing of a pilot in a paste, as the edge of the row. */
+.friendly { border-left-color: var(--cv-stand-friendly); }
+.good     { border-left-color: var(--cv-stand-good); }
+.neutral  { border-left-color: var(--border); }
+.bad      { border-left-color: var(--cv-stand-bad); }
+.hostile  { border-left-color: var(--cv-stand-hostile); }
+
+.name {
+  color: var(--text-bright);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  max-width: 50%;
+}
+.name:hover { text-decoration: underline; }
+.expand {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-bright);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  max-width: 45%;
+}
+.org {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-faint);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.seen {
+  flex-shrink: 0;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.on { color: var(--accent, var(--text-bright)); }
+
+.sightings {
+  list-style: none;
+  margin: 0 0 4px 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.sighting { display: flex; align-items: baseline; gap: 6px; font-size: 11px; }
+.sys { color: var(--text-default); font-weight: 600; }
+.sysLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-bright);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+.time { color: var(--text-faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.add { display: flex; gap: 6px; }
+.addInput {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-sunken);
+  color: var(--text-default);
+  font: inherit;
+  font-size: 12px;
+}

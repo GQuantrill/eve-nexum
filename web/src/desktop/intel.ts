@@ -3,6 +3,8 @@ import { onDesktopEvent, desktopInvoke, isDesktop } from './bridge';
 import { useMapStore } from '../store/mapStore';
 import { playIntelSound } from './intelSounds';
 import { api } from '../api/client';
+import { readUserSetting } from '../hooks/useUserSetting';
+import { sanitiseWatched, WATCH_KEY } from '../utils/pilotWatch';
 
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
 // logs) and sends each new line here. A line naming a system on the open map
@@ -12,6 +14,9 @@ import { api } from '../api/client';
 // the desktop settings, and arrive with each line. "clr"/"clear" lines are reports that a system is
 // empty, so they don't alert. The lines themselves are never sent to the
 // server; only their words go, in the system-name lookup below (not stored).
+// The one exception is a pilot on the pilot's own watch list: when a live line
+// names one beside a system, that pilot and system (not the line) are recorded
+// as a sighting on the open map (recordWatched).
 
 export type IntelPulse = 'off' | 'subtle' | 'normal' | 'strong';
 const PULSES: IntelPulse[] = ['off', 'subtle', 'normal', 'strong'];
@@ -168,6 +173,42 @@ async function flush(): Promise<void> {
   }
   publish(next);
   setFeed({ ...feed });   // re-render the feed with the newly known names
+  if (recording) recordWatched(items.filter((q) => q.report).map((q) => q.line));
+}
+
+// Only the main window records, so a pop-out doesn't send every line twice.
+let recording = false;
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** Whether `name` appears in `text` as whole words. */
+export function namesPilot(text: string, name: string): boolean {
+  const n = name.trim();
+  if (!n) return false;
+  return new RegExp(`(^|[^a-z0-9])${escapeRe(n)}([^a-z0-9]|$)`, 'i').test(text);
+}
+
+/** Record each watched pilot named in a live line beside a known system. The
+ *  reporter themselves is skipped, and so are "clr" lines. */
+function recordWatched(lines: IntelLine[]): void {
+  const watched = sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
+  const mapId = useMapStore.getState().activeMapId;
+  if (watched.length === 0 || !mapId) return;
+  for (const line of lines) {
+    if (CLEAR.test(line.text)) continue;
+    const pilots = watched.filter((w) =>
+      w.name.toLowerCase() !== line.sender.trim().toLowerCase() && namesPilot(line.text, w.name));
+    if (pilots.length === 0) continue;
+    // The system: the first word (or pair) that is one, ignoring the pilots' own names.
+    const inNames = new Set(pilots.flatMap((p) => candidateNames(p.name)));
+    const sys = candidateNames(line.text).filter((n) => !inNames.has(n)).map((n) => known.get(n))
+      .find((v): v is { eveSystemId: number; name: string } => !!v);
+    if (!sys) continue;
+    void api('/api/pilots/sightings', {
+      method: 'POST',
+      body: JSON.stringify({ mapId, eveSystemId: sys.eveSystemId, pilots: pilots.slice(0, 20) }),
+    }).catch(() => { /* read-only map, offline: not worth a toast */ });
+  }
 }
 
 function queueLookup(line: IntelLine, report: boolean): void {
@@ -237,6 +278,7 @@ const MAX_AGE_MS = 60_000;   // a line older than this is history, not intel
  *  to the main window. */
 export function startIntel(quiet = false): () => void {
   const expiry = setInterval(expireReports, 15_000);
+  if (!quiet) recording = true;
   refreshIntelFeed();
   // "Preview" in the app's settings: play that sound here.
   const offPreview = quiet
@@ -261,5 +303,5 @@ export function startIntel(quiet = false): () => void {
     // is known (hooks/useProximityAlerts).
     if (line.sound && typeof line.alertRange !== 'number') playIntelSound(line.soundName);
   });
-  return () => { off(); offChannels(); offPreview(); clearInterval(expiry); };
+  return () => { off(); offChannels(); offPreview(); clearInterval(expiry); if (!quiet) recording = false; };
 }

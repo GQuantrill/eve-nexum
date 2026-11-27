@@ -12,10 +12,12 @@ import type { MapSystem } from '../../types';
 import { useRoute } from '../../hooks/useRoute';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
+import { isDesktop } from '../../desktop/bridge';
+import { PilotTracker } from './PilotTracker';
 import styles from './IntelPane.module.css';
 
-// Desktop app only (the sidebar hides it in a browser): the pilot's intel
-// channels as one feed, newest first. Each channel can be switched off;
+// Pilot tracking (PilotTracker: paste local, watched pilots) everywhere; then,
+// in the desktop app only, the pilot's intel channels as one feed, newest first. Each channel can be switched off;
 // "All" switches them all back on. System names are highlighted, and those on
 // the open map can be clicked to select them there, or right-clicked to set
 // them as the autopilot destination or add them as a waypoint.
@@ -27,6 +29,21 @@ const WORD = /^([^A-Za-z0-9]*)(.*?)([^A-Za-z0-9]*)$/;
 const eveTime = (at: number): string => new Date(at).toISOString().slice(11, 19);
 
 export function IntelPane() {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.pane}>
+      <PilotTracker />
+      {isDesktop() && (
+        <>
+          <div className={styles.feedHead}>{t('pilots.feed')}</div>
+          <IntelFeed />
+        </>
+      )}
+    </div>
+  );
+}
+
+function IntelFeed() {
   const { t } = useTranslation();
   const { channels, lines } = useIntelFeed();
   const systems = useMapStore((s) => s.map.systems);

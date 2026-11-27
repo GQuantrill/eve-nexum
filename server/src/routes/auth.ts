@@ -1025,6 +1025,12 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // routes/character.ts). Being absent here meant the PATCH discarded it, so the
   // column could only ever read 'false' and "hide me" silently did nothing.
   'nexum.presence.hidden',
+
+  // ── Pilot tracking (Intel panel): who the pilot watches, which one the map
+  // heatmap shows, and which map's sightings to show. Per-pilot.
+  'nexum.pilots.watched',
+  'nexum.pilots.heatPilot',
+  'nexum.pilots.mapFilter',
 ]);
 
 // Allowed key PREFIXES, for settings whose keys are generated rather than

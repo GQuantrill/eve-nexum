@@ -97,6 +97,8 @@ import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useFleet } from '../../hooks/useFleet';
 import { HeatmapContext } from '../../context/HeatmapContext';
 import { heatValue, heatScale, type HeatMetric } from '../../utils/heatmap';
+import { heatBySystem, sanitiseHeatPilot, HEAT_PILOT_KEY, MAP_FILTER_KEY, type WatchedPilot } from '../../utils/pilotWatch';
+import { usePilotSightings } from '../../hooks/usePilotSightings';
 import { resolveIntelColor } from '../../utils/intelColors';
 
 // Modifier keys that add a system to the current selection on click, alongside
@@ -304,18 +306,28 @@ export function MapCanvas() {
   const heatKills    = useCurrentHourKills();
   const heatFleet    = useFleet();
   const selfCharId   = useAuth().user?.characterId ?? null;
+  // "Watched pilot": where the pilot picked in the Intel panel was seen.
+  const [heatPilotRaw] = useUserSetting<WatchedPilot | null>(HEAT_PILOT_KEY, null);
+  const [pilotMapFilter] = useUserSetting<string>(MAP_FILTER_KEY, '');
+  const heatPilot = sanitiseHeatPilot(heatPilotRaw);
+  const pilotRows = usePilotSightings(heatMetric === 'pilot' && heatPilot ? [heatPilot.id] : [], pilotMapFilter);
+  const heatPilotId = heatPilot?.id ?? null;
+  const pilotHeat = useMemo(
+    () => (pilotRows && heatPilotId != null ? heatBySystem(pilotRows, heatPilotId) : new Map<number, number>()),
+    [pilotRows, heatPilotId],
+  );
   const heatMax = useMemo(() => {
     if (heatMetric === 'none') return 0;
     let max = 0;
     for (const s of systems) {
-      const v = heatValue(heatMetric, s.eveSystemId, heatKills, heatFleet, selfCharId);
+      const v = heatValue(heatMetric, s.eveSystemId, heatKills, heatFleet, selfCharId, pilotHeat);
       if (v > max) max = v;
     }
     return heatScale(heatMetric, max);
-  }, [heatMetric, systems, heatKills, heatFleet, selfCharId]);
+  }, [heatMetric, systems, heatKills, heatFleet, selfCharId, pilotHeat]);
   const heatmapState = useMemo(
-    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision }),
-    [heatMetric, heatMax, heatIntensity, colorVision],
+    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision, pilot: pilotHeat }),
+    [heatMetric, heatMax, heatIntensity, colorVision, pilotHeat],
   );
 
   // Precompute each node's minimap colour once. Resolving it inside the MiniMap's

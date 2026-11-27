@@ -734,6 +734,11 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   white-space: nowrap;
   border: 0;
 }
+/* Which pilot the "Watched pilot" heatmap shows. */
+.heatmap-menu__note {
+  color: var(--text-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+}
 .heatmap-menu__select {
   background: var(--surface-base);
   border: 1px solid var(--border);

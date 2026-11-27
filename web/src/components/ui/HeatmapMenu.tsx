@@ -4,6 +4,7 @@ import { FireIcon } from '../../icons';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { useClickOutside } from '../../hooks/useClickOutside';
 import { HEAT_METRICS, type HeatMetric } from '../../utils/heatmap';
+import { HEAT_PILOT_KEY, sanitiseHeatPilot, type WatchedPilot } from '../../utils/pilotWatch';
 import { Select } from './Select';
 import { useEscapeClose } from '../../hooks/useEscapeClose';
 
@@ -17,6 +18,8 @@ export function HeatmapMenu() {
   const { t } = useTranslation();
   const [metric, setMetric]       = useUserSetting<HeatMetric>('nexum.map.heatmap', 'none');
   const [intensity, setIntensity] = useUserSetting<number>('nexum.map.heatIntensity', 1);
+  const [heatPilotRaw] = useUserSetting<WatchedPilot | null>(HEAT_PILOT_KEY, null);
+  const heatPilot = sanitiseHeatPilot(heatPilotRaw);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +57,11 @@ export function HeatmapMenu() {
             onChange={(v) => setMetric(v as HeatMetric)}
             options={HEAT_METRICS.map((m) => ({ value: m, label: t(`mapSidebar.heatmapOptions.${m}`) }))}
           />
+          {metric === 'pilot' && (
+            <span className="heatmap-menu__note">
+              {heatPilot ? t('pilots.heatShowing', { name: heatPilot.name }) : t('pilots.heatPick')}
+            </span>
+          )}
           {active && (
             <>
               <label className="heatmap-menu__label" htmlFor="heatmap-intensity-tb">{t('mapSidebar.heatIntensity')}</label>

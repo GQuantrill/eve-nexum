@@ -180,14 +180,14 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
   const heat = useMemo(() => {
     const metric = heatmap.metric;
     if (metric === 'none' || heatmap.max <= 0) return null;
-    const v = heatValue(metric, sys.eveSystemId, allKills, fleet, user?.characterId);
+    const v = heatValue(metric, sys.eveSystemId, allKills, fleet, user?.characterId, heatmap.pilot);
     if (v <= 0) return null;
     // Raw 0..1 share drives the colour (yellow→orange→red); the glow strength
     // is that share times the user intensity, so the busiest system on the map
     // is the reference point and the slider just brightens/dims the rest.
     const raw = Math.min(1, v / heatmap.max);
     return { glow: Math.min(1, raw * heatmap.intensity), color: heatColor(raw, heatmap.colorVision !== 'off') };
-  }, [heatmap.metric, heatmap.max, heatmap.intensity, heatmap.colorVision, sys.eveSystemId, allKills, fleet, user?.characterId]);
+  }, [heatmap.metric, heatmap.max, heatmap.intensity, heatmap.colorVision, heatmap.pilot, sys.eveSystemId, allKills, fleet, user?.characterId]);
   const now             = useNow30s();
   // The flag fades once the kill ages past the display window; the 30s ticker
   // re-evaluates this so it drops on its own without another SSE frame.
