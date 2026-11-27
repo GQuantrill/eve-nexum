@@ -48,7 +48,9 @@ type Service = 'cloning' | 'repair' | 'fitting' | 'market' | 'reprocessing' | 'i
 const SERVICES: Service[] = ['cloning', 'repair', 'fitting', 'market', 'reprocessing', 'insurance'];
 
 const ORDER_KEY     = 'nexum.useful.order';
-const COLLAPSED_KEY = 'nexum.useful.collapsed';
+// Which groups are OPEN, not which are folded: every group starts folded,
+// including any added in a later release, so the panel opens short.
+const EXPANDED_KEY  = 'nexum.useful.expanded';
 // What's HIDDEN, not shown, so a group added later shows up. Quiet systems
 // starts hidden: it's the most niche, and the slowest to work out.
 const HIDDEN_KEY    = 'nexum.useful.hidden';
@@ -100,10 +102,10 @@ export function UsefulSystemsPane() {
   const { body: routeBody, revision } = useRouteOptions(whScope);
 
   const [orderRaw, setOrder]         = useUserSetting<Group[]>(ORDER_KEY, GROUPS);
-  const [collapsedRaw, setCollapsed] = useUserSetting<Group[]>(COLLAPSED_KEY, []);
+  const [expandedRaw, setExpanded]   = useUserSetting<Group[]>(EXPANDED_KEY, []);
   const [hiddenRaw, setHidden]       = useUserSetting<Group[]>(HIDDEN_KEY, ['quiet']);
   const order     = useMemo(() => sanitiseOrder(orderRaw), [orderRaw]);
-  const collapsed = useMemo(() => new Set(cleanGroups(collapsedRaw)), [collapsedRaw]);
+  const expanded  = useMemo(() => new Set(cleanGroups(expandedRaw)), [expandedRaw]);
   const hidden    = useMemo(() => new Set(cleanGroups(hiddenRaw)), [hiddenRaw]);
   const shown     = order.filter((g) => !hidden.has(g));
   const [choosing, setChoosing] = useState(false);
@@ -155,7 +157,7 @@ export function UsefulSystemsPane() {
   }, [structures, structKind]);
 
   // One request for every open group. Folded and hidden ones aren't asked for.
-  const wantedKey = shown.filter((g) => !collapsed.has(g)).join(',');
+  const wantedKey = shown.filter((g) => expanded.has(g)).join(',');
   // Plain, not memoised: it only feeds requestKey, a string.
   const sets = (() => {
     const wanted = wantedKey ? (wantedKey.split(',') as Group[]) : [];
@@ -207,7 +209,7 @@ export function UsefulSystemsPane() {
     if (a !== -1 && b !== -1) setOrder(arrayMove(order, a, b));
   };
   const toggleCollapsed = (g: Group) =>
-    setCollapsed((prev) => { const l = cleanGroups(prev); return l.includes(g) ? l.filter((x) => x !== g) : [...l, g]; });
+    setExpanded((prev) => { const l = cleanGroups(prev); return l.includes(g) ? l.filter((x) => x !== g) : [...l, g]; });
   const toggleHidden = (g: Group) =>
     setHidden((prev) => { const l = cleanGroups(prev); return l.includes(g) ? l.filter((x) => x !== g) : [...l, g]; });
 
@@ -278,7 +280,7 @@ export function UsefulSystemsPane() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
         <SortableContext items={listed.map((l) => l.g)} strategy={verticalListSortingStrategy}>
           {listed.map(({ g, rows }) => {
-            const isCollapsed = collapsed.has(g);
+            const isCollapsed = !expanded.has(g);
             return (
               <GroupSection
                 key={g}
