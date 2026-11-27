@@ -33,8 +33,11 @@ const DEFAULT_THRESHOLD = 2;
 // proximity chip; never used outside debug mode.
 const DEMO_THREAT: NearestThreat = { kind: 'incursion', jumps: 2, systemId: -1 };
 
+/** The farthest proximity alert range, in jumps. */
+export const MAX_THRESHOLD = 10;
+
 function clamp(n: number): number {
-  return Math.max(0, Math.min(5, Math.floor(n)));
+  return Math.max(0, Math.min(MAX_THRESHOLD, Math.floor(n)));
 }
 
 export function readThreshold(): number {
@@ -44,9 +47,6 @@ export function readThreshold(): number {
 export function writeThreshold(n: number): void {
   writeUserSetting(THRESHOLD_KEY, clamp(n));
 }
-
-/** The farthest proximity alert range, in jumps. */
-export const MAX_THRESHOLD = 10;
 
 /** Threshold-watching hook. Returns the current threshold and a setter. */
 export function useProximityThreshold(): [number, (n: number) => void] {

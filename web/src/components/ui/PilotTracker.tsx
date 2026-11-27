@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
@@ -7,7 +7,7 @@ import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useStandings } from '../../hooks/useStandings';
 import { usePilotSightings, refreshPilotSightings } from '../../hooks/usePilotSightings';
-import { recordWatchedFromFeed } from '../../desktop/intel';
+import { recordWatchedFromFeed, useIntelFeed, knownSystem } from '../../desktop/intel';
 import { timeAgo } from '../../i18n/format';
 import { FireIcon, StarIcon, XIcon } from '../../icons';
 import type { HeatMetric } from '../../utils/heatmap';
@@ -16,6 +16,7 @@ import {
   sanitiseWatched, sanitiseHeatPilot, summarise, MAX_WATCHED,
   WATCH_KEY, HEAT_PILOT_KEY, MAP_FILTER_KEY, HIGHLIGHT_KEY,
   type Sighting, type WatchedPilot,
+  intelNameCandidates,
 } from '../../utils/pilotWatch';
 import { Select } from './Select';
 import styles from './PilotTracker.module.css';
@@ -42,7 +43,15 @@ const toneOf = (v: number): Tone =>
   v > 5 ? 'friendly' : v > 0 ? 'good' : v < -5 ? 'hostile' : v < 0 ? 'bad' : 'neutral';
 const TONE_RANK: Record<Tone, number> = { hostile: 0, bad: 1, neutral: 2, good: 3, friendly: 4 };
 
-interface KnownPilot { characterId: number; name: string; systemName: string | null; seenAt: string }
+interface KnownPilot {
+  characterId: number; name: string; systemName: string | null; seenAt: string;
+  /** Only named in an intel channel (desktop app), not seen on a map yet. */
+  intel?: boolean;
+}
+
+// Which words from intel are pilots (the server checks exact names in a
+// batch); kept for the session, misses too, so each is asked about once.
+const pilotNames = new Map<string, { id: number; name: string } | null>();
 
 interface PasteResult { system: string; eveSystemId: number; data: LocalData }
 
@@ -79,14 +88,42 @@ export function PilotTracker() {
   const [found, setFound] = useState<{ q: string; rows: KnownPilot[] }>({ q: '', rows: [] });
   const [addFocused, setAddFocused] = useState(false);
   const addQuery = addName.trim();
+  // Names in the intel channels (desktop app) count too: read when the text
+  // changes, not on every new line.
+  const intelFeed = useIntelFeed();
+  const feedRef = useRef(intelFeed.lines);
+  useEffect(() => { feedRef.current = intelFeed.lines; }, [intelFeed.lines]);
   useEffect(() => {
     if (addQuery.length < 2) return;
     let live = true;
     const timer = setTimeout(() => {
-      api<KnownPilot[]>(`/api/pilots/known?q=${encodeURIComponent(addQuery)}`)
-        .then((rows) => { if (live) setFound({ q: addQuery, rows }); })
-        .catch(() => { if (live) setFound({ q: addQuery, rows: [] }); });
-    }, 250);
+      const onMap = new Set(useMapStore.getState().map.systems.map((x) => x.name.toLowerCase()));
+      const candidates = intelNameCandidates(feedRef.current, addQuery,
+        (w) => onMap.has(w.toLowerCase()) || knownSystem(w) !== null);
+      const ask = candidates.map((c) => c.name).filter((n) => !pilotNames.has(n.toLowerCase()));
+      const checked = ask.length === 0 ? Promise.resolve()
+        : api<{ id: number | string; name: string }[]>('/api/search/characters/batch', {
+            method: 'POST', body: JSON.stringify({ names: ask }),
+          }).then((hits) => {
+            ask.forEach((n) => pilotNames.set(n.toLowerCase(), null));
+            hits.forEach((h) => pilotNames.set(h.name.toLowerCase(), { id: Number(h.id), name: h.name }));
+          }).catch(() => { /* rate-limited or offline: suggest from the maps only */ });
+      Promise.all([
+        api<KnownPilot[]>(`/api/pilots/known?q=${encodeURIComponent(addQuery)}`).catch(() => [] as KnownPilot[]),
+        checked,
+      ]).then(([rows]) => {
+        if (!live) return;
+        const seen = new Set(rows.map((r) => r.characterId));
+        const fromIntel: KnownPilot[] = [];
+        for (const c of candidates) {
+          const p = pilotNames.get(c.name.toLowerCase());
+          if (!p || !Number.isInteger(p.id) || p.id <= 0 || seen.has(p.id)) continue;
+          seen.add(p.id);
+          fromIntel.push({ characterId: p.id, name: p.name, systemName: null, seenAt: new Date(c.at).toISOString(), intel: true });
+        }
+        setFound({ q: addQuery, rows: [...rows, ...fromIntel].slice(0, 12) });
+      });
+    }, 300);
     return () => { live = false; clearTimeout(timer); };
   }, [addQuery]);
   const suggestions = found.q === addQuery && addQuery.length >= 2 ? found.rows : [];
@@ -358,7 +395,7 @@ export function PilotTracker() {
                   }}>
                   <span className={styles.suggestionName}>{k.name}</span>
                   <span className={styles.org}>
-                    {[k.systemName, timeAgo(t, new Date(k.seenAt))].filter(Boolean).join(', ')}
+                    {[k.intel ? t('pilots.fromIntel') : k.systemName, timeAgo(t, new Date(k.seenAt))].filter(Boolean).join(', ')}
                   </span>
                 </button>
               </li>
