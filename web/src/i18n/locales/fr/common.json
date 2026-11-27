@@ -1961,7 +1961,11 @@
       "threshold": "« À portée » utilise le seuil des alertes de proximité.",
       "experimental": "Fonctionnalité expérimentale",
       "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue.",
-      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois)."
+      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois).",
+      "evIntel": "Nouvel intel",
+      "desktopAlwaysOn": "Toujours active dans l'application de bureau ; l'intel est aussi lu avec cette voix. Coupez-la ici.",
+      "voiceOn": "Voix",
+      "voiceVolume": "Volume de la voix — {{pct}} %"
     },
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "browserNotifications": "Notifications du navigateur",
@@ -2098,7 +2102,7 @@
     "notifKillsBillion": "1 Md+ ISK",
     "notifKillsAll": "Chaque kill signalé sur la carte",
     "notifKillsHint": "Spécial signifie un capital perdu, 1 Md+ ISK, ou un dictor, HIC ou smartbomb sur le killmail. Les alertes de fin de vie se déclenchent quand quelqu’un d’autre marque un trou de cette carte à moins de 4 heures ou moins d’1 heure.",
-    "notifVolume": "Volume des alertes et des annonces — {{pct}} %",
+    "notifVolume": "Volume des sons — {{pct}} %",
     "openOptions": "Options de carte",
     "optimizeConnections": "⟳ Optimiser les connexions",
     "panelBelow": "Sous la carte",
@@ -2320,7 +2324,20 @@
       "fortress": "Forteresse",
       "hexagon": "Hexagone",
       "spiked": "Hérissé"
-    }
+    },
+    "notifIntel": "Intel signalé",
+    "notifIntelSound": "Son de l'intel",
+    "notifIntelPreview": "Écouter",
+    "intelSounds": {
+      "twoTone": "Deux tons",
+      "chime": "Carillon",
+      "ping": "Ping",
+      "bell": "Cloche",
+      "blip": "Bip",
+      "alarm": "Alarme",
+      "low": "Tons graves"
+    },
+    "notifSounds": "Sons"
   },
   "mass": {
     "billionKg": "{{value}} Md kg",

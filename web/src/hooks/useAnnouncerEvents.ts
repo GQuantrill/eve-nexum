@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useAnnouncer, primeAudioOnGesture } from '../audio/announcer';
-import { useUserSetting } from './useUserSetting';
-import { alertMuted } from '../utils/notificationPrefs';
+import { useUserSetting, readUserSetting } from './useUserSetting';
+import { voiceMuted } from '../utils/notificationPrefs';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useAccountLocations } from './useAccountLocations';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,7 @@ import { useRoute } from './useRoute';
 import { useKillLog } from '../store/killStore';
 import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
+import { isDesktop } from '../desktop/bridge';
 
 // Settings keys (English-only — see AnnouncerSection). The master switch is OFF
 // by default: the announcer is opt-in (it talks, and its first use downloads the
@@ -25,7 +26,24 @@ export const ANN = {
   lawless:    'nexum.announcer.ev.lawless',
   kills:      'nexum.announcer.ev.kills',
   newChain:   'nexum.announcer.ev.newChain',
+  // Desktop app only: a new intel report within the pilot's intel range.
+  intel:      'nexum.announcer.ev.intel',
 } as const;
+
+/**
+ * Whether the announcer is on. Always, in the desktop app: there every alert
+ * speaks in its voice (intel included), so there's no switch and no prompt. In
+ * a browser it's opt-in, because its first use downloads the voice model.
+ * Either way the voice can be muted (VOICE_ON_KEY) without turning it off.
+ */
+export function announcerOn(enabledSetting: boolean): boolean {
+  return isDesktop() || enabledSetting;
+}
+
+/** Whether the announcer is on (sync read at speak time). */
+export function announcerEnabled(): boolean {
+  return announcerOn(readUserSetting<boolean>(ANN.enabled, false));
+}
 
 interface NearbyLawless { eveSystemId: number; name: string; security: number; jumps: number }
 
@@ -65,7 +83,7 @@ export function useAnnouncerEvents(active = true): void {
   const speak = useAnnouncer((s) => s.speak);
   const [enabledSetting] = useUserSetting<boolean>(ANN.enabled, false);
   // A pop-out window (utils/popout.ts) never speaks: the main window does.
-  const enabled = enabledSetting && active;
+  const enabled = announcerOn(enabledSetting) && active;
   const [voice]      = useUserSetting<string>(ANN.voice, 'af_nicole');
   const [evConnect]  = useUserSetting<boolean>(ANN.connect, true);
   const [evIncur]    = useUserSetting<boolean>(ANN.incursions, true);
@@ -93,13 +111,20 @@ export function useAnnouncerEvents(active = true): void {
   // first event can be heard. Cheap and idempotent.
   useEffect(() => { if (enabled) primeAudioOnGesture(); }, [enabled]);
 
+  // The desktop app fetches the voice straight away, in the background, so
+  // the first intel report is already spoken in it rather than waiting for a
+  // download. (Until then intel falls back to the computer's own voice.)
+  useEffect(() => {
+    if (enabled && isDesktop() && !voiceMuted()) void useAnnouncer.getState().load().catch(() => {});
+  }, [enabled]);
+
   // A speak wrapper that no-ops unless the announcer is enabled AND audible.
   // The volume check is deliberately here rather than inside speak(): an
   // automatic announcement nobody can hear isn't worth downloading the model
   // and running inference for, while the Preview button stays working for
   // someone deliberately testing it with the slider down.
   const say = useMemo(
-    () => (text: string) => { if (enabled && !alertMuted()) void speak(text); },
+    () => (text: string) => { if (enabled && !voiceMuted()) void speak(text); },
     [enabled, speak],
   );
 

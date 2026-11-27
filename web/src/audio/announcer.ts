@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { alertGain } from '../utils/notificationPrefs';
+import { voiceGain } from '../utils/notificationPrefs';
 import { isDesktop } from '../desktop/bridge';
 
 // In-browser voice announcer (Kokoro-82M via kokoro-js + ONNX). The model and all
@@ -152,13 +152,11 @@ async function playSamples(samples: Float32Array, sampleRate: number): Promise<v
   buffer.getChannelData(0).set(samples);
   const source = ctx.createBufferSource();
   source.buffer = buffer;
-  // Speech goes through the same volume the alert beeps use. It used to connect
-  // straight to the destination with no gain stage at all, so the slider
-  // governed the pips and nothing else — turning it to zero silenced the beeps
-  // and left the voice at full blast, which is exactly how it was reported.
-  // Peak 1 so the setting maps to the voice's natural level.
+  // Speech goes through the voice's own volume (the Announcer section's
+  // slider; the alert sounds have theirs). Peak 1 so the setting maps to the
+  // voice's natural level.
   const gain = ctx.createGain();
-  gain.gain.value = alertGain(1);
+  gain.gain.value = voiceGain();
   source.connect(gain);
   gain.connect(ctx.destination);
   currentSource = source;

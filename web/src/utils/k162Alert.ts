@@ -1,9 +1,10 @@
 import { toast } from './toastStore';
-import { NOTIFY, notifyOn, anyChannelOn, alertGain, fireDesktopNotification } from './notificationPrefs';
+import { NOTIFY, notifyOn, anyChannelOn, alertGain, fireDesktopNotification, soundsMuted } from './notificationPrefs';
 
 // Audio context is created lazily on first use to avoid autoplay-policy issues.
 let audioCtx: AudioContext | null = null;
 function playBeep() {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const ctx = audioCtx;

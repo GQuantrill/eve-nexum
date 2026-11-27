@@ -6,12 +6,13 @@ import { useRoute } from './useRoute';
 import { useStandings } from './useStandings';
 import { ensureSovLoaded, getSovEntries } from './useSovData';
 import { useUserSetting, readUserSetting, writeUserSetting } from './useUserSetting';
-import { NOTIFY, notifyOn, alertGain } from '../utils/notificationPrefs';
+import { NOTIFY, notifyOn, alertGain, voiceMuted, voiceGain, INTEL_SOUND_NAME_KEY, soundsMuted } from '../utils/notificationPrefs';
 import { useDebugFlag } from '../utils/debugFlags';
 import { desktopNotify, desktopAttention, desktopInvoke, isDesktop } from '../desktop/bridge';
 import { useIntelReports } from '../desktop/intel';
-import { playIntelSound } from '../desktop/intelSounds';
-import type { IntelSpeech } from '../desktop/intel';
+import { playIntelSound, DEFAULT_INTEL_SOUND } from '../desktop/intelSounds';
+import { useAnnouncer } from '../audio/announcer';
+import { ANN, announcerEnabled } from './useAnnouncerEvents';
 import i18n from '../i18n';
 
 /** 'intel': a system named in one of the pilot's intel channels (desktop app). */
@@ -55,6 +56,7 @@ export function useProximityThreshold(): [number, (n: number) => void] {
 
 let audioCtx: AudioContext | null = null;
 function playBeep() {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const ctx = audioCtx;
@@ -196,6 +198,8 @@ export function useProximityAlerts(): {
   // - sound and voice within the pilot's intel range (desktop settings): any
   //   system on the open map, or within a number of jumps. On the map, the
   //   sound has already played as the line arrived (desktop/intel.ts).
+  //   Whether there is a sound, which one, and the voice are the pilot's
+  //   Notifications and Announcer settings, at the one alert volume.
   const alertedRef = useRef(new Set<string>());
   const located = location.system?.eveSystemId != null;
   useEffect(() => {
@@ -209,13 +213,13 @@ export function useProximityAlerts(): {
       alertedRef.current.add(key);
       const jumps = route?.jumps ?? null;
       if (jumps !== null && jumps <= threshold) {
-        if (notifyOn(NOTIFY.proximityDesktop)) fireIntelNotification(r.name, jumps);
+        if (notifyOn(NOTIFY.intelDesktop)) fireIntelNotification(r.name, jumps);
         desktopAttention();
       }
       const inRange = r.range === null ? r.onMap : jumps !== null && jumps <= r.range;
       if (!inRange) continue;
-      if (r.range !== null && r.sound) playIntelSound(r.soundName);
-      if (r.speech) speakIntel(r.name, jumps, r.speech);
+      if (r.range !== null && notifyOn(NOTIFY.intelSound)) playIntelSound(intelSoundName());
+      if (announcerEnabled() && readUserSetting<boolean>(ANN.intel, true)) speakIntel(r.name, jumps);
     }
   }, [intel, routes, threshold, located]);
 
@@ -251,12 +255,27 @@ function fireIntelNotification(sysName: string, jumps: number) {
   try { new Notification(title, { body, tag: `nexum-intel-${sysName}` }); } catch { /* ignore */ }
 }
 
-const SPEECH_RATES: Record<string, number> = { slow: 0.8, normal: 1, fast: 1.3 };
+/** The intel sound the pilot picked in Notifications. */
+export function intelSoundName(): string {
+  return readUserSetting<string>(INTEL_SOUND_NAME_KEY, DEFAULT_INTEL_SOUND);
+}
 
-// Read a report aloud, in the site's language, at the pilot's volume, speed
-// and voice. A newer report cuts off one still being read: the latest is what
-// matters.
-function speakIntel(sysName: string, jumps: number | null, speech: IntelSpeech) {
+// Read a report aloud in the announcer's voice, like every other spoken alert,
+// at the voice volume. Until the voice has downloaded (the desktop app fetches
+// it at start), the computer's own voice says it instead, in the site's
+// language, so a report is never silent. A newer report cuts off one still
+// being read by that fallback: the latest is what matters.
+function speakIntel(sysName: string, jumps: number | null) {
+  if (voiceMuted()) return;
+  const announcer = useAnnouncer.getState();
+  if (announcer.status === 'ready') {
+    // English: the announcer's voice only speaks English.
+    const text = jumps === null ? `Intel, ${sysName}`
+      : jumps === 0 ? `Intel, ${sysName}, your system`
+      : `Intel, ${sysName}, ${jumps === 1 ? '1 jump' : `${jumps} jumps`}`;
+    void announcer.speak(text);
+    return;
+  }
   if (typeof speechSynthesis === 'undefined') return;
   const text = jumps === null
     ? i18n.t('toolbar.proximity.intelSpeakReported', { system: sysName })
@@ -267,10 +286,8 @@ function speakIntel(sysName: string, jumps: number | null, speech: IntelSpeech) 
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = i18n.language;
-    u.volume = Math.min(100, Math.max(0, speech.volume)) / 100;
-    u.rate = SPEECH_RATES[speech.rate] ?? 1;
-    const voice = speech.voice ? speechSynthesis.getVoices().find((v) => v.voiceURI === speech.voice) : undefined;
-    if (voice) u.voice = voice;
+    // The voice's own volume, on the same curve as the announcer's.
+    u.volume = voiceGain();
     speechSynthesis.speak(u);
   } catch { /* no voices: stay silent */ }
 }

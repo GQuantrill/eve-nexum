@@ -1961,7 +1961,11 @@
       "threshold": "\"Binnen bereik\" gebruikt de drempel van Nabijheidsmeldingen.",
       "experimental": "Experimentele functie",
       "delayNote": "De stem kan tot 5 seconden achterlopen. De eerste keer duurt langer.",
-      "downloadSize": "Bij het eerste gebruik wordt de stem gedownload, ongeveer {{mb}} MB (eenmalig)."
+      "downloadSize": "Bij het eerste gebruik wordt de stem gedownload, ongeveer {{mb}} MB (eenmalig).",
+      "evIntel": "Nieuwe intel",
+      "desktopAlwaysOn": "Altijd aan in de desktop-app; intel wordt ook met deze stem voorgelezen. Hier dempen.",
+      "voiceOn": "Stem",
+      "voiceVolume": "Stemvolume — {{pct}}%"
     },
     "bookmarkHelp": "Klik op een rij met een wormgat-signatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam, en plak die in de bookmark in het spel. Stel de naam samen met deze tokens:",
     "browserNotifications": "Browsermeldingen",
@@ -2098,7 +2102,7 @@
     "notifKillsBillion": "1 mld+ ISK",
     "notifKillsAll": "Elke kill die op de kaart oplicht",
     "notifKillsHint": "Speciaal betekent een verloren capital, 1 mld+ ISK, of een dictor, HIC of smartbomb op de killmail. End-of-life-meldingen komen als iemand anders een gat op deze kaart op minder dan 4 uur of minder dan 1 uur zet.",
-    "notifVolume": "Volume van meldingen en omroeper — {{pct}}%",
+    "notifVolume": "Geluidsvolume — {{pct}}%",
     "openOptions": "Kaartopties",
     "optimizeConnections": "⟳ Verbindingen optimaliseren",
     "panelBelow": "Onder de kaart",
@@ -2320,7 +2324,20 @@
       "fortress": "Vesting",
       "hexagon": "Zeshoek",
       "spiked": "Stekelig"
-    }
+    },
+    "notifIntel": "Intel gemeld",
+    "notifIntelSound": "Intelgeluid",
+    "notifIntelPreview": "Voorbeeld",
+    "intelSounds": {
+      "twoTone": "Twee tonen",
+      "chime": "Gong",
+      "ping": "Ping",
+      "bell": "Bel",
+      "blip": "Blip",
+      "alarm": "Alarm",
+      "low": "Lage tonen"
+    },
+    "notifSounds": "Geluiden"
   },
   "mass": {
     "billionKg": "{{value}} mld kg",

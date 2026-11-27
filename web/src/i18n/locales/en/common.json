@@ -1961,7 +1961,11 @@
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
       "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer.",
-      "downloadSize": "First use downloads the voice, about {{mb}} MB (once)."
+      "downloadSize": "First use downloads the voice, about {{mb}} MB (once).",
+      "evIntel": "New intel",
+      "desktopAlwaysOn": "Always on in the desktop app; intel is read in this voice too. Mute it here.",
+      "voiceOn": "Voice",
+      "voiceVolume": "Voice volume — {{pct}}%"
     },
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "browserNotifications": "Browser Notifications",
@@ -2098,7 +2102,7 @@
     "notifKillsBillion": "1B+ ISK",
     "notifKillsAll": "Every kill flagged on the map",
     "notifKillsHint": "Special means a capital lost, 1B+ ISK, or a dictor, HIC or smartbomb on the mail. End-of-life alerts fire when someone else marks a hole on this map under 4 hours or under 1 hour.",
-    "notifVolume": "Alert & announcer volume — {{pct}}%",
+    "notifVolume": "Sound volume — {{pct}}%",
     "openOptions": "Map options",
     "optimizeConnections": "⟳ Optimize Connections",
     "panelBelow": "Below map",
@@ -2320,7 +2324,20 @@
       "fortress": "Fortress",
       "hexagon": "Hexagon",
       "spiked": "Spiked"
-    }
+    },
+    "notifIntel": "Intel reported",
+    "notifIntelSound": "Intel sound",
+    "notifIntelPreview": "Preview",
+    "intelSounds": {
+      "twoTone": "Two tones",
+      "chime": "Chime",
+      "ping": "Ping",
+      "bell": "Bell",
+      "blip": "Blip",
+      "alarm": "Alarm",
+      "low": "Low tones"
+    },
+    "notifSounds": "Sounds"
   },
   "mass": {
     "billionKg": "{{value}} B kg",

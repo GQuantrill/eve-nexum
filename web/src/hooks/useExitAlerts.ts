@@ -6,7 +6,7 @@ import { systemDisplayName } from '../utils/systemName';
 import { toast } from '../utils/toastStore';
 import {
   NOTIFY, alertGain, fireDesktopNotification, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT,
-  EXITS_MIN_SECURITY_OFF,
+  EXITS_MIN_SECURITY_OFF, soundsMuted,
 } from '../utils/notificationPrefs';
 
 // The k-space classes that can be an exit. Wormhole systems never are.
@@ -21,6 +21,7 @@ const MAX_SEPARATE_ALERTS = 3;
 
 let audioCtx: AudioContext | null = null;
 function playExitChime() {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const ctx = audioCtx;

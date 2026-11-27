@@ -22,7 +22,15 @@ export const NOTIFY = {
   killsSound:       'nexum.notify.kills.sound',
   eolDesktop:       'nexum.notify.eol.desktop',
   eolSound:         'nexum.notify.eol.sound',
+  // Intel reports (desktop app): the notification and the sound. Both used to
+  // be the desktop app's own settings; they live here now, beside every other
+  // alert, so there's one place to manage sound.
+  intelDesktop:     'nexum.notify.intel.desktop',
+  intelSound:       'nexum.notify.intel.sound',
 } as const;
+
+/** Which sound intel plays (desktop/intelSounds.ts). */
+export const INTEL_SOUND_NAME_KEY = 'nexum.notify.intel.soundName';
 
 /**
  * Alert volume, 0–100. Nexum's chimes are generated rather than played from a
@@ -31,6 +39,41 @@ export const NOTIFY = {
  */
 export const ALERT_VOLUME_KEY = 'nexum.notify.volume';
 export const ALERT_VOLUME_DEFAULT = 100;
+/** Every alert sound (the chimes and intel's sound) on or off. The voice has
+ *  its own switch and volume (the announcer's). */
+export const SOUNDS_ON_KEY = 'nexum.notify.soundsOn';
+/** The voice's volume, 0-100: the announcer and intel read aloud. */
+export const VOICE_VOLUME_KEY = 'nexum.announcer.volume';
+/** The voice unmuted. A mute, not the announcer's on/off: the desktop app's
+ *  announcer is always on, and this just silences it. */
+export const VOICE_ON_KEY = 'nexum.announcer.voiceOn';
+
+const pct = (v: unknown): number => Math.min(100, Math.max(0, Number(v) || 0));
+
+/** The voice's volume. Until it's been set, whatever the one shared slider
+ *  was at, so splitting them changed nobody's voice. */
+export function voiceVolume(): number {
+  return pct(readUserSetting<number>(VOICE_VOLUME_KEY,
+    readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT)));
+}
+
+/** The voice's gain, on the same curve as the chimes (see alertGain). */
+export function voiceGain(): number {
+  return Math.max((voiceVolume() / 100) ** 2, 0.00001);
+}
+
+/** Voice muted, or its volume at zero: nothing worth generating speech for
+ *  (the first use downloads the model and every line runs on the CPU). */
+export function voiceMuted(): boolean {
+  return !readUserSetting<boolean>(VOICE_ON_KEY, true) || voiceVolume() === 0;
+}
+
+/** Alert sounds switched off, or their volume at zero. Every chime checks
+ *  this before it plays. */
+export function soundsMuted(): boolean {
+  return !readUserSetting<boolean>(SOUNDS_ON_KEY, true)
+    || pct(readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT)) === 0;
+}
 
 /**
  * Scale a chime's peak gain by the user's volume. Each alert keeps its own
@@ -49,16 +92,11 @@ export function alertGain(peak: number): number {
 }
 
 /**
- * Volume slider sitting at zero. The gain floor above is inaudible rather than
+ * Sound volume sitting at zero. The gain floor above is inaudible rather than
  * truly silent, so callers can't test the returned gain for "muted" — ask here.
- *
- * Worth checking before work that only exists to make a sound: the announcer
- * downloads an ~86 MB model and runs inference on the user's own CPU, and doing
- * that to play something nobody can hear is pure waste.
  */
 export function alertMuted(): boolean {
-  const pct = readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
-  return Math.min(100, Math.max(0, Number(pct) || 0)) === 0;
+  return pct(readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT)) === 0;
 }
 
 /**
@@ -122,6 +160,9 @@ export const NOTIFY_DEFAULTS: Record<string, boolean> = {
   [NOTIFY.killsSound]:       false,
   [NOTIFY.eolDesktop]:       false,
   [NOTIFY.eolSound]:         false,
+  // Intel is what the channels are followed for: on, as it was in the app.
+  [NOTIFY.intelDesktop]:     true,
+  [NOTIFY.intelSound]:       true,
 };
 
 /**

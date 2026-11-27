@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { isHydrated, readUserSetting, writeUserSetting } from '../../hooks/useUserSetting';
 import { ANN } from '../../hooks/useAnnouncerEvents';
+import { isDesktop } from '../../desktop/bridge';
 import { ANNOUNCER_DOWNLOAD_MB } from '../../audio/announcer';
 import { proximityPromptPending } from '../../utils/firstRunPrompts';
 import styles from './ProximityOptInModal.module.css';
@@ -27,6 +28,8 @@ export function AnnouncerOptInModal() {
     const check = () => {
       timer = null;
       if (!isHydrated() || proximityPromptPending()) { timer = setTimeout(check, 1000); return; }
+      // Nothing to ask in the desktop app: the announcer is simply on there.
+      if (isDesktop()) return;
       if (readUserSetting<boolean>(ANN.asked, false)) return;
       if (readUserSetting<boolean>(ANN.enabled, false)) { writeUserSetting(ANN.asked, true); return; }
       setShow(true);

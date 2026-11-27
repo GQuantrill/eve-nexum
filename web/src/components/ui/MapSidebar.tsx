@@ -23,7 +23,7 @@ import {
 import type { Density } from '../../utils/density';
 import { useUserSetting } from "../../hooks/useUserSetting";
 import { normalizePlacement } from "../../hooks/useLocationTracking";
-import { NOTIFY, notifyDefault, previewAlertVolume, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF, KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter } from "../../utils/notificationPrefs";
+import { NOTIFY, notifyDefault, previewAlertVolume, INTEL_SOUND_NAME_KEY, SOUNDS_ON_KEY, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT, EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT, EXITS_MIN_SECURITY_OFF, KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter } from "../../utils/notificationPrefs";
 import { useResettableState } from "../../hooks/useResettableState";
 import { DEFAULT_BOOKMARK_FORMAT, BOOKMARK_TOKENS, DEFAULT_SITE_BOOKMARK_FORMAT, SITE_BOOKMARK_TOKENS, K162_BOOKMARK_FORMAT_KEY } from "../../utils/signatureBookmark";
 import { COPY_BOOKMARK_ON_JUMP } from "../../hooks/whJumpConfirm";
@@ -33,6 +33,8 @@ import { CaretLeftIcon, CaretRightIcon, DiscordLogoIcon } from "@phosphor-icons/
 import { DISCORD_INVITE_URL } from "../../data/links";
 import { JumpRangePane } from "./JumpRangePane";
 import { AnnouncerSection } from "./AnnouncerSection";
+import { isDesktop } from "../../desktop/bridge";
+import { INTEL_SOUNDS, DEFAULT_INTEL_SOUND, playIntelSound } from "../../desktop/intelSounds";
 import { MapSharesSection } from "./MapSharesSection";
 import { MapAuditModal } from "./MapAuditModal";
 import { WAYPOINT_SEND_TO_KEY, type WaypointSendTo } from "../../api/waypoint";
@@ -999,6 +1001,9 @@ export function MapSidebar() {
   const [exitsMinSec, setExitsMinSec] = useUserSetting<number>(EXITS_MIN_SECURITY_KEY, EXITS_MIN_SECURITY_DEFAULT);
   const [killsFilter, setKillsFilter] = useUserSetting<KillsFilter>(KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT);
   const [alertVolume, setAlertVolume] = useUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT);
+  const [soundsOn, setSoundsOn] = useUserSetting<boolean>(SOUNDS_ON_KEY, true);
+  // Intel's sound (desktop app): which one, set here with the other alerts.
+  const [intelSoundName, setIntelSoundName] = useUserSetting<string>(INTEL_SOUND_NAME_KEY, DEFAULT_INTEL_SOUND);
   const setPanelSideBySide = useMapStore((s) => s.setPanelSideBySide);
   const setCompactMode = useMapStore((s) => s.setCompactMode);
   const showMinimap = useMapStore((s) => s.showMinimap);
@@ -1867,7 +1872,30 @@ export function MapSidebar() {
               desktopKey={NOTIFY.eolDesktop}
               soundKey={NOTIFY.eolSound}
             />
+            {/* Intel channels are read by the desktop app only. */}
+            {isDesktop() && (
+              <NotifRow
+                label={t("mapSidebar.notifIntel")}
+                desktopKey={NOTIFY.intelDesktop}
+                soundKey={NOTIFY.intelSound}
+              />
+            )}
           </div>
+          {isDesktop() && (
+            <label className="map-sidebar__field">
+              <span>{t("mapSidebar.notifIntelSound")}</span>
+              <span className="map-sidebar__row" style={{ gap: 6 }}>
+                <Select
+                  value={INTEL_SOUNDS.includes(intelSoundName as never) ? intelSoundName : DEFAULT_INTEL_SOUND}
+                  onChange={(v) => { setIntelSoundName(v); playIntelSound(v); }}
+                  options={INTEL_SOUNDS.map((id) => ({ value: id, label: t(`mapSidebar.intelSounds.${id}`) }))}
+                />
+                <button type="button" className="toolbar__toggle" onClick={() => playIntelSound(intelSoundName)}>
+                  {t("mapSidebar.notifIntelPreview")}
+                </button>
+              </span>
+            </label>
+          )}
           {/* Which exits count. Only meaningful with the row above switched on,
               so it sits under the grid rather than in it. */}
           <label className="map-sidebar__field">
@@ -1900,13 +1928,20 @@ export function MapSidebar() {
           </label>
           <div className="map-sidebar__hint">{t("mapSidebar.notifKillsHint")}</div>
 
-          {/* Volume for everything the app makes a sound with: the generated
-              chimes AND the spoken announcer in the section below. The chimes
-              come from code rather than a file, so this scales their gain — and
-              macOS has no per-app volume to fall back on. Releasing the slider
-              plays a sample, since a number alone tells you nothing about how
-              loud it actually is. The sample is a chime; the announcer would
-              need the model loaded to preview. */}
+          {/* Every alert sound on or off, and their volume. The voice has its
+              own pair in the Announcer section. The chimes come from code
+              rather than a file, so this scales their gain (and macOS has no
+              per-app volume to fall back on). Releasing the slider plays a
+              sample, since a number alone says nothing about how loud it is. */}
+          <label className="map-sidebar__row map-sidebar__toggle-row">
+            <span className="map-sidebar__label">{t("mapSidebar.notifSounds")}</span>
+            <input
+              type="checkbox"
+              className="map-sidebar__toggle-input"
+              checked={soundsOn !== false}
+              onChange={(e) => setSoundsOn(e.target.checked)}
+            />
+          </label>
           <label className="map-sidebar__field">
             <span>{t("mapSidebar.notifVolume", { pct: alertVolume })}</span>
             <input
@@ -1915,6 +1950,7 @@ export function MapSidebar() {
               max={100}
               step={5}
               value={alertVolume}
+              disabled={soundsOn === false}
               onChange={(e) => setAlertVolume(Number(e.target.value))}
               onMouseUp={() => previewAlertVolume()}
               onKeyUp={() => previewAlertVolume()}
