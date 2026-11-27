@@ -92,3 +92,44 @@ export function sightsBySystem(rows: Sighting[], ids: ReadonlySet<number>): Map<
   }
   return out;
 }
+
+/** A possible pilot name from an intel line: the newest time it appeared. */
+export interface IntelName { name: string; at: number }
+
+const WORD_EDGE = /^[^\p{L}\p{N}]+|[^\p{L}\p{N}'.-]+$/gu;
+
+/**
+ * Pilot names in intel are plain text, so suggest what could be one: runs of
+ * one to three words (EVE names are at most three) containing the typed text,
+ * without system names or the line's punctuation, plus every sender. Newest
+ * line first, at most `max`. The server then keeps only the real pilots.
+ */
+export function intelNameCandidates(
+  lines: ReadonlyArray<{ sender: string; text: string; at: number }>,
+  query: string,
+  isSystem: (word: string) => boolean,
+  max = 30,
+): IntelName[] {
+  const q = query.trim().toLowerCase();
+  if (q.length < 2) return [];
+  const out = new Map<string, IntelName>();
+  const add = (name: string, at: number) => {
+    const key = name.toLowerCase();
+    if (name.length < 3 || name.length > 37 || !key.includes(q)) return;
+    const had = out.get(key);
+    if (!had || had.at < at) out.set(key, { name, at });
+  };
+  for (const l of [...lines].sort((a, b) => b.at - a.at)) {
+    add(l.sender.trim(), l.at);
+    const words = l.text.split(/\s+/).map((w) => w.replace(WORD_EDGE, '')).filter(Boolean);
+    for (let i = 0; i < words.length; i++) {
+      for (let n = 1; n <= 3 && i + n <= words.length; n++) {
+        const run = words.slice(i, i + n);
+        if (run.some(isSystem)) break;
+        add(run.join(' '), l.at);
+      }
+    }
+    if (out.size >= max) break;
+  }
+  return [...out.values()].slice(0, max);
+}

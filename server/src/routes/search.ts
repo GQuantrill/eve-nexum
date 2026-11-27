@@ -14,7 +14,8 @@ const ESI_TIMEOUT_MS = 8_000;
 
 // Cache exact-name lookups for 24h. Character / corp names are effectively
 // immutable; this stops a debounced search-as-you-type UI from hammering ESI.
-const lookupCache = new TtlCache<string, { id: number; name: string } | null>(24 * 60 * 60 * 1000);
+// Swept hourly: the batch check below can add a few dozen names per call.
+const lookupCache = new TtlCache<string, { id: number; name: string } | null>(24 * 60 * 60 * 1000, 60 * 60 * 1000);
 
 interface IdsResponse {
   characters?:    Array<{ id: number; name: string }>;
@@ -96,6 +97,49 @@ searchRouter.get('/characters', async (req, res) => {
     : null;
   lookupCache.set(key, match);
   res.json({ match });
+});
+
+// POST /api/search/characters/batch { names: string[] }
+// Which of these exact names are pilots: the words of intel lines that could
+// be names, so the watch list only suggests real ones. One ESI call for the
+// names not already cached (a miss is cached too), at most MAX_BATCH names.
+const MAX_BATCH = 30;
+searchRouter.post('/characters/batch', async (req, res) => {
+  const raw = (req.body as { names?: unknown } | undefined)?.names;
+  if (!Array.isArray(raw) || raw.length > MAX_BATCH) { res.status(400).json({ error: 'invalid_names' }); return; }
+  const names = [...new Set(raw.map(cleanQuery).filter((n): n is string => !!n && n.length <= 37))];
+  const found: Array<{ id: number; name: string }> = [];
+  const ask: string[] = [];
+  for (const n of names) {
+    const hit = lookupCache.get(`char:${n.toLowerCase()}`);
+    if (hit === null) ask.push(n);
+    else if (hit.value) found.push(hit.value);
+  }
+  if (ask.length > 0) {
+    let body: IdsResponse | null = null;
+    try {
+      const r = await esiFetch('https://esi.evetech.net/latest/universe/ids/', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(ask),
+        signal:  AbortSignal.timeout(ESI_TIMEOUT_MS),
+      });
+      // 404: none of them exist.
+      body = r.ok ? await r.json() as IdsResponse : r.status === 404 ? {} : null;
+      if (!body) log.warn(`ESI /universe/ids/ returned ${r.status} for a batch of ${ask.length}`);
+    } catch (err) {
+      log.warn('ESI /universe/ids/ batch failed:', err);
+    }
+    if (body) {
+      const byName = new Map((body.characters ?? []).map((c) => [c.name.toLowerCase(), { id: c.id, name: c.name }]));
+      for (const n of ask) {
+        const m = byName.get(n.toLowerCase()) ?? null;
+        lookupCache.set(`char:${n.toLowerCase()}`, m);
+        if (m) found.push(m);
+      }
+    }
+  }
+  res.json(found);
 });
 
 // GET /api/search/corporations?q=<exact name>
