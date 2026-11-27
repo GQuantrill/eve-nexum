@@ -1963,7 +1963,9 @@
       "delayNote": "音声が最大5秒遅れることがあります。初回は時間がかかります。",
       "downloadSize": "初回使用時に音声をダウンロードします（約 {{mb}} MB、一度だけ）。",
       "evIntel": "新しいインテル",
-      "desktopAlwaysOn": "デスクトップアプリでは常にオンで、通知で設定したアラート音量で再生されます。インテルもこの声で読み上げます。"
+      "desktopAlwaysOn": "デスクトップアプリでは常にオンで、インテルもこの声で読み上げます。ここでミュートできます。",
+      "voiceOn": "音声",
+      "voiceVolume": "音声の音量 — {{pct}}%"
     },
     "bookmarkHelp": "ワームホールのシグネチャ行でコピーアイコンをクリックすると、貼り付け可能なブックマーク名がコピーされます。ゲーム内のブックマークに貼り付けてください。次のトークンで名前を作成します：",
     "browserNotifications": "ブラウザ通知",
@@ -2100,7 +2102,7 @@
     "notifKillsBillion": "10億ISK以上",
     "notifKillsAll": "マップで表示されるすべてのキル",
     "notifKillsHint": "特別とは、キャピタルの撃沈、10億ISK以上、またはキルメールにDictor・HIC・スマートボムが含まれるものです。寿命末期の通知は、他の人がこのマップのホールを残り4時間未満または1時間未満にしたときに届きます。",
-    "notifVolume": "通知・アナウンス音量 — {{pct}}%",
+    "notifVolume": "サウンド音量 — {{pct}}%",
     "openOptions": "マップオプション",
     "optimizeConnections": "⟳ 接続を最適化",
     "panelBelow": "マップの下",
@@ -2334,7 +2336,8 @@
       "blip": "ブリップ",
       "alarm": "アラーム",
       "low": "低音"
-    }
+    },
+    "notifSounds": "サウンド"
   },
   "mass": {
     "billionKg": "{{value}}十億 kg",

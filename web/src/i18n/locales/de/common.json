@@ -1963,7 +1963,9 @@
       "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger.",
       "downloadSize": "Beim ersten Einsatz wird die Stimme geladen, etwa {{mb}} MB (einmalig).",
       "evIntel": "Neue Intel",
-      "desktopAlwaysOn": "In der Desktop-App immer an, mit der Lautstärke aus den Benachrichtigungen. Auch Intel wird mit dieser Stimme vorgelesen."
+      "desktopAlwaysOn": "In der Desktop-App immer an; auch Intel wird mit dieser Stimme vorgelesen. Hier stummschalten.",
+      "voiceOn": "Stimme",
+      "voiceVolume": "Lautstärke der Stimme — {{pct}} %"
     },
     "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
     "browserNotifications": "Browser-Benachrichtigungen",
@@ -2100,7 +2102,7 @@
     "notifKillsBillion": "1 Mrd.+ ISK",
     "notifKillsAll": "Jeder auf der Karte markierte Kill",
     "notifKillsHint": "Besonders heißt: ein verlorenes Capital, 1 Mrd.+ ISK oder ein Dictor, HIC oder Smartbomb auf der Killmail. End-of-Life-Meldungen kommen, wenn jemand anderes ein Loch auf dieser Karte auf unter 4 Stunden oder unter 1 Stunde setzt.",
-    "notifVolume": "Lautstärke für Warnungen & Ansagen — {{pct}} %",
+    "notifVolume": "Lautstärke der Töne — {{pct}} %",
     "openOptions": "Kartenoptionen",
     "optimizeConnections": "⟳ Verbindungen optimieren",
     "panelBelow": "Unter Karte",
@@ -2334,7 +2336,8 @@
       "blip": "Blip",
       "alarm": "Alarm",
       "low": "Tiefe Töne"
-    }
+    },
+    "notifSounds": "Töne"
   },
   "mass": {
     "billionKg": "{{value}} Mrd. kg",

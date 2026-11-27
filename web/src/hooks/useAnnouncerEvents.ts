@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useAnnouncer, primeAudioOnGesture } from '../audio/announcer';
-import { useUserSetting } from './useUserSetting';
-import { alertMuted } from '../utils/notificationPrefs';
+import { useUserSetting, readUserSetting } from './useUserSetting';
+import { voiceMuted } from '../utils/notificationPrefs';
 import { useCharacterLocation } from './useCharacterLocation';
 import { useAccountLocations } from './useAccountLocations';
 import { useAuth } from '../context/AuthContext';
@@ -34,9 +34,15 @@ export const ANN = {
  * Whether the announcer is on. Always, in the desktop app: there every alert
  * speaks in its voice (intel included), so there's no switch and no prompt. In
  * a browser it's opt-in, because its first use downloads the voice model.
+ * Either way the voice can be muted (VOICE_ON_KEY) without turning it off.
  */
 export function announcerOn(enabledSetting: boolean): boolean {
   return isDesktop() || enabledSetting;
+}
+
+/** Whether the announcer is on (sync read at speak time). */
+export function announcerEnabled(): boolean {
+  return announcerOn(readUserSetting<boolean>(ANN.enabled, false));
 }
 
 interface NearbyLawless { eveSystemId: number; name: string; security: number; jumps: number }
@@ -109,7 +115,7 @@ export function useAnnouncerEvents(active = true): void {
   // the first intel report is already spoken in it rather than waiting for a
   // download. (Until then intel falls back to the computer's own voice.)
   useEffect(() => {
-    if (enabled && isDesktop() && !alertMuted()) void useAnnouncer.getState().load().catch(() => {});
+    if (enabled && isDesktop() && !voiceMuted()) void useAnnouncer.getState().load().catch(() => {});
   }, [enabled]);
 
   // A speak wrapper that no-ops unless the announcer is enabled AND audible.
@@ -118,7 +124,7 @@ export function useAnnouncerEvents(active = true): void {
   // and running inference for, while the Preview button stays working for
   // someone deliberately testing it with the slider down.
   const say = useMemo(
-    () => (text: string) => { if (enabled && !alertMuted()) void speak(text); },
+    () => (text: string) => { if (enabled && !voiceMuted()) void speak(text); },
     [enabled, speak],
   );
 

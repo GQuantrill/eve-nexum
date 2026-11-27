@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useUserSetting } from "../../hooks/useUserSetting";
+import { useUserSetting, readUserSetting } from "../../hooks/useUserSetting";
 import { useAnnouncer, VOICES, ANNOUNCER_DOWNLOAD_MB } from "../../audio/announcer";
 import { ANN, announcerOn } from "../../hooks/useAnnouncerEvents";
+import { VOICE_ON_KEY, VOICE_VOLUME_KEY, ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT } from "../../utils/notificationPrefs";
 import { isDesktop } from "../../desktop/bridge";
 import { Select } from "./Select";
 
@@ -36,6 +37,11 @@ export function AnnouncerSection() {
   const enabled = announcerOn(enabledSetting);
   const [voice, setVoice] = useUserSetting<string>(ANN.voice, "af_nicole");
   const { status, progress, error, speaking, setVoice: setAnnVoice, speak } = useAnnouncer();
+  // A mute and a volume of its own, apart from the alert sounds'. The volume
+  // starts where the one shared slider was, so splitting them changed nobody.
+  const [voiceOn, setVoiceOn] = useUserSetting<boolean>(VOICE_ON_KEY, true);
+  const [voiceVolume, setVoiceVolume] = useUserSetting<number>(
+    VOICE_VOLUME_KEY, readUserSetting<number>(ALERT_VOLUME_KEY, ALERT_VOLUME_DEFAULT));
 
   const loading = status === "loading";
 
@@ -86,6 +92,28 @@ export function AnnouncerSection() {
 
       {enabled && (
         <>
+          <label className="map-sidebar__row map-sidebar__toggle-row">
+            <span className="map-sidebar__label">{t("mapSidebar.announcer.voiceOn")}</span>
+            <input
+              type="checkbox"
+              className="map-sidebar__toggle-input"
+              checked={voiceOn !== false}
+              onChange={(e) => setVoiceOn(e.target.checked)}
+            />
+          </label>
+          <label className="map-sidebar__field">
+            <span>{t("mapSidebar.announcer.voiceVolume", { pct: voiceVolume })}</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={voiceVolume}
+              disabled={voiceOn === false}
+              onChange={(e) => setVoiceVolume(Number(e.target.value))}
+              aria-label={t("mapSidebar.announcer.voiceVolume", { pct: voiceVolume })}
+            />
+          </label>
           <label className="map-sidebar__row" style={{ gap: 8 }}>
             <span className="map-sidebar__label">{t("mapSidebar.announcer.voice")}</span>
             <Select

@@ -1,4 +1,4 @@
-import { alertGain } from '../utils/notificationPrefs';
+import { alertGain, soundsMuted } from '../utils/notificationPrefs';
 
 // The intel alert sounds the pilot picks from in the desktop app's settings
 // (intelSoundName). All made with Web Audio, no files. The ids are shared with
@@ -69,6 +69,7 @@ let audioCtx: AudioContext | null = null;
 /** Play an intel sound (the default for an unknown name), at the site's
  *  alert volume. */
 export function playIntelSound(name?: string | null): void {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new AudioContext();
     const ctx = audioCtx;

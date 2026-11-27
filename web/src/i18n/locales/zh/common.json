@@ -1963,7 +1963,9 @@
       "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。",
       "downloadSize": "首次使用会下载语音，约 {{mb}} MB（仅一次）。",
       "evIntel": "新情报",
-      "desktopAlwaysOn": "在桌面应用中始终开启，音量为通知中设置的提醒音量。情报也会用此声音朗读。"
+      "desktopAlwaysOn": "在桌面应用中始终开启；情报也会用此声音朗读。可在此静音。",
+      "voiceOn": "语音",
+      "voiceVolume": "语音音量 — {{pct}}%"
     },
     "bookmarkHelp": "在虫洞信号行点击复制图标，即可复制可直接粘贴的书签名称，然后粘贴到游戏内书签中。使用以下变量构建名称：",
     "browserNotifications": "浏览器通知",
@@ -2100,7 +2102,7 @@
     "notifKillsBillion": "10 亿+ ISK",
     "notifKillsAll": "地图上标记的所有击杀",
     "notifKillsHint": "特殊指旗舰被击毁、价值 10 亿+ ISK，或击杀报告中有拦截舰、重拦或立体炸弹。当其他人将此地图上的虫洞标记为少于 4 小时或少于 1 小时时，会发出寿命将尽提醒。",
-    "notifVolume": "提醒与语音播报音量 — {{pct}}%",
+    "notifVolume": "提示音音量 — {{pct}}%",
     "openOptions": "地图选项",
     "optimizeConnections": "⟳ 优化连接",
     "panelBelow": "地图下方",
@@ -2334,7 +2336,8 @@
       "blip": "哔哔",
       "alarm": "警报",
       "low": "低音"
-    }
+    },
+    "notifSounds": "提示音"
   },
   "mass": {
     "billionKg": "{{value}} 十亿 kg",

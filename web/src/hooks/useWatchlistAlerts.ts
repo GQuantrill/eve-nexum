@@ -7,11 +7,12 @@ import { useShareMode } from '../context/ShareModeContext';
 import { systemDisplayName } from '../utils/systemName';
 import { matchSystem, matchConnection } from '../utils/watchMatch';
 import { toast } from '../utils/toastStore';
-import { NOTIFY, alertGain, fireDesktopNotification } from '../utils/notificationPrefs';
+import { NOTIFY, alertGain, fireDesktopNotification, soundsMuted } from '../utils/notificationPrefs';
 
 // Lazily-created shared audio context (autoplay policy: only on first sound).
 let audioCtx: AudioContext | null = null;
 function playWatchChime() {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const ctx = audioCtx;

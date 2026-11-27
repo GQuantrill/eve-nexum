@@ -6,7 +6,7 @@ import { systemDisplayName } from './systemName';
 import { abbreviateValue } from '../i18n/format';
 import {
   NOTIFY, notifyOn, anyChannelOn, alertGain, fireDesktopNotification,
-  KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter,
+  KILLS_FILTER_KEY, KILLS_FILTER_DEFAULT, type KillsFilter, soundsMuted,
 } from './notificationPrefs';
 import { readUserSetting } from '../hooks/useUserSetting';
 
@@ -21,6 +21,7 @@ let audioCtx: AudioContext | null = null;
 // K162 (1320 saw), watchlist (988 triangle), proximity (880 sine) and exit
 // (660 square) chimes.
 function playTwoTone(first: number, second: number, type: OscillatorType, peak: number) {
+  if (soundsMuted()) return;
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const ctx = audioCtx;
