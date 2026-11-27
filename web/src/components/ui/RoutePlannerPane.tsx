@@ -201,8 +201,11 @@ export function RoutePlannerPane() {
   // the location poll.
   const [fromOverride, setFromOverride] = useState<Picked | null | undefined>(undefined);
   const [to, setTo] = useState<Picked | null>(null);
-  // "Route to here" from the map's right-click menu.
-  useRouteToRequests(setTo);
+  // "Route to here" / "Route from here" from the map's right-click menu.
+  useRouteToRequests((t) => {
+    const picked = { id: t.id, name: t.name };
+    if (t.end === 'to') setTo(picked); else setFromOverride(picked);
+  });
   const from: Picked | null = fromOverride !== undefined
     ? fromOverride
     : (origin.systemId != null ? { id: origin.systemId, name: origin.name ?? String(origin.systemId) } : null);

@@ -20,18 +20,19 @@ describe('routeTo', () => {
     settings['nexum.panel.collapsed.routePlanner'] = true;
     const got: unknown[] = [];
     renderHook(() => useRouteToRequests((t) => got.push(t)));
-    routeTo({ id: 30000142, name: 'Jita' });
-    expect(got).toEqual([{ id: 30000142, name: 'Jita' }]);
+    routeTo({ id: 30000142, name: 'Jita', end: 'to' });
+    expect(got).toEqual([{ id: 30000142, name: 'Jita', end: 'to' }]);
     expect(settings['nexum.sidebar.hidden']).toEqual(['a0']);
     expect(settings['nexum.panel.collapsed.routePlanner']).toBe(false);
     expect(settings['nexum.sidebar.collapsed']).toBe(false);
   });
 
   it('holds it for a planner that mounts just after (it was folded)', () => {
-    routeTo({ id: 30002187, name: 'Amarr' });
+    routeTo({ id: 30002187, name: 'Amarr', end: 'to' });
+    routeTo({ id: 30003069, name: 'Sosa', end: 'from' });
     const got: unknown[] = [];
     renderHook(() => useRouteToRequests((t) => got.push(t)));
-    expect(got).toEqual([{ id: 30002187, name: 'Amarr' }]);
+    expect(got).toEqual([{ id: 30002187, name: 'Amarr', end: 'to' }, { id: 30003069, name: 'Sosa', end: 'from' }]);
     // Taken once: a later mount doesn't get it again.
     const again: unknown[] = [];
     renderHook(() => useRouteToRequests((t) => again.push(t)));

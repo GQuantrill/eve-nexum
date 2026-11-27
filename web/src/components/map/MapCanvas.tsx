@@ -1611,13 +1611,16 @@ export function MapCanvas() {
           : {
               label: t('ctxMenu.routeFromHere'),
               icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
-              action: () => setRouteFromSystem({ eveSystemId: sys.eveSystemId!, systemName: sys.name, systemClass: sys.systemClass }),
+              action: () => {
+                setRouteFromSystem({ eveSystemId: sys.eveSystemId!, systemName: sys.name, systemClass: sys.systemClass });
+                routeTo({ id: sys.eveSystemId!, name: sys.name, end: 'from' });
+              },
             },
         // The other end: this system into the Route Planner's To field.
         {
           label:  t('ctxMenu.routeToHere'),
           icon:   <NavigationArrowIcon size={16} weight="regular" color="#3ddc84" style={{ transform: 'scaleX(-1)' }} />,
-          action: () => routeTo({ id: sys.eveSystemId!, name: sys.name }),
+          action: () => routeTo({ id: sys.eveSystemId!, name: sys.name, end: 'to' }),
         },
       ] : [];
 
