@@ -600,11 +600,35 @@ authRouter.get('/org', (_req, res) => {
 });
 
 // GET /auth/me
+/** The languages the app ships (web/src/i18n). */
+const UI_LANGS = new Set(['en', 'de', 'nl', 'fr', 'es', 'pt', 'zh', 'ko', 'ja', 'ru']);
+
+/**
+ * Note that a pilot opened Nexum, for the anonymous usage counts (active users,
+ * desktop users, languages: services/telemetry.ts). At most once an hour per
+ * pilot; best-effort, never holds up /me.
+ */
+function touchActivity(userId: number, desktop: boolean, lang: string | undefined): void {
+  const l = (lang ?? '').trim().slice(0, 2).toLowerCase();
+  db.query(
+    `UPDATE users
+        SET last_active_at  = NOW(),
+            last_desktop_at = CASE WHEN $2 THEN NOW() ELSE last_desktop_at END,
+            ui_lang         = COALESCE($3, ui_lang)
+      WHERE id = $1
+        AND (last_active_at IS NULL OR last_active_at < NOW() - interval '1 hour'
+             OR ($2 AND (last_desktop_at IS NULL OR last_desktop_at < NOW() - interval '1 hour'))
+             OR ui_lang IS DISTINCT FROM COALESCE($3, ui_lang))`,
+    [userId, desktop, UI_LANGS.has(l) ? l : null],
+  ).catch(() => { /* best-effort */ });
+}
+
 authRouter.get('/me', async (req, res) => {
   if (!req.session.userId) {
     res.json({ user: null });
     return;
   }
+  touchActivity(req.session.userId, req.get('x-nexum-desktop') === '1', req.get('x-nexum-lang'));
 
   // Prefs are read from the DB every time rather than from the session copy:
   // with shared settings another character (another session) can change them,

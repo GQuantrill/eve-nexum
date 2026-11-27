@@ -258,7 +258,8 @@
       "tabs": {
         "users": "Gebruikers",
         "systems": "Systemen",
-        "ghostSites": "Ghost sites"
+        "ghostSites": "Ghost sites",
+        "usage": "Gebruik"
       },
       "filter": "Filter",
       "window": "Tijdvak",
@@ -3179,5 +3180,70 @@
     "inUse": "{{label}} is al in gebruik op deze kaart, of een nummer eronder.",
     "beneathOwn": "{{label}} zou {{from}} onder zichzelf plaatsen: elk cijfer is één hole verder van home, dus {{label}} is een hole vanuit {{from}}.",
     "saveFailed": "Het ketennummer kon niet worden opgeslagen."
+  },
+  "usage": {
+    "title": "Nexum-gebruik",
+    "subtitle": "Maandelijks actieve gebruikers op eve-nexum.com en op zelf-gehoste Nexum-installaties.",
+    "updated": "Bijgewerkt {{time}}",
+    "loading": "Laden...",
+    "failed": "De gebruikscijfers konden niet worden geladen.",
+    "notFound": "Deze link is uitgezet of bestaat niet.",
+    "kpi": {
+      "total": "Actieve gebruikers, laatste 30 dagen",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Ingelogde piloten",
+      "selfHosted": "Zelf gehost",
+      "installs": "Installaties: {{count}}",
+      "desktop": "Desktop-app",
+      "desktopNote": "Piloten, laatste 30 dagen"
+    },
+    "chart": {
+      "title": "Maandelijks actieve gebruikers"
+    },
+    "table": {
+      "month": "Maand",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (ingelogd)",
+      "selfHosted": "Zelf gehost",
+      "installs": "Installaties",
+      "total": "Totaal"
+    },
+    "breakdown": {
+      "title": "Installaties",
+      "modes": "Servermodus",
+      "versions": "Versies",
+      "languages": "Talen (actieve piloten)",
+      "features": "Gebruikte functies"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Alliantie"
+    },
+    "features": {
+      "chainNumbering": "Kaarten met ketennummers (L+1)",
+      "autoRemove": "Kaarten met automatisch verwijderen",
+      "crossMapSync": "Kaarten met synchronisatie tussen kaarten",
+      "discord": "Organisaties met Discord-meldingen"
+    },
+    "notes": {
+      "title": "Hoe dit wordt geteld",
+      "live": "eve-nexum.com: actieve gebruikers volgens Google Analytics. Ingelogde piloten zijn characters die de site de laatste 30 dagen gebruikten.",
+      "selfHosted": "Zelf gehost: elke installatie stuurt dagelijks anoniem het aantal piloten dat de laatste 30 dagen actief was; een maand gebruikt de laatste telling van elke installatie in die maand. Installaties worden opgeteld, dus een piloot op twee installaties telt dubbel.",
+      "noGa": "Google Analytics is niet gekoppeld, dus eve-nexum.com toont ingelogde piloten.",
+      "old": "Installaties op een versie die te oud is om cijfers te sturen, dus niet meegeteld: {{count}}."
+    },
+    "share": {
+      "title": "Deelbare link",
+      "hint": "Iedereen met de link kan deze pagina zien zonder in te loggen. Een nieuwe link zet de oude uit.",
+      "create": "Link maken",
+      "replace": "Nieuwe link maken",
+      "remove": "Link uitzetten",
+      "copy": "Kopiëren",
+      "copied": "Link gekopieerd",
+      "active": "Er staat een link aan (gemaakt {{time}}). Hij wordt alleen bij het maken getoond; maak een nieuwe als je hem weer nodig hebt.",
+      "none": "Nog geen link."
+    }
   }
 }

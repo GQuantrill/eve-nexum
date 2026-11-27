@@ -258,7 +258,8 @@
       "tabs": {
         "users": "Users",
         "systems": "Systems",
-        "ghostSites": "Ghost sites"
+        "ghostSites": "Ghost sites",
+        "usage": "Usage"
       },
       "filter": "Filter",
       "window": "Window",
@@ -3179,5 +3180,70 @@
     "inUse": "{{label}} is already in use on this map, or something beneath it is.",
     "beneathOwn": "{{label}} would put {{from}} beneath itself: each digit is one hole further from home, so {{label}} is a hole out of {{from}}.",
     "saveFailed": "Couldn't save the chain number."
+  },
+  "usage": {
+    "title": "Nexum usage",
+    "subtitle": "Monthly active users on eve-nexum.com and on self-hosted Nexum installs.",
+    "updated": "Updated {{time}}",
+    "loading": "Loading...",
+    "failed": "Couldn't load the usage figures.",
+    "notFound": "This link has been turned off or doesn't exist.",
+    "kpi": {
+      "total": "Active users, last 30 days",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Signed-in pilots",
+      "selfHosted": "Self-hosted",
+      "installs": "Installs: {{count}}",
+      "desktop": "Desktop app",
+      "desktopNote": "Pilots, last 30 days"
+    },
+    "chart": {
+      "title": "Monthly active users"
+    },
+    "table": {
+      "month": "Month",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (signed in)",
+      "selfHosted": "Self-hosted",
+      "installs": "Installs",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Installs",
+      "modes": "Server mode",
+      "versions": "Versions",
+      "languages": "Languages (active pilots)",
+      "features": "Features in use"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Alliance"
+    },
+    "features": {
+      "chainNumbering": "Maps with chain numbers (L+1)",
+      "autoRemove": "Maps with auto-remove",
+      "crossMapSync": "Maps with cross-map sync",
+      "discord": "Orgs with Discord alerts"
+    },
+    "notes": {
+      "title": "How these are counted",
+      "live": "eve-nexum.com: active users as counted by Google Analytics. Signed-in pilots are characters that used the site in the last 30 days.",
+      "selfHosted": "Self-hosted: each install sends an anonymous daily count of pilots active in the last 30 days, and a month uses each install's last count that month. Installs are added together, so a pilot who uses two installs counts twice.",
+      "noGa": "Google Analytics isn't connected, so eve-nexum.com shows signed-in pilots.",
+      "old": "Installs on a version too old to send counts, so not included: {{count}}."
+    },
+    "share": {
+      "title": "Shareable link",
+      "hint": "Anyone with the link can see this page without signing in. Making a new link turns the old one off.",
+      "create": "Make link",
+      "replace": "Make a new link",
+      "remove": "Turn off link",
+      "copy": "Copy",
+      "copied": "Link copied",
+      "active": "A link is on (made {{time}}). It's only shown when made, so make a new one if you need it again.",
+      "none": "No link yet."
+    }
   }
 }

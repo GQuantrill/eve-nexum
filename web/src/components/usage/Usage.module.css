@@ -1,0 +1,281 @@
+/* The usage figures (UsageView) and the public page around them (UsagePage). */
+
+.page {
+  min-height: 100vh;
+  background: var(--surface-base);
+  color: var(--text-default);
+  box-sizing: border-box;
+  padding-inline: var(--sp-16);
+  padding-block: var(--sp-16) 3rem;
+}
+
+.pageInner {
+  max-width: 60rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-10);
+  flex-wrap: wrap;
+}
+
+.pageLogo {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.pageHeading { flex: 1; min-width: 12rem; }
+
+.pageTitle {
+  margin: 0;
+  font-size: calc(22px * var(--font-scale, 1));
+  color: var(--text-bright);
+}
+
+.pageSub {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: calc(13px * var(--font-scale, 1));
+}
+
+.empty { color: var(--text-muted); }
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+
+.updated {
+  margin: 0;
+  color: var(--text-faint);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+/* ── Headline tiles ── */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: var(--sp-10);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.tileMain { border-color: var(--border-accent); }
+
+.tileLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.tileValue {
+  color: var(--text-bright);
+  font-size: calc(26px * var(--font-scale, 1));
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.tileNote {
+  color: var(--text-faint);
+  font-size: calc(11px * var(--font-scale, 1));
+}
+
+.swatchLive,
+.swatchSelf {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.swatchLive { background: var(--theme-accent); }
+.swatchSelf { background: var(--warning-alt); }
+
+/* ── Cards ── */
+.card,
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cardTitle {
+  margin: 0;
+  color: var(--text-bright);
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+
+  span { display: inline-flex; align-items: center; gap: 6px; }
+}
+
+/* ── Monthly bars ── */
+.chart {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 200px;
+  overflow-x: auto;
+}
+
+.col {
+  flex: 1 0 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 28px;
+}
+
+.colValue {
+  color: var(--text-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  width: 70%;
+  max-width: 34px;
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 3px 3px 0 0;
+  overflow: hidden;
+  min-height: 1px;
+}
+
+.barLive { background: var(--theme-accent); min-height: 0; }
+.barSelf { background: var(--warning-alt); min-height: 0; }
+
+.colLabel {
+  color: var(--text-faint);
+  font-size: calc(10px * var(--font-scale, 1));
+  white-space: nowrap;
+}
+
+/* ── Table ── */
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums;
+
+  th, td {
+    padding: 5px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-muted); font-weight: 500; }
+  td { color: var(--text-secondary); }
+}
+
+.totalCell { color: var(--text-bright) !important; font-weight: 600; }
+
+/* ── Breakdown lists ── */
+.lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 16px;
+}
+
+.listTitle {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: calc(12px * var(--font-scale, 1));
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.listEmpty { color: var(--text-faint) !important; }
+
+.notes p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.5;
+}
+
+/* ── Share controls (Reports tab) ── */
+.share {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.shareRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.shareLink {
+  flex: 1;
+  min-width: 14rem;
+  font-family: var(--font-mono, monospace);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.shareHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+}
