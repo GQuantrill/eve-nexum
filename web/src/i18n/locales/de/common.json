@@ -1035,7 +1035,8 @@
     "exportSystems": "Systeme exportieren ({{count}})…",
     "importSystems": "Systeme importieren…",
     "routeFromHere": "Route von hier",
-    "stopRouteFromHere": "Nicht mehr von hier routen"
+    "stopRouteFromHere": "Nicht mehr von hier routen",
+    "routeToHere": "Route hierher"
   },
   "customIntel": {
     "title": "Eigene Intel",

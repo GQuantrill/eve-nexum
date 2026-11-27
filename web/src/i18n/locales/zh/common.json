@@ -1035,7 +1035,8 @@
     "exportSystems": "导出星系（{{count}}）…",
     "importSystems": "导入星系…",
     "routeFromHere": "从这里规划路线",
-    "stopRouteFromHere": "停止从这里规划路线"
+    "stopRouteFromHere": "停止从这里规划路线",
+    "routeToHere": "规划路线到这里"
   },
   "customIntel": {
     "title": "自定义情报",

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { routeTo } from '../../utils/routePlannerTarget';
 import { useTranslation } from 'react-i18next';
 import {
   ReactFlow, Background, Controls, ControlButton, MiniMap,
@@ -1612,6 +1613,12 @@ export function MapCanvas() {
               icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
               action: () => setRouteFromSystem({ eveSystemId: sys.eveSystemId!, systemName: sys.name, systemClass: sys.systemClass }),
             },
+        // The other end: this system into the Route Planner's To field.
+        {
+          label:  t('ctxMenu.routeToHere'),
+          icon:   <NavigationArrowIcon size={16} weight="regular" color="#3ddc84" style={{ transform: 'scaleX(-1)' }} />,
+          action: () => routeTo({ id: sys.eveSystemId!, name: sys.name }),
+        },
       ] : [];
 
       // Display-only alias — rename the node on this map. Toggles to "Clear alias"

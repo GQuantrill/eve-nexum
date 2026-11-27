@@ -1045,7 +1045,8 @@
     "exportSystems": "Экспорт систем ({{count}})…",
     "importSystems": "Импорт систем…",
     "routeFromHere": "Маршрут отсюда",
-    "stopRouteFromHere": "Не прокладывать отсюда"
+    "stopRouteFromHere": "Не прокладывать отсюда",
+    "routeToHere": "Маршрут сюда"
   },
   "customIntel": {
     "title": "Свои метки интела",

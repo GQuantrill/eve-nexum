@@ -1035,7 +1035,8 @@
     "exportSystems": "星系をエクスポート（{{count}}）…",
     "importSystems": "星系をインポート…",
     "routeFromHere": "ここからルート",
-    "stopRouteFromHere": "ここからのルートをやめる"
+    "stopRouteFromHere": "ここからのルートをやめる",
+    "routeToHere": "ここまでのルート"
   },
   "customIntel": {
     "title": "カスタムインテル",

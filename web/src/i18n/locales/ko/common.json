@@ -1035,7 +1035,8 @@
     "exportSystems": "성계 내보내기 ({{count}})…",
     "importSystems": "성계 가져오기…",
     "routeFromHere": "여기서 경로 계산",
-    "stopRouteFromHere": "여기서 경로 계산 중지"
+    "stopRouteFromHere": "여기서 경로 계산 중지",
+    "routeToHere": "여기까지 경로 계산"
   },
   "customIntel": {
     "title": "사용자 지정 인텔",

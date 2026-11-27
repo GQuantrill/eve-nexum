@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouteToRequests } from '../../utils/routePlannerTarget';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useSearchKeys } from '../../hooks/useSearchKeys';
@@ -200,6 +201,8 @@ export function RoutePlannerPane() {
   // the location poll.
   const [fromOverride, setFromOverride] = useState<Picked | null | undefined>(undefined);
   const [to, setTo] = useState<Picked | null>(null);
+  // "Route to here" from the map's right-click menu.
+  useRouteToRequests(setTo);
   const from: Picked | null = fromOverride !== undefined
     ? fromOverride
     : (origin.systemId != null ? { id: origin.systemId, name: origin.name ?? String(origin.systemId) } : null);

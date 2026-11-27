@@ -1035,7 +1035,8 @@
     "exportSystems": "Systemen exporteren ({{count}})…",
     "importSystems": "Systemen importeren…",
     "routeFromHere": "Route vanaf hier",
-    "stopRouteFromHere": "Niet meer vanaf hier routeren"
+    "stopRouteFromHere": "Niet meer vanaf hier routeren",
+    "routeToHere": "Route hierheen"
   },
   "customIntel": {
     "title": "Eigen intel",

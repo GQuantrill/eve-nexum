@@ -1035,7 +1035,8 @@
     "exportSystems": "Exportar sistemas ({{count}})…",
     "importSystems": "Importar sistemas…",
     "routeFromHere": "Ruta desde aquí",
-    "stopRouteFromHere": "Dejar de calcular desde aquí"
+    "stopRouteFromHere": "Dejar de calcular desde aquí",
+    "routeToHere": "Ruta hasta aquí"
   },
   "customIntel": {
     "title": "Intel personalizada",
