@@ -12,8 +12,12 @@ export interface HeatmapState {
   /** Active colour-vision mode ('off' = default ramp). Switches the heat ramp
    *  to a colour-blind-safe one, since the heat colour is computed in JS. */
   colorVision: string;
+  /** Sightings of the watched pilot per EVE system ('pilot' metric). */
+  pilot: Map<number, number>;
 }
 
-export const HeatmapContext = createContext<HeatmapState>({ metric: 'none', max: 0, intensity: 1, colorVision: 'off' });
+export const HeatmapContext = createContext<HeatmapState>({
+  metric: 'none', max: 0, intensity: 1, colorVision: 'off', pilot: new Map(),
+});
 
 export const useHeatmap = (): HeatmapState => useContext(HeatmapContext);

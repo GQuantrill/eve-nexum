@@ -2,9 +2,9 @@ import type { SystemKills } from '../hooks/useCurrentHourKills';
 import type { FleetState } from '../hooks/useFleet';
 
 // One heatmap can be active at a time. 'none' = off.
-export type HeatMetric = 'none' | 'fleet' | 'shipKills' | 'podKills' | 'npcKills' | 'jumps';
+export type HeatMetric = 'none' | 'fleet' | 'shipKills' | 'podKills' | 'npcKills' | 'jumps' | 'pilot';
 
-export const HEAT_METRICS: HeatMetric[] = ['none', 'fleet', 'shipKills', 'podKills', 'npcKills', 'jumps'];
+export const HEAT_METRICS: HeatMetric[] = ['none', 'fleet', 'shipKills', 'podKills', 'npcKills', 'jumps', 'pilot'];
 
 // Standard heat ramp: low = yellow, mid = orange, high = red. The colour
 // encodes intensity (not the metric), so every heatmap reads the same way.
@@ -46,8 +46,11 @@ export function heatValue(
   kills: Map<number, SystemKills>,
   fleet: FleetState,
   selfCharId: number | null | undefined,
+  /** 'pilot': sightings of the watched pilot per system (utils/pilotWatch). */
+  pilot?: Map<number, number>,
 ): number {
   if (metric === 'none' || eveSystemId == null) return 0;
+  if (metric === 'pilot') return pilot?.get(eveSystemId) ?? 0;
   if (metric === 'fleet') {
     const all = fleet.bySystem.get(eveSystemId);
     if (!all) return 0;
@@ -76,6 +79,7 @@ const HEAT_FLOOR: Record<Exclude<HeatMetric, 'none'>, number> = {
   podKills:  10,
   npcKills:  200,
   jumps:     100,
+  pilot:     3,
 };
 
 /** The value that reads as full heat on this map: its busiest system, or the

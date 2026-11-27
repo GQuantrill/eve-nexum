@@ -4,6 +4,7 @@ import { getMapAccess, requireMapContentWrite } from './maps.js';
 import { publishToMap } from '../services/mapEvents.js';
 import { dscanCreateLimiter, dscanHourlyLimiter } from '../middleware/rateLimits.js';
 import { createLogger } from '../utils/logger.js';
+import { recordSightings } from '../services/pilotSightings.js';
 import {
   parsePaste, analyseDscan, analyseLocal, saveScan, getScan, listSystemScans,
   LocalLookupError, MAX_PASTE_CHARS,
@@ -66,6 +67,14 @@ dscanRouter.post('/', dscanCreateLimiter, dscanHourlyLimiter, async (req, res) =
   const saved = await saveScan({ data, createdBy: req.session.userId ?? null, mapId, eveSystemId });
   if (mapId && eveSystemId != null) {
     publishToMap(mapId, { type: 'dscan.changed', actor: req.get('x-client-id') ?? null, eveSystemId });
+    // A pinned local list says who was in that system: remember it per pilot,
+    // past the scan's own expiry. A failure here mustn't lose the scan.
+    if (data.kind === 'local') {
+      await recordSightings({
+        mapId, eveSystemId, source: 'local', seenBy: req.session.userId ?? null,
+        pilots: data.pilots.map((p) => ({ id: p.id, name: p.n, corpId: p.c, allianceId: p.a })),
+      }).catch((err) => log.warn('recording sightings failed:', err instanceof Error ? err.message : String(err)));
+    }
   }
   log.info(`created ${parsed.kind} scan${mapId ? ' (pinned)' : ''}`);
   res.status(201).json({ id: saved.id, expiresAt: saved.expiresAt, kind: data.kind });

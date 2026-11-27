@@ -16,7 +16,6 @@ import { WatchlistBlock } from './WatchlistBlock';
 import { ChainsPane } from './ChainsPane';
 import { RoutePlannerPane } from './RoutePlannerPane';
 import { IntelPane } from './IntelPane';
-import { isDesktop } from '../../desktop/bridge';
 import { CaretLeftIcon, CaretRightIcon, ArrowLineLeftIcon, ArrowLineRightIcon, SquaresFourIcon } from '../../icons';
 import { PanelVisibilityModal } from './PanelVisibilityModal';
 import { useUserSetting } from '../../hooks/useUserSetting';
@@ -221,10 +220,9 @@ export function Sidebar() {
   // in the position the user put it if the deployment later gains a corp or
   // alliance.
   const orgInstall = !!user?.corpMode || !!user?.allianceMode;
-  // The intel feed reads the pilot's EVE chat logs, which only the desktop
-  // app can: in a browser it isn't offered at all.
-  const desktop    = isDesktop();
-  const available  = order.filter((id) => (id !== 'pilotsOnline' || orgInstall) && (id !== 'intel' || desktop));
+  // Intel is offered everywhere: pasting local and watching pilots work in a
+  // browser; only its channel feed needs the desktop app (IntelPane).
+  const available  = order.filter((id) => id !== 'pilotsOnline' || orgInstall);
   // Hidden sections are filtered at render and kept in the saved order, so
   // switching one back on returns it to where the user had it.
   const visibleOrder = available.filter((id) => !hidden.has(id));

@@ -56,7 +56,9 @@ import { apiV1Router } from './routes/apiV1.js';
 import { shareRouter } from './routes/share.js';
 import searchRouter from './routes/search.js';
 import { dscanRouter } from './routes/dscan.js';
+import { pilotsRouter } from './routes/pilots.js';
 import { startDscanSweeper } from './services/dscan.js';
+import { startSightingSweeper } from './services/pilotSightings.js';
 import { startMapAuditPruner } from './services/mapAudit.js';
 import { startPvpHistory } from './services/pvpHistory.js';
 import { startKillStore } from './services/killStore.js';
@@ -187,6 +189,7 @@ app.use('/api/search',            esiLimiter, searchRouter);
 // D-scan analyser. Public: creating and viewing a scan needs no login (the
 // app limiter keys anonymous callers by IP; creation has its own tighter cap).
 app.use('/api/dscan',             appLimiter, dscanRouter);
+app.use('/api/pilots',            appLimiter, pilotsRouter);
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
@@ -246,6 +249,7 @@ migrate()
     startPvpHistory();
     startKillStore();
     startDscanSweeper();
+    startSightingSweeper();
     startMapAuditPruner();
     startFreezeDetector();
     startBlueLootRefresher();

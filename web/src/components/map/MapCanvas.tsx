@@ -97,6 +97,12 @@ import { useCurrentHourKills } from '../../hooks/useCurrentHourKills';
 import { useFleet } from '../../hooks/useFleet';
 import { HeatmapContext } from '../../context/HeatmapContext';
 import { heatValue, heatScale, type HeatMetric } from '../../utils/heatmap';
+import {
+  heatBySystem, sightsBySystem, sanitiseHeatPilot, sanitiseWatched,
+  HEAT_PILOT_KEY, MAP_FILTER_KEY, WATCH_KEY, HIGHLIGHT_KEY, type WatchedPilot, type PilotSight,
+} from '../../utils/pilotWatch';
+import { PilotSightContext } from '../../context/PilotSightContext';
+import { usePilotSightings } from '../../hooks/usePilotSightings';
 import { resolveIntelColor } from '../../utils/intelColors';
 
 // Modifier keys that add a system to the current selection on click, alongside
@@ -304,18 +310,40 @@ export function MapCanvas() {
   const heatKills    = useCurrentHourKills();
   const heatFleet    = useFleet();
   const selfCharId   = useAuth().user?.characterId ?? null;
+  // "Watched pilot": where the pilot picked in the Intel panel was seen.
+  const [heatPilotRaw] = useUserSetting<WatchedPilot | null>(HEAT_PILOT_KEY, null);
+  const [pilotMapFilter] = useUserSetting<string>(MAP_FILTER_KEY, '');
+  const heatPilot = sanitiseHeatPilot(heatPilotRaw);
+  // ...and, with "mark on map" on, a marker on every system a watched pilot
+  // was seen in. One request covers both.
+  const [watchedRaw] = useUserSetting<WatchedPilot[]>(WATCH_KEY, []);
+  const [markSightings] = useUserSetting<boolean>(HIGHLIGHT_KEY, true);
+  // Share-link viewers have no session, so nothing to fetch.
+  const shareView = useShareMode().isShareMode;
+  const watchedIds = shareView || markSightings === false ? [] : sanitiseWatched(watchedRaw).map((p) => p.id);
+  const heatPilotId = heatMetric === 'pilot' && heatPilot && !shareView ? heatPilot.id : null;
+  const pilotRows = usePilotSightings(heatPilotId != null ? [...watchedIds, heatPilotId] : watchedIds, pilotMapFilter);
+  const pilotHeat = useMemo(
+    () => (pilotRows && heatPilotId != null ? heatBySystem(pilotRows, heatPilotId) : new Map<number, number>()),
+    [pilotRows, heatPilotId],
+  );
+  const watchedKey = watchedIds.join(',');
+  const pilotSights = useMemo(
+    () => (pilotRows && watchedKey ? sightsBySystem(pilotRows, new Set(watchedKey.split(',').map(Number))) : new Map<number, PilotSight[]>()),
+    [pilotRows, watchedKey],
+  );
   const heatMax = useMemo(() => {
     if (heatMetric === 'none') return 0;
     let max = 0;
     for (const s of systems) {
-      const v = heatValue(heatMetric, s.eveSystemId, heatKills, heatFleet, selfCharId);
+      const v = heatValue(heatMetric, s.eveSystemId, heatKills, heatFleet, selfCharId, pilotHeat);
       if (v > max) max = v;
     }
     return heatScale(heatMetric, max);
-  }, [heatMetric, systems, heatKills, heatFleet, selfCharId]);
+  }, [heatMetric, systems, heatKills, heatFleet, selfCharId, pilotHeat]);
   const heatmapState = useMemo(
-    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision }),
-    [heatMetric, heatMax, heatIntensity, colorVision],
+    () => ({ metric: heatMetric, max: heatMax, intensity: heatIntensity, colorVision, pilot: pilotHeat }),
+    [heatMetric, heatMax, heatIntensity, colorVision, pilotHeat],
   );
 
   // Precompute each node's minimap colour once. Resolving it inside the MiniMap's
@@ -2032,6 +2060,7 @@ export function MapCanvas() {
 
   return (
     <HeatmapContext.Provider value={heatmapState}>
+    <PilotSightContext.Provider value={pilotSights}>
     <div className="map-canvas" ref={wrapperRef} style={{ background: bgColor }}>
       {bgImageLayer && <div className="map-canvas__image" style={bgImageLayer} aria-hidden="true" />}
       {/* connectOnClick={false}: React Flow joins a source handle to a target
@@ -2309,6 +2338,7 @@ export function MapCanvas() {
         />
       )}
     </div>
+    </PilotSightContext.Provider>
     </HeatmapContext.Provider>
   );
 }
