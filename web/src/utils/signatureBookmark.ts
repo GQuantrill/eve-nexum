@@ -109,7 +109,9 @@ export function formatBookmarkName(
     '{type}':        sig.whType ?? '',
     '{dest_type}':   destType,
     '{leads_to}':    (leadsTo && aliasOfSystem?.(leadsTo)?.trim()) || leadsTo,
-    '{size}':        wh ? sizeLetter(wh.maxJumpMass) : '',
+    // The size someone logged (the sig picker, or the connection once jumped;
+    // callers pass it as sig.whSize) wins over the size the type implies.
+    '{size}':        sig.whSize ? whSizeShort(sig.whSize) : wh ? sizeLetter(wh.maxJumpMass) : '',
     '{mass}':        wh && wh.totalMass ? String(Number((wh.totalMass / 1_000_000_000).toFixed(1))) : '',
     '{age}':         ageH != null ? `${ageH}h` : '',
     '{name}':        sig.name ?? '',

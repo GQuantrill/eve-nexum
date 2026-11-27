@@ -11,6 +11,7 @@ import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
 } from '../utils/signatureBookmark';
 import { copyWhenFocused } from '../utils/copyWhenFocused';
+import { connectionForSig, effectiveWhSize } from '../utils/whState';
 import {
   chainNumberSettled, forwardChainLabel, withChain, settleChainNumber, parentLabel, isChildLabel,
 } from '../utils/chainNumber';
@@ -38,7 +39,8 @@ async function copyJumpedBookmark(sig: Signature, fromMapSystemId: string): Prom
     readUserSetting<string>(K162_BOOKMARK_FORMAT_KEY, '')), map.chainNumbering);
   const chain = !map.chainNumbering ? ''
     : reserved || forwardChainLabel(map.systems.find((s) => s.id === fromMapSystemId), byName(sig.whLeadsTo ?? ''));
-  const name = formatBookmarkName(format, sig, wormholeTypesSnapshot(), Date.now(),
+  const sized = { ...sig, whSize: effectiveWhSize(sig, connectionForSig(sig.id, map.connections)) };
+  const name = formatBookmarkName(format, sized, wormholeTypesSnapshot(), Date.now(),
     (n) => { const c = byName(n)?.systemClass; return c && c !== 'unknown' ? c : null; },
     (n) => byName(n)?.alias?.trim() || null, chain);
   if (!name) return;

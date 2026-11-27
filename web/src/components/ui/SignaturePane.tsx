@@ -709,7 +709,9 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       wormholeBookmarkFormat(sig, mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat), chainNumbering);
     const state = chainStateOf(sig);
     const chain = state.kind === 'number' ? state.label : '';
-    const name = formatBookmarkName(format, sig, whTypes, Date.now(),
+    // {size} follows the size picker: the connection's once jumped, else the sig's.
+    const sized = { ...sig, whSize: effectiveWhSize(sig, connectionForSig(sig.id, mapConnections)) };
+    const name = formatBookmarkName(format, sized, whTypes, Date.now(),
       (n) => classBySystemName.get(n.trim().toUpperCase()) ?? null,
       (n) => aliasBySystemName.get(n.trim().toUpperCase()) ?? null, chain);
     if (!name) return;
@@ -717,7 +719,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       .then(() => toast.success(t('signatures.bookmarkCopied', { name })))
       .catch(() => toast.error(t('signatures.bookmarkCopyFailed')));
   }, [mapBookmarkFormat, userBookmarkFormat, userK162BookmarkFormat, whTypes, classBySystemName, aliasBySystemName, t,
-      chainNumbering, chainStateOf]);
+      chainNumbering, chainStateOf, mapConnections]);
 
   // Put reserved numbers on the rows now; everyone else gets them by sig.changed.
   const applyReserved = useCallback((reserved: { id: string; chainLabel: string | null }[]) => {
