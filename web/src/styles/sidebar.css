@@ -288,6 +288,16 @@
   }
 }
 
+/* On the map: a button that centres on the threat's system. */
+.toolbar__proximity--clickable {
+  font-family: inherit;
+  cursor: pointer;
+}
+.toolbar__proximity--clickable:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+}
+
 .toolbar__proximity-icon {
   font-size: calc(14px * var(--font-scale, 1));
 }
