@@ -1961,7 +1961,9 @@
       "threshold": "“范围内”使用接近警报的阈值。",
       "experimental": "实验性功能",
       "delayNote": "语音可能会延迟最多 5 秒。首次运行会更久。",
-      "downloadSize": "首次使用会下载语音，约 {{mb}} MB（仅一次）。"
+      "downloadSize": "首次使用会下载语音，约 {{mb}} MB（仅一次）。",
+      "evIntel": "新情报",
+      "desktopAlwaysOn": "在桌面应用中始终开启，音量为通知中设置的提醒音量。情报也会用此声音朗读。"
     },
     "bookmarkHelp": "在虫洞信号行点击复制图标，即可复制可直接粘贴的书签名称，然后粘贴到游戏内书签中。使用以下变量构建名称：",
     "browserNotifications": "浏览器通知",
@@ -2320,6 +2322,18 @@
       "fortress": "堡垒",
       "hexagon": "六边形",
       "spiked": "尖刺"
+    },
+    "notifIntel": "情报报告",
+    "notifIntelSound": "情报提示音",
+    "notifIntelPreview": "试听",
+    "intelSounds": {
+      "twoTone": "双音",
+      "chime": "风铃",
+      "ping": "声呐",
+      "bell": "钟声",
+      "blip": "哔哔",
+      "alarm": "警报",
+      "low": "低音"
     }
   },
   "mass": {

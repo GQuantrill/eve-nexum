@@ -908,6 +908,10 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.notify.exits.desktop',
   'nexum.notify.volume',
   'nexum.notify.exits.sound',
+  // Intel (desktop app): moved here from the app's own settings window.
+  'nexum.notify.intel.desktop',
+  'nexum.notify.intel.sound',
+  'nexum.notify.intel.soundName',
   'nexum.notify.exitsMinSecurity',
   'nexum.customIntel',
   'nexum.flagPresets',
@@ -941,6 +945,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.announcer.ev.lawless',
   'nexum.announcer.ev.kills',
   'nexum.announcer.ev.newChain',
+  'nexum.announcer.ev.intel',
   // Whether the one-time "turn the announcer on?" prompt has been answered,
   // so it isn't asked again on another device.
   'nexum.announcer.asked',

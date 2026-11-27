@@ -99,7 +99,8 @@
     "overlayEmpty": "No intel near you in the last 5 minutes",
     "overlayHere": "in {system}",
     "overlayInSystem": "here",
-    "overlayJumps": "{n}j"
+    "overlayJumps": "{n}j",
+    "soundsMoved": "Intel sounds, the voice and their volume are set in Nexum itself: Notifications and Announcer in the map sidebar."
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -201,7 +202,8 @@
     "overlayEmpty": "Keine Intel in deiner Nähe in den letzten 5 Minuten",
     "overlayHere": "in {system}",
     "overlayInSystem": "hier",
-    "overlayJumps": "{n}S"
+    "overlayJumps": "{n}S",
+    "soundsMoved": "Intel-Töne, die Stimme und ihre Lautstärke stellst du in Nexum selbst ein: Benachrichtigungen und Sprachansage in der Kartenseitenleiste."
   },
   "nl": {
     "show": "Nexum tonen",
@@ -303,7 +305,8 @@
     "overlayEmpty": "Geen intel bij jou in de buurt in de laatste 5 minuten",
     "overlayHere": "in {system}",
     "overlayInSystem": "hier",
-    "overlayJumps": "{n}s"
+    "overlayJumps": "{n}s",
+    "soundsMoved": "Intelgeluiden, de stem en hun volume stel je in Nexum zelf in: Meldingen en Omroeper in de zijbalk van de kaart."
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -405,7 +408,8 @@
     "overlayEmpty": "Aucune intel près de vous ces 5 dernières minutes",
     "overlayHere": "à {system}",
     "overlayInSystem": "ici",
-    "overlayJumps": "{n}s"
+    "overlayJumps": "{n}s",
+    "soundsMoved": "Les sons de l'intel, la voix et leur volume se règlent dans Nexum : Notifications et Annonces vocales dans la barre latérale de la carte."
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -507,7 +511,8 @@
     "overlayEmpty": "Sin intel cerca de ti en los últimos 5 minutos",
     "overlayHere": "en {system}",
     "overlayInSystem": "aquí",
-    "overlayJumps": "{n}s"
+    "overlayJumps": "{n}s",
+    "soundsMoved": "Los sonidos de intel, la voz y su volumen se ajustan en Nexum: Notificaciones y Anuncios de voz en la barra lateral del mapa."
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -609,7 +614,8 @@
     "overlayEmpty": "Nenhuma intel perto de você nos últimos 5 minutos",
     "overlayHere": "em {system}",
     "overlayInSystem": "aqui",
-    "overlayJumps": "{n}s"
+    "overlayJumps": "{n}s",
+    "soundsMoved": "Os sons de intel, a voz e o volume são definidos no próprio Nexum: Notificações e Anúncios de voz na barra lateral do mapa."
   },
   "zh": {
     "show": "显示 Nexum",
@@ -711,7 +717,8 @@
     "overlayEmpty": "最近 5 分钟附近没有情报",
     "overlayHere": "位于 {system}",
     "overlayInSystem": "此处",
-    "overlayJumps": "{n}跳"
+    "overlayJumps": "{n}跳",
+    "soundsMoved": "情报提示音、语音及其音量在 Nexum 中设置：地图侧边栏的“通知”和“语音播报”。"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -813,7 +820,8 @@
     "overlayEmpty": "최근 5분 동안 근처 인텔 없음",
     "overlayHere": "{system}에 있음",
     "overlayInSystem": "여기",
-    "overlayJumps": "{n}점프"
+    "overlayJumps": "{n}점프",
+    "soundsMoved": "인텔 소리, 목소리, 볼륨은 Nexum에서 설정합니다: 지도 사이드바의 알림과 음성 안내."
   },
   "ja": {
     "show": "Nexum を表示",
@@ -915,7 +923,8 @@
     "overlayEmpty": "過去 5 分間、近くにインテルなし",
     "overlayHere": "{system} にいます",
     "overlayInSystem": "ここ",
-    "overlayJumps": "{n}J"
+    "overlayJumps": "{n}J",
+    "soundsMoved": "インテルの通知音、音声、音量は Nexum 本体で設定します：マップのサイドバーの「通知」と「音声アナウンス」。"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -1017,6 +1026,7 @@
     "overlayEmpty": "Рядом нет интела за последние 5 минут",
     "overlayHere": "в {system}",
     "overlayInSystem": "здесь",
-    "overlayJumps": "{n} пр."
+    "overlayJumps": "{n} пр.",
+    "soundsMoved": "Звуки интела, голос и их громкость настраиваются в самом Nexum: «Уведомления» и «Голосовые оповещения» на боковой панели карты."
   }
 }

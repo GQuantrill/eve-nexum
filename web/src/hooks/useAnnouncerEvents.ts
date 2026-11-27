@@ -11,6 +11,7 @@ import { useRoute } from './useRoute';
 import { useKillLog } from '../store/killStore';
 import { useRemoteActivity } from '../store/remoteActivityStore';
 import { apiUrl } from '../api/client';
+import { isDesktop } from '../desktop/bridge';
 
 // Settings keys (English-only — see AnnouncerSection). The master switch is OFF
 // by default: the announcer is opt-in (it talks, and its first use downloads the
@@ -25,7 +26,18 @@ export const ANN = {
   lawless:    'nexum.announcer.ev.lawless',
   kills:      'nexum.announcer.ev.kills',
   newChain:   'nexum.announcer.ev.newChain',
+  // Desktop app only: a new intel report within the pilot's intel range.
+  intel:      'nexum.announcer.ev.intel',
 } as const;
+
+/**
+ * Whether the announcer is on. Always, in the desktop app: there every alert
+ * speaks in its voice (intel included), so there's no switch and no prompt. In
+ * a browser it's opt-in, because its first use downloads the voice model.
+ */
+export function announcerOn(enabledSetting: boolean): boolean {
+  return isDesktop() || enabledSetting;
+}
 
 interface NearbyLawless { eveSystemId: number; name: string; security: number; jumps: number }
 
@@ -65,7 +77,7 @@ export function useAnnouncerEvents(active = true): void {
   const speak = useAnnouncer((s) => s.speak);
   const [enabledSetting] = useUserSetting<boolean>(ANN.enabled, false);
   // A pop-out window (utils/popout.ts) never speaks: the main window does.
-  const enabled = enabledSetting && active;
+  const enabled = announcerOn(enabledSetting) && active;
   const [voice]      = useUserSetting<string>(ANN.voice, 'af_nicole');
   const [evConnect]  = useUserSetting<boolean>(ANN.connect, true);
   const [evIncur]    = useUserSetting<boolean>(ANN.incursions, true);
@@ -92,6 +104,13 @@ export function useAnnouncerEvents(active = true): void {
   // Prime the audio context + unlock autoplay on the first user gesture so the
   // first event can be heard. Cheap and idempotent.
   useEffect(() => { if (enabled) primeAudioOnGesture(); }, [enabled]);
+
+  // The desktop app fetches the voice straight away, in the background, so
+  // the first intel report is already spoken in it rather than waiting for a
+  // download. (Until then intel falls back to the computer's own voice.)
+  useEffect(() => {
+    if (enabled && isDesktop() && !alertMuted()) void useAnnouncer.getState().load().catch(() => {});
+  }, [enabled]);
 
   // A speak wrapper that no-ops unless the announcer is enabled AND audible.
   // The volume check is deliberately here rather than inside speak(): an

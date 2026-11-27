@@ -1961,7 +1961,9 @@
       "threshold": "\"In range\" uses the Proximity Alerts threshold.",
       "experimental": "Experimental Feature",
       "delayNote": "Voice may be delayed by up to 5 seconds. The first run takes longer.",
-      "downloadSize": "First use downloads the voice, about {{mb}} MB (once)."
+      "downloadSize": "First use downloads the voice, about {{mb}} MB (once).",
+      "evIntel": "New intel",
+      "desktopAlwaysOn": "Always on in the desktop app, at the alert volume set in Notifications. Intel is read in this voice too."
     },
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "browserNotifications": "Browser Notifications",
@@ -2320,6 +2322,18 @@
       "fortress": "Fortress",
       "hexagon": "Hexagon",
       "spiked": "Spiked"
+    },
+    "notifIntel": "Intel reported",
+    "notifIntelSound": "Intel sound",
+    "notifIntelPreview": "Preview",
+    "intelSounds": {
+      "twoTone": "Two tones",
+      "chime": "Chime",
+      "ping": "Ping",
+      "bell": "Bell",
+      "blip": "Blip",
+      "alarm": "Alarm",
+      "low": "Low tones"
     }
   },
   "mass": {

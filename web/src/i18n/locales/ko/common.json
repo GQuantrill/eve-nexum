@@ -1961,7 +1961,9 @@
       "threshold": "‘범위 내’는 근접 경보 임계값을 사용합니다.",
       "experimental": "실험적 기능",
       "delayNote": "음성이 최대 5초 지연될 수 있습니다. 첫 실행은 더 오래 걸립니다.",
-      "downloadSize": "처음 사용할 때 음성을 내려받습니다. 약 {{mb}} MB(한 번만)."
+      "downloadSize": "처음 사용할 때 음성을 내려받습니다. 약 {{mb}} MB(한 번만).",
+      "evIntel": "새 인텔",
+      "desktopAlwaysOn": "데스크톱 앱에서는 항상 켜져 있으며, 알림에서 설정한 알림 볼륨을 따릅니다. 인텔도 이 목소리로 읽습니다."
     },
     "bookmarkHelp": "웜홀 시그니처 행에서 복사 아이콘을 클릭하면 붙여넣기용 북마크 이름이 복사됩니다. 게임 내 북마크에 붙여넣으세요. 다음 토큰으로 이름을 구성합니다:",
     "browserNotifications": "브라우저 알림",
@@ -2320,6 +2322,18 @@
       "fortress": "요새",
       "hexagon": "육각형",
       "spiked": "가시"
+    },
+    "notifIntel": "인텔 보고",
+    "notifIntelSound": "인텔 소리",
+    "notifIntelPreview": "미리 듣기",
+    "intelSounds": {
+      "twoTone": "두 음",
+      "chime": "차임",
+      "ping": "핑",
+      "bell": "종소리",
+      "blip": "삑",
+      "alarm": "경보",
+      "low": "낮은 음"
     }
   },
   "mass": {

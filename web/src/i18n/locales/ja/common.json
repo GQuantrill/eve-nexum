@@ -1961,7 +1961,9 @@
       "threshold": "「範囲内」は近接アラートのしきい値を使用します。",
       "experimental": "実験的機能",
       "delayNote": "音声が最大5秒遅れることがあります。初回は時間がかかります。",
-      "downloadSize": "初回使用時に音声をダウンロードします（約 {{mb}} MB、一度だけ）。"
+      "downloadSize": "初回使用時に音声をダウンロードします（約 {{mb}} MB、一度だけ）。",
+      "evIntel": "新しいインテル",
+      "desktopAlwaysOn": "デスクトップアプリでは常にオンで、通知で設定したアラート音量で再生されます。インテルもこの声で読み上げます。"
     },
     "bookmarkHelp": "ワームホールのシグネチャ行でコピーアイコンをクリックすると、貼り付け可能なブックマーク名がコピーされます。ゲーム内のブックマークに貼り付けてください。次のトークンで名前を作成します：",
     "browserNotifications": "ブラウザ通知",
@@ -2320,6 +2322,18 @@
       "fortress": "要塞",
       "hexagon": "六角形",
       "spiked": "トゲトゲ"
+    },
+    "notifIntel": "インテル報告",
+    "notifIntelSound": "インテルの通知音",
+    "notifIntelPreview": "試聴",
+    "intelSounds": {
+      "twoTone": "2音",
+      "chime": "チャイム",
+      "ping": "ピン",
+      "bell": "ベル",
+      "blip": "ブリップ",
+      "alarm": "アラーム",
+      "low": "低音"
     }
   },
   "mass": {

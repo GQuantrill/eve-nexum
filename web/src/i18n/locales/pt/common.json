@@ -1961,7 +1961,9 @@
       "threshold": "«No alcance» usa o limiar dos alertas de proximidade.",
       "experimental": "Funcionalidade experimental",
       "delayNote": "A voz pode demorar até 5 segundos. A primeira execução demora mais.",
-      "downloadSize": "O primeiro uso baixa a voz, cerca de {{mb}} MB (uma única vez)."
+      "downloadSize": "O primeiro uso baixa a voz, cerca de {{mb}} MB (uma única vez).",
+      "evIntel": "Novo intel",
+      "desktopAlwaysOn": "Sempre ligado na app de desktop, ao volume dos alertas definido em Notificações. O intel também é lido com esta voz."
     },
     "bookmarkHelp": "Na linha de uma assinatura de buraco de minhoca, clique no ícone de copiar para copiar um nome de marcador pronto e cole-o no marcador do jogo. Monte o nome com estes tokens:",
     "browserNotifications": "Notificações do navegador",
@@ -2320,6 +2322,18 @@
       "fortress": "Fortaleza",
       "hexagon": "Hexágono",
       "spiked": "Espinhoso"
+    },
+    "notifIntel": "Intel reportado",
+    "notifIntelSound": "Som de intel",
+    "notifIntelPreview": "Ouvir",
+    "intelSounds": {
+      "twoTone": "Dois tons",
+      "chime": "Carrilhão",
+      "ping": "Ping",
+      "bell": "Sino",
+      "blip": "Bip",
+      "alarm": "Alarme",
+      "low": "Tons graves"
     }
   },
   "mass": {

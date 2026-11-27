@@ -22,7 +22,15 @@ export const NOTIFY = {
   killsSound:       'nexum.notify.kills.sound',
   eolDesktop:       'nexum.notify.eol.desktop',
   eolSound:         'nexum.notify.eol.sound',
+  // Intel reports (desktop app): the notification and the sound. Both used to
+  // be the desktop app's own settings; they live here now, beside every other
+  // alert, so there's one place to manage sound.
+  intelDesktop:     'nexum.notify.intel.desktop',
+  intelSound:       'nexum.notify.intel.sound',
 } as const;
+
+/** Which sound intel plays (desktop/intelSounds.ts). */
+export const INTEL_SOUND_NAME_KEY = 'nexum.notify.intel.soundName';
 
 /**
  * Alert volume, 0–100. Nexum's chimes are generated rather than played from a
@@ -122,6 +130,9 @@ export const NOTIFY_DEFAULTS: Record<string, boolean> = {
   [NOTIFY.killsSound]:       false,
   [NOTIFY.eolDesktop]:       false,
   [NOTIFY.eolSound]:         false,
+  // Intel is what the channels are followed for: on, as it was in the app.
+  [NOTIFY.intelDesktop]:     true,
+  [NOTIFY.intelSound]:       true,
 };
 
 /**

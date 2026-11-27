@@ -1961,7 +1961,9 @@
       "threshold": "„In Reichweite“ nutzt den Schwellenwert der Näherungswarnungen.",
       "experimental": "Experimentelle Funktion",
       "delayNote": "Die Stimme kann sich um bis zu 5 Sekunden verzögern. Der erste Durchlauf dauert länger.",
-      "downloadSize": "Beim ersten Einsatz wird die Stimme geladen, etwa {{mb}} MB (einmalig)."
+      "downloadSize": "Beim ersten Einsatz wird die Stimme geladen, etwa {{mb}} MB (einmalig).",
+      "evIntel": "Neue Intel",
+      "desktopAlwaysOn": "In der Desktop-App immer an, mit der Lautstärke aus den Benachrichtigungen. Auch Intel wird mit dieser Stimme vorgelesen."
     },
     "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
     "browserNotifications": "Browser-Benachrichtigungen",
@@ -2320,6 +2322,18 @@
       "fortress": "Festung",
       "hexagon": "Sechseck",
       "spiked": "Stachelig"
+    },
+    "notifIntel": "Intel gemeldet",
+    "notifIntelSound": "Intel-Ton",
+    "notifIntelPreview": "Anhören",
+    "intelSounds": {
+      "twoTone": "Zwei Töne",
+      "chime": "Glockenspiel",
+      "ping": "Ping",
+      "bell": "Glocke",
+      "blip": "Blip",
+      "alarm": "Alarm",
+      "low": "Tiefe Töne"
     }
   },
   "mass": {

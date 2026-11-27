@@ -1961,7 +1961,9 @@
       "threshold": "«Dentro del alcance» usa el umbral de las alertas de proximidad.",
       "experimental": "Función experimental",
       "delayNote": "La voz puede tardar hasta 5 segundos. La primera vez tarda más.",
-      "downloadSize": "El primer uso descarga la voz, unos {{mb}} MB (una sola vez)."
+      "downloadSize": "El primer uso descarga la voz, unos {{mb}} MB (una sola vez).",
+      "evIntel": "Nuevo intel",
+      "desktopAlwaysOn": "Siempre activo en la app de escritorio, al volumen de alertas de Notificaciones. El intel también se lee con esta voz."
     },
     "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
     "browserNotifications": "Notificaciones del navegador",
@@ -2320,6 +2322,18 @@
       "fortress": "Fortaleza",
       "hexagon": "Hexágono",
       "spiked": "Con púas"
+    },
+    "notifIntel": "Intel reportado",
+    "notifIntelSound": "Sonido de intel",
+    "notifIntelPreview": "Escuchar",
+    "intelSounds": {
+      "twoTone": "Dos tonos",
+      "chime": "Campanilla",
+      "ping": "Ping",
+      "bell": "Campana",
+      "blip": "Bip",
+      "alarm": "Alarma",
+      "low": "Tonos graves"
     }
   },
   "mass": {

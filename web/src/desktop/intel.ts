@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from 'react';
 import { onDesktopEvent, desktopInvoke, isDesktop } from './bridge';
 import { useMapStore } from '../store/mapStore';
-import { playIntelSound } from './intelSounds';
+import { playIntelSound, DEFAULT_INTEL_SOUND } from './intelSounds';
+import { NOTIFY, notifyOn, INTEL_SOUND_NAME_KEY } from '../utils/notificationPrefs';
 import { api } from '../api/client';
 import { readUserSetting } from '../hooks/useUserSetting';
 import { sanitiseWatched, WATCH_KEY } from '../utils/pilotWatch';
@@ -23,21 +24,18 @@ const PULSES: IntelPulse[] = ['off', 'subtle', 'normal', 'strong'];
 const SECONDS = [5, 10, 15, 30];
 const CLEAR = /(^|[^a-z0-9])(clr|clear)([^a-z0-9]|$)/i;
 
+// The app also sends its own (older) sound and speech settings with each line
+// (sound, soundName, speak, speakVolume...). They're ignored: whether intel
+// makes a sound, which, and the voice are Nexum's Notifications and Announcer
+// settings now, so sound is managed in one place.
 export interface IntelLine {
-  channel: string; sender: string; text: string; at: number; sound: boolean;
-  /** Older app versions don't send these: 5 s, normal, silent. */
-  pulseSecs?: number; pulse?: IntelPulse; speak?: boolean;
-  /** How to speak it: volume 0-100, slow/normal/fast, a voice id. */
-  speakVolume?: number; speakRate?: string; speakVoice?: string | null;
+  channel: string; sender: string; text: string; at: number;
+  /** Older app versions don't send these: 5 s, normal. */
+  pulseSecs?: number; pulse?: IntelPulse;
   /** Sound and voice only within this many jumps of the pilot; null (or an
    *  older app that doesn't send it) = for any system on the open map. */
   alertRange?: number | null;
-  /** Which sound (intelSounds.ts); older apps don't send it: the default. */
-  soundName?: string;
 }
-
-/** How a report is read aloud (the pilot's desktop settings). */
-export interface IntelSpeech { volume: number; rate: string; voice: string | null }
 
 // ── Which systems are pulsing ───────────────────────────────────────────────
 const pulsing = new Map<string, { until: number; level: IntelPulse }>();
@@ -90,12 +88,6 @@ const BATCH_MAX = 60;
 
 export interface IntelReport {
   eveSystemId: number; name: string; at: number;
-  /** Read it aloud when it's within range, and how (desktop settings);
-   *  null when not. */
-  speech: IntelSpeech | null;
-  /** Whether the pilot wants a sound for intel, and which. */
-  sound: boolean;
-  soundName: string | null;
   /** Sound and voice only within this many jumps; null = for any system on
    *  the open map (see onMap). */
   range: number | null;
@@ -161,11 +153,6 @@ async function flush(): Promise<void> {
       else next.set(sys.eveSystemId, {
         ...sys,
         at: line.at,
-        speech: line.speak
-          ? { volume: line.speakVolume ?? 100, rate: line.speakRate ?? 'normal', voice: line.speakVoice ?? null }
-          : null,
-        sound: line.sound,
-        soundName: line.soundName ?? null,
         range: typeof line.alertRange === 'number' ? line.alertRange : null,
         onMap: onMap.has(sys.name.toLowerCase()),
       });
@@ -301,7 +288,9 @@ export function startIntel(quiet = false): () => void {
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
     // With a jump range set, the proximity alerts play it once the distance
     // is known (hooks/useProximityAlerts).
-    if (line.sound && typeof line.alertRange !== 'number') playIntelSound(line.soundName);
+    if (notifyOn(NOTIFY.intelSound) && typeof line.alertRange !== 'number') {
+      playIntelSound(readUserSetting<string>(INTEL_SOUND_NAME_KEY, DEFAULT_INTEL_SOUND));
+    }
   });
   return () => { off(); offChannels(); offPreview(); clearInterval(expiry); if (!quiet) recording = false; };
 }

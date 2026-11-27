@@ -1961,7 +1961,9 @@
       "threshold": "« À portée » utilise le seuil des alertes de proximité.",
       "experimental": "Fonctionnalité expérimentale",
       "delayNote": "La voix peut être retardée jusqu’à 5 secondes. La première exécution est plus longue.",
-      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois)."
+      "downloadSize": "La première utilisation télécharge la voix, environ {{mb}} Mo (une seule fois).",
+      "evIntel": "Nouvel intel",
+      "desktopAlwaysOn": "Toujours actif dans l'application de bureau, au volume des alertes réglé dans Notifications. L'intel est aussi lu avec cette voix."
     },
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "browserNotifications": "Notifications du navigateur",
@@ -2320,6 +2322,18 @@
       "fortress": "Forteresse",
       "hexagon": "Hexagone",
       "spiked": "Hérissé"
+    },
+    "notifIntel": "Intel signalé",
+    "notifIntelSound": "Son de l'intel",
+    "notifIntelPreview": "Écouter",
+    "intelSounds": {
+      "twoTone": "Deux tons",
+      "chime": "Carillon",
+      "ping": "Ping",
+      "bell": "Cloche",
+      "blip": "Bip",
+      "alarm": "Alarme",
+      "low": "Tons graves"
     }
   },
   "mass": {
