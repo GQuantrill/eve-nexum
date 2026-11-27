@@ -338,6 +338,24 @@ export function RoutePlannerPane() {
         <div className="scout-pane__empty">{t('routePlanner.noRoute')}</div>
       )}
 
+      {/* Save this route: always right under the result. */}
+      <div className="route-planner__save">
+        <input
+          className="chains-new__name"
+          value={saveName}
+          placeholder={t('routePlanner.nameToSave')}
+          onChange={(e) => setSaveName(e.target.value)}
+        />
+        <button
+          type="button"
+          className="sys-btn"
+          disabled={!from || !to || from.id === to.id || !saveName.trim() || busy}
+          onClick={savePlan}
+        >
+          {t('routePlanner.save')}
+        </button>
+      </div>
+
       {/* ── Saved routes ── */}
       <div className="route-planner__saved">
         <div className="route-planner__label">{t('routePlanner.savedHdr')}</div>
@@ -366,22 +384,6 @@ export function RoutePlannerPane() {
             ))}
           </div>
         )}
-        <div className="route-planner__save">
-          <input
-            className="chains-new__name"
-            value={saveName}
-            placeholder={t('routePlanner.nameToSave')}
-            onChange={(e) => setSaveName(e.target.value)}
-          />
-          <button
-            type="button"
-            className="sys-btn"
-            disabled={!from || !to || from.id === to.id || !saveName.trim() || busy}
-            onClick={savePlan}
-          >
-            {t('routePlanner.save')}
-          </button>
-        </div>
       </div>
     </div>
   );
