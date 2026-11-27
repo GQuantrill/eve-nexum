@@ -1,7 +1,7 @@
 {
   "name": "nexum-desktop",
   "private": true,
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Nexum desktop app: the Nexum website in its own window, plus EVE log jump tracking, probe-scan paste, notifications and an always-on-top mode.",
   "scripts": {
     "dev": "tauri dev",
