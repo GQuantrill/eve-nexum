@@ -1965,7 +1965,8 @@
       "evIntel": "Nouvel intel",
       "desktopAlwaysOn": "Toujours active dans l'application de bureau ; l'intel est aussi lu avec cette voix. Coupez-la ici.",
       "voiceOn": "Voix",
-      "voiceVolume": "Volume de la voix — {{pct}} %"
+      "voiceVolume": "Volume de la voix — {{pct}} %",
+      "evWatchedAnyRange": "Pilotes surveillés dans l'intel, à toute distance"
     },
     "bookmarkHelp": "Sur la ligne d'une signature de trou de ver, cliquez sur l'icône de copie pour copier un nom de favori prêt à coller, puis collez-le dans le favori en jeu. Composez le nom avec ces variables :",
     "browserNotifications": "Notifications du navigateur",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, signalé",
       "intelSpeakHere": "{{system}}, dans votre système",
       "intelSpeak_one": "{{system}}, {{count}} saut",
-      "intelSpeak_other": "{{system}}, {{count}} sauts"
+      "intelSpeak_other": "{{system}}, {{count}} sauts",
+      "watchedSpeak": "Pilote surveillé, {{pilots}}"
     },
     "resetLayout": "Réinitialiser la disposition de la barre d'outils",
     "role": "Rôle : {{role}}",

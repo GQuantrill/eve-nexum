@@ -45,11 +45,14 @@ export function writeThreshold(n: number): void {
   writeUserSetting(THRESHOLD_KEY, clamp(n));
 }
 
+/** The farthest proximity alert range, in jumps. */
+export const MAX_THRESHOLD = 10;
+
 /** Threshold-watching hook. Returns the current threshold and a setter. */
 export function useProximityThreshold(): [number, (n: number) => void] {
   const [threshold, setThreshold] = useUserSetting<number>(THRESHOLD_KEY, DEFAULT_THRESHOLD);
   return [
-    Number.isFinite(threshold) && threshold >= 0 && threshold <= 5 ? threshold : DEFAULT_THRESHOLD,
+    Number.isFinite(threshold) && threshold >= 0 && threshold <= MAX_THRESHOLD ? threshold : DEFAULT_THRESHOLD,
     (n: number) => setThreshold(clamp(n)),
   ];
 }
@@ -208,11 +211,19 @@ export function useProximityAlerts(): {
       if (!route && located) continue;
       alertedRef.current.add(key);
       const jumps = route?.jumps ?? null;
-      if (jumps === null || jumps > threshold) continue;
+      if (jumps === null || jumps > threshold) {
+        // Out of range (or no location), but naming a watched pilot: read
+        // out anyway when the pilot asked for that. Voice only.
+        if (r.pilots.length > 0 && announcerEnabled() && readUserSetting<boolean>(ANN.intel, true)
+            && readUserSetting<boolean>(ANN.watchedAnyRange, true)) {
+          speakIntel(r.name, jumps, r.pilots);
+        }
+        continue;
+      }
       if (notifyOn(NOTIFY.intelDesktop)) fireIntelNotification(r.name, jumps);
       desktopAttention();
       if (notifyOn(NOTIFY.intelSound)) playIntelSound(intelSoundName());
-      if (announcerEnabled() && readUserSetting<boolean>(ANN.intel, true)) speakIntel(r.name, jumps);
+      if (announcerEnabled() && readUserSetting<boolean>(ANN.intel, true)) speakIntel(r.name, jumps, r.pilots);
     }
   }, [intel, routes, threshold, located]);
 
@@ -258,23 +269,26 @@ export function intelSoundName(): string {
 // it at start), the computer's own voice says it instead, in the site's
 // language, so a report is never silent. A newer report cuts off one still
 // being read by that fallback: the latest is what matters.
-function speakIntel(sysName: string, jumps: number | null) {
+function speakIntel(sysName: string, jumps: number | null, pilots: string[] = []) {
   if (voiceMuted()) return;
   const announcer = useAnnouncer.getState();
+  // Watched pilots named in the line lead: "Watched pilot, Name, ...".
+  const who = pilots.slice(0, 3).join(', ');
   if (announcer.status === 'ready') {
     // English: the announcer's voice only speaks English.
-    const text = jumps === null ? `Intel, ${sysName}`
-      : jumps === 0 ? `Intel, ${sysName}, your system`
-      : `Intel, ${sysName}, ${jumps === 1 ? '1 jump' : `${jumps} jumps`}`;
-    void announcer.speak(text);
+    const where = jumps === null ? sysName
+      : jumps === 0 ? `${sysName}, your system`
+      : `${sysName}, ${jumps === 1 ? '1 jump' : `${jumps} jumps`}`;
+    void announcer.speak(who ? `Watched pilot, ${who}, ${where}` : `Intel, ${where}`);
     return;
   }
   if (typeof speechSynthesis === 'undefined') return;
-  const text = jumps === null
+  const base = jumps === null
     ? i18n.t('toolbar.proximity.intelSpeakReported', { system: sysName })
     : jumps === 0
     ? i18n.t('toolbar.proximity.intelSpeakHere', { system: sysName })
     : i18n.t('toolbar.proximity.intelSpeak', { system: sysName, count: jumps });
+  const text = who ? `${i18n.t('toolbar.proximity.watchedSpeak', { pilots: who })}, ${base}` : base;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);

@@ -85,6 +85,8 @@ const BATCH_MAX = 60;
 
 export interface IntelReport {
   eveSystemId: number; name: string; at: number;
+  /** Watched pilots the line names (they can be announced at any range). */
+  pilots: string[];
 }
 
 let reports = new Map<number, IntelReport>();
@@ -135,15 +137,23 @@ async function flush(): Promise<void> {
     } catch { /* rate-limited or offline: try these words again next time */ }
   }
   const next = new Map(reports);
+  const watched = sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
   for (const { line } of items.filter((q) => q.report)) {
     const clear = CLEAR.test(line.text);
+    const sender = line.sender.trim().toLowerCase();
+    const pilots = watched
+      .filter((w) => w.name.toLowerCase() !== sender && namesPilot(line.text, w.name))
+      .map((w) => w.name);
+    const inPilotNames = new Set(pilots.flatMap((p) => candidateNames(p)));
     for (const n of candidateNames(line.text)) {
+      if (inPilotNames.has(n)) continue;   // a pilot's name, not a system
       const sys = known.get(n);
       if (!sys) continue;
       if (clear) next.delete(sys.eveSystemId);
       else next.set(sys.eveSystemId, {
         ...sys,
         at: line.at,
+        pilots,
       });
     }
   }

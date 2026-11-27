@@ -1965,7 +1965,8 @@
       "evIntel": "新しいインテル",
       "desktopAlwaysOn": "デスクトップアプリでは常にオンで、インテルもこの声で読み上げます。ここでミュートできます。",
       "voiceOn": "音声",
-      "voiceVolume": "音声の音量 — {{pct}}%"
+      "voiceVolume": "音声の音量 — {{pct}}%",
+      "evWatchedAnyRange": "インテルの監視パイロット（距離に関係なく）"
     },
     "bookmarkHelp": "ワームホールのシグネチャ行でコピーアイコンをクリックすると、貼り付け可能なブックマーク名がコピーされます。ゲーム内のブックマークに貼り付けてください。次のトークンで名前を作成します：",
     "browserNotifications": "ブラウザ通知",
@@ -2779,7 +2780,8 @@
       "intelSpeakReported": "{{system}}、報告あり",
       "intelSpeakHere": "{{system}}、現在の星系",
       "intelSpeak_one": "{{system}}、{{count}} ジャンプ",
-      "intelSpeak_other": "{{system}}、{{count}} ジャンプ"
+      "intelSpeak_other": "{{system}}、{{count}} ジャンプ",
+      "watchedSpeak": "監視パイロット、{{pilots}}"
     },
     "resetLayout": "ツールバーのレイアウトをリセット",
     "role": "権限: {{role}}",

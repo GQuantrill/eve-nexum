@@ -1965,7 +1965,8 @@
       "evIntel": "Nuevo intel",
       "desktopAlwaysOn": "Siempre activa en la app de escritorio; el intel también se lee con esta voz. Silénciala aquí.",
       "voiceOn": "Voz",
-      "voiceVolume": "Volumen de la voz — {{pct}} %"
+      "voiceVolume": "Volumen de la voz — {{pct}} %",
+      "evWatchedAnyRange": "Pilotos vigilados en intel, a cualquier distancia"
     },
     "bookmarkHelp": "En la fila de una firma de agujero de gusano, haz clic en el icono de copiar para copiar un nombre de marcador listo, y pégalo en el marcador del juego. Crea el nombre con estos tokens:",
     "browserNotifications": "Notificaciones del navegador",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, reportado",
       "intelSpeakHere": "{{system}}, en tu sistema",
       "intelSpeak_one": "{{system}}, {{count}} salto",
-      "intelSpeak_other": "{{system}}, {{count}} saltos"
+      "intelSpeak_other": "{{system}}, {{count}} saltos",
+      "watchedSpeak": "Piloto vigilado, {{pilots}}"
     },
     "resetLayout": "Restablecer disposición de la barra de herramientas",
     "role": "Rol: {{role}}",

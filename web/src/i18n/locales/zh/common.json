@@ -1965,7 +1965,8 @@
       "evIntel": "新情报",
       "desktopAlwaysOn": "在桌面应用中始终开启；情报也会用此声音朗读。可在此静音。",
       "voiceOn": "语音",
-      "voiceVolume": "语音音量 — {{pct}}%"
+      "voiceVolume": "语音音量 — {{pct}}%",
+      "evWatchedAnyRange": "情报中的关注飞行员（任意距离）"
     },
     "bookmarkHelp": "在虫洞信号行点击复制图标，即可复制可直接粘贴的书签名称，然后粘贴到游戏内书签中。使用以下变量构建名称：",
     "browserNotifications": "浏览器通知",
@@ -2779,7 +2780,8 @@
       "intelSpeakReported": "{{system}}，有情报",
       "intelSpeakHere": "{{system}}，就在你所在星系",
       "intelSpeak_one": "{{system}}，{{count}} 跳",
-      "intelSpeak_other": "{{system}}，{{count}} 跳"
+      "intelSpeak_other": "{{system}}，{{count}} 跳",
+      "watchedSpeak": "关注的飞行员，{{pilots}}"
     },
     "resetLayout": "重置工具栏布局",
     "role": "权限：{{role}}",

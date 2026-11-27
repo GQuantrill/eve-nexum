@@ -1965,7 +1965,8 @@
       "evIntel": "Nieuwe intel",
       "desktopAlwaysOn": "Altijd aan in de desktop-app; intel wordt ook met deze stem voorgelezen. Hier dempen.",
       "voiceOn": "Stem",
-      "voiceVolume": "Stemvolume — {{pct}}%"
+      "voiceVolume": "Stemvolume — {{pct}}%",
+      "evWatchedAnyRange": "Gevolgde piloten in intel, op elke afstand"
     },
     "bookmarkHelp": "Klik op een rij met een wormgat-signatuur op het kopieerpictogram voor een kant-en-klare bookmarknaam, en plak die in de bookmark in het spel. Stel de naam samen met deze tokens:",
     "browserNotifications": "Browsermeldingen",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, gemeld",
       "intelSpeakHere": "{{system}}, in jouw systeem",
       "intelSpeak_one": "{{system}}, {{count}} sprong",
-      "intelSpeak_other": "{{system}}, {{count}} sprongen"
+      "intelSpeak_other": "{{system}}, {{count}} sprongen",
+      "watchedSpeak": "Gevolgde piloot, {{pilots}}"
     },
     "resetLayout": "Werkbalkindeling herstellen",
     "role": "Rol: {{role}}",
