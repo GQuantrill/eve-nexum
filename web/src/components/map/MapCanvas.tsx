@@ -1962,14 +1962,16 @@ export function MapCanvas() {
 
     return [
       {
+        label: t('ctxMenu.selectAll'),
+        icon: <SelectionAllIcon size={14} weight="regular" />,
+        action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
+        disabled: nodes.length === 0,
+      },
+      { separator: true as const },
+      {
         label: t('ctxMenu.addSystem'),
         icon: <PlusIcon size={16} weight="regular" />,
         action: () => setPendingPosition({ x: contextMenu.flowX - 75, y: contextMenu.flowY - 40 }),
-      },
-      {
-        label: t('ctxMenu.pasteSystems'),
-        icon: <ClipboardTextIcon size={16} weight="regular" />,
-        action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
         label: t('ctxMenu.importSystems'),
@@ -1977,11 +1979,11 @@ export function MapCanvas() {
         action: () => setImportAt({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
-        label: t('ctxMenu.selectAll'),
-        icon: <SelectionAllIcon size={14} weight="regular" />,
-        action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
-        disabled: nodes.length === 0,
+        label: t('ctxMenu.pasteSystems'),
+        icon: <ClipboardTextIcon size={16} weight="regular" />,
+        action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
+      { separator: true as const },
       {
         label: t('ctxMenu.optimizeConnections'),
         icon: <LinkSimpleIcon size={15} weight="regular" />,
