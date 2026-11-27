@@ -761,7 +761,8 @@
         "turnur": "Turnur-ingangen",
         "incursion": "Incursions",
         "structure": "Structuren van je corp",
-        "quiet": "Rustige systemen"
+        "quiet": "Rustige systemen",
+        "region": "Dichtstbijzijnde regio's"
       },
       "services": {
         "cloning": "Kloonbank (jump clones)",
@@ -3267,6 +3268,7 @@
       "refinery": "Raffinaderijen"
     },
     "filter": "Filteren...",
-    "noMatch": "Niets gevonden."
+    "noMatch": "Niets gevonden.",
+    "regionVia": "Dichtstbijzijnde systeem: {{system}}"
   }
 }

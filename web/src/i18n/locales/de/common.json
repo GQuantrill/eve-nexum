@@ -761,7 +761,8 @@
         "turnur": "Turnur-Eingänge",
         "incursion": "Incursions",
         "structure": "Strukturen deiner Corp",
-        "quiet": "Ruhige Systeme"
+        "quiet": "Ruhige Systeme",
+        "region": "Nächste Regionen"
       },
       "services": {
         "cloning": "Klonbank (Sprungklone)",
@@ -3267,6 +3268,7 @@
       "refinery": "Raffinerien"
     },
     "filter": "Filtern...",
-    "noMatch": "Keine Treffer."
+    "noMatch": "Keine Treffer.",
+    "regionVia": "Nächstes System: {{system}}"
   }
 }

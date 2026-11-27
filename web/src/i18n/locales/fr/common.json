@@ -761,7 +761,8 @@
         "turnur": "Entrées de Turnur",
         "incursion": "Incursions",
         "structure": "Structures de votre corpo",
-        "quiet": "Systèmes calmes"
+        "quiet": "Systèmes calmes",
+        "region": "Régions les plus proches"
       },
       "services": {
         "cloning": "Baie de clonage (clones de saut)",
@@ -3267,6 +3268,7 @@
       "refinery": "Raffineries"
     },
     "filter": "Filtrer...",
-    "noMatch": "Aucun résultat."
+    "noMatch": "Aucun résultat.",
+    "regionVia": "Système le plus proche : {{system}}"
   }
 }

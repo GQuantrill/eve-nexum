@@ -761,7 +761,8 @@
         "turnur": "Turnur 入口",
         "incursion": "入侵",
         "structure": "你军团的建筑",
-        "quiet": "安静星系"
+        "quiet": "安静星系",
+        "region": "最近的星域"
       },
       "services": {
         "cloning": "克隆舱（跳跃克隆）",
@@ -3262,6 +3263,7 @@
       "refinery": "精炼厂"
     },
     "filter": "筛选...",
-    "noMatch": "没有匹配项。"
+    "noMatch": "没有匹配项。",
+    "regionVia": "最近的星系：{{system}}"
   }
 }

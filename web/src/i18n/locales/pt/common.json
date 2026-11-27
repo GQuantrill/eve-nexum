@@ -761,7 +761,8 @@
         "turnur": "Entradas de Turnur",
         "incursion": "Incursões",
         "structure": "Estruturas da sua corp",
-        "quiet": "Sistemas tranquilos"
+        "quiet": "Sistemas tranquilos",
+        "region": "Regiões mais próximas"
       },
       "services": {
         "cloning": "Baia de clonagem (clones de salto)",
@@ -3267,6 +3268,7 @@
       "refinery": "Refinarias"
     },
     "filter": "Filtrar...",
-    "noMatch": "Nada corresponde."
+    "noMatch": "Nada corresponde.",
+    "regionVia": "Sistema mais próximo: {{system}}"
   }
 }

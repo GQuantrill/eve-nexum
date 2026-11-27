@@ -168,9 +168,12 @@ export async function nearestRoutes(
   mode: RouteMode = 'shortest',
   overlay?: RouteOverlay,
   avoid?: ReadonlySet<number>,
+  /** One hit per group (e.g. per region): a target whose group was already
+   *  found, or that has none, doesn't count. */
+  groupOf?: (id: number) => number | undefined,
 ): Promise<Array<{ id: number } & RouteEntry>> {
   const ids = [...targets].filter((t) => t !== source);
-  const { result, order } = searchRoutes(source, ids, mode, overlay, avoid, limit);
+  const { result, order } = searchRoutes(source, ids, mode, overlay, avoid, limit, groupOf);
   return order.map((id) => ({ id, ...result[id] }));
 }
 
@@ -181,6 +184,7 @@ function searchRoutes(
   overlay: RouteOverlay | undefined,
   avoid: ReadonlySet<number> | undefined,
   maxFound = Infinity,
+  groupOf?: (id: number) => number | undefined,
 ): { result: Record<number, RouteEntry>; order: number[] } {
   if (!adjacency || !systemInfo) throw new Error('Route graph not loaded');
   const baseAdj  = adjacency;
@@ -210,6 +214,17 @@ function searchRoutes(
   const prev = new Map<number, number>();
   dist.set(source, 0);
   const found = new Set<number>();   // insertion order = nearest first
+  const groupsFound = new Set<number>();
+  /** Counts a target reached, unless its group already has one. */
+  const take = (node: number): void => {
+    if (!targetSet.has(node) || found.has(node)) return;
+    if (groupOf) {
+      const g = groupOf(node);
+      if (g === undefined || groupsFound.has(g)) return;
+      groupsFound.add(g);
+    }
+    found.add(node);
+  };
 
   if (mode === 'shortest') {
     // Plain BFS — cheaper than Dijkstra for uniform-weight graphs.
@@ -217,10 +232,8 @@ function searchRoutes(
     let head = 0;
     while (head < queue.length && found.size < want) {
       const node = queue[head++];
-      if (targetSet.has(node)) {
-        found.add(node);
-        if (found.size === want) break;
-      }
+      take(node);
+      if (found.size === want) break;
       const neighbors = neighborsOf(node);
       if (neighbors.length === 0) continue;
       const d = dist.get(node)!;
@@ -240,10 +253,8 @@ function searchRoutes(
     while (!heap.empty() && found.size < want) {
       const { id: node, cost } = heap.pop()!;
       if (cost > (dist.get(node) ?? Infinity)) continue; // stale entry
-      if (targetSet.has(node) && !found.has(node)) {
-        found.add(node);
-        if (found.size === want) break;
-      }
+      take(node);
+      if (found.size === want) break;
       const neighbors = neighborsOf(node);
       if (neighbors.length === 0) continue;
       for (const n of neighbors) {

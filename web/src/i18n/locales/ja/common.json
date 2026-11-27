@@ -761,7 +761,8 @@
         "turnur": "Turnur の入口",
         "incursion": "インカージョン",
         "structure": "コーポのストラクチャ",
-        "quiet": "静かな星系"
+        "quiet": "静かな星系",
+        "region": "最寄りのリージョン"
       },
       "services": {
         "cloning": "クローンベイ（ジャンプクローン）",
@@ -3262,6 +3263,7 @@
       "refinery": "精製所"
     },
     "filter": "絞り込み...",
-    "noMatch": "一致するものがありません。"
+    "noMatch": "一致するものがありません。",
+    "regionVia": "最寄りの星系: {{system}}"
   }
 }

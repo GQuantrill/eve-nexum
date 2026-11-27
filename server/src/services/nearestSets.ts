@@ -34,15 +34,17 @@ export function isServerKind(k: string): k is ServerKind {
   return k.startsWith('service:') && k.slice(8) in STATION_SERVICES;
 }
 
-interface SystemRow { id: number; name: string; security: number; region_id: number | null }
+interface SystemRow { id: number; name: string; security: number; region_id: number | null; region_name: string | null }
 let systems: SystemRow[] | null = null;
 
 /** Every k-space system on the gate network, loaded once. */
 async function kspaceSystems(): Promise<SystemRow[]> {
   if (systems) return systems;
-  const { rows } = await db.query<{ id: number; name: string; security: string; region_id: number | null }>(
-    `SELECT id, name, security::text AS security, region_id FROM solar_systems
-      WHERE id IN (SELECT DISTINCT system_id FROM map_stargates)`);
+  const { rows } = await db.query<{ id: number; name: string; security: string; region_id: number | null; region_name: string | null }>(
+    `SELECT s.id, s.name, s.security::text AS security, s.region_id, r.name AS region_name
+       FROM solar_systems s
+       LEFT JOIN map_regions r ON r.id = s.region_id
+      WHERE s.id IN (SELECT DISTINCT system_id FROM map_stargates)`);
   systems = rows.map((r) => ({ ...r, security: Number(r.security) }));
   return systems;
 }
@@ -101,6 +103,15 @@ async function loadKindTargets(kind: ServerKind): Promise<KindTargets> {
       return { ids: await stationSystems('$1 = ANY(services)', [service]) };
     }
   }
+}
+
+/**
+ * Every k-space system's region, for the nearest regions: the nearest system
+ * of each region (but the start's own) stands for it.
+ */
+export async function systemRegions(): Promise<Map<number, { id: number; name: string }>> {
+  const all = await kspaceSystems();
+  return new Map(all.flatMap((s) => (s.region_id != null ? [[s.id, { id: s.region_id, name: s.region_name ?? '' }] as const] : [])));
 }
 
 /** Tests only. */

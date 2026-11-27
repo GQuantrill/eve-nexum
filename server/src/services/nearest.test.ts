@@ -27,6 +27,15 @@ describe('nearestRoutes', () => {
     expect(r.map((x) => x.id)).toEqual([2, 6]);
     expect(r[1].jumps).toBe(5);
   });
+
+  it('with groups, takes the nearest of each and skips ungrouped ones', async () => {
+    // Regions along the line: 1-2 A (the start's, so ungrouped), 3-4 B, 5-6 C.
+    const region: Record<number, number | undefined> = { 3: 20, 4: 20, 5: 30, 6: 30 };
+    for (const mode of ['shortest', 'secure'] as const) {
+      const r = await nearestRoutes(1, [2, 3, 4, 5, 6], 3, mode, undefined, undefined, (id) => region[id]);
+      expect(r.map((x) => x.id)).toEqual([3, 5]);
+    }
+  });
 });
 
 describe('npcBuyers', () => {

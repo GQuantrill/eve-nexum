@@ -761,7 +761,8 @@
         "turnur": "Turnur entrances",
         "incursion": "Incursions",
         "structure": "Your corp's structures",
-        "quiet": "Quiet systems"
+        "quiet": "Quiet systems",
+        "region": "Nearest regions"
       },
       "services": {
         "cloning": "Clone bay (jump clones)",
@@ -3267,6 +3268,7 @@
       "refinery": "Refineries"
     },
     "filter": "Filter...",
-    "noMatch": "Nothing matches."
+    "noMatch": "Nothing matches.",
+    "regionVia": "Nearest system: {{system}}"
   }
 }

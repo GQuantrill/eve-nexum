@@ -761,7 +761,8 @@
         "turnur": "Turnur 입구",
         "incursion": "인커전",
         "structure": "내 코퍼레이션 구조물",
-        "quiet": "조용한 성계"
+        "quiet": "조용한 성계",
+        "region": "가장 가까운 지역"
       },
       "services": {
         "cloning": "클론 베이 (점프 클론)",
@@ -3262,6 +3263,7 @@
       "refinery": "정제소"
     },
     "filter": "필터...",
-    "noMatch": "일치하는 항목이 없습니다."
+    "noMatch": "일치하는 항목이 없습니다.",
+    "regionVia": "가장 가까운 성계: {{system}}"
   }
 }

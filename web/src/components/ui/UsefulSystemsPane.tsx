@@ -33,11 +33,11 @@ import styles from './UsefulSystemsPane.module.css';
 // (POST /api/route/nearest), routing from the same start as Closest Systems.
 
 type Group =
-  | 'hub' | 'hub2' | 'blueloot' | 'a0' | 'highsec' | 'lowsec' | 'nullsec' | 'station'
+  | 'hub' | 'hub2' | 'blueloot' | 'a0' | 'highsec' | 'lowsec' | 'nullsec' | 'region' | 'station'
   | 'service' | 'concord' | 'clone' | 'structure' | 'thera' | 'turnur' | 'incursion' | 'quiet';
 
 const GROUPS: Group[] = [
-  'hub', 'hub2', 'blueloot', 'a0', 'highsec', 'lowsec', 'nullsec', 'station',
+  'hub', 'hub2', 'blueloot', 'a0', 'highsec', 'lowsec', 'nullsec', 'region', 'station',
   'service', 'concord', 'clone', 'structure', 'thera', 'turnur', 'incursion', 'quiet',
 ];
 const VALID = new Set<string>(GROUPS);
@@ -69,6 +69,8 @@ interface Found extends RouteEntry {
   id:      number;
   path:    RoutePathNode[];
   detail?: number[];
+  /** The nearest regions: the region this system stands for. */
+  regionName?: string;
 }
 
 interface CorpStructure { name: string; typeName: string; solarSystemId: number | null; source: 'corp' | 'map' }
@@ -235,7 +237,7 @@ export function UsefulSystemsPane() {
   ];
   const rowHit = (g: Group, r: Found) => {
     const name = r.path[r.path.length - 1]?.name ?? '';
-    return hit(name) || hit(aliasName(name))
+    return hit(name) || hit(aliasName(name)) || (!!r.regionName && hit(r.regionName))
       || (g === 'structure' && (structuresBySystem.get(r.id) ?? []).some(hit));
   };
   const listed = shown.flatMap((g) => {
@@ -309,13 +311,22 @@ export function UsefulSystemsPane() {
                   return (
                     <div key={r.id} className="scout-row">
                       <div className="scout-row__sys">
-                        <span className="scout-row__name">{aliasName(name)}</span>
-                        {end && end.kspace && (
+                        {/* A region row names the region; its nearest system goes under it. */}
+                        <span className="scout-row__name">{r.regionName || aliasName(name)}</span>
+                        {!r.regionName && end && end.kspace && (
                           <span className={styles.sec} style={{ color: truesecColor(end.security) }}>
                             {end.security.toFixed(1)}
                           </span>
                         )}
                       </div>
+                      {r.regionName && (
+                        <div className={styles.detail}>
+                          {t('useful.regionVia', { system: aliasName(name) })}
+                          {end && end.kspace && (
+                            <span className={styles.sec} style={{ color: truesecColor(end.security) }}> {end.security.toFixed(1)}</span>
+                          )}
+                        </div>
+                      )}
                       {here.length > 0 && (
                         <div className={styles.detail}>
                           {here[0]}{here.length > 1 && ` ${t('useful.moreHere', { count: here.length - 1 })}`}
