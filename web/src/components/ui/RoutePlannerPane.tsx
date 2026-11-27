@@ -12,6 +12,7 @@ import { RouteSquares } from './routeUi';
 import { canSetAutopilot } from '../../utils/routeActions';
 import { setDestination, addWaypoint } from '../../api/waypoint';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { routeMapHighlight } from '../../utils/routeMapHighlight';
 import { jumps as jumpsLabel } from '../../i18n/format';
 import { XIcon, ArrowsLeftRightIcon, CrosshairIcon } from '../../icons';
 
@@ -235,6 +236,21 @@ export function RoutePlannerPane() {
     } catch { /* toasted by the waypoint helpers */ }
   };
 
+  // Highlight on map: the route's systems and links on the open map, until
+  // turned off, the route changes to nothing on this map, or the pane closes.
+  const [highlightOn, setHighlightOn] = useState(false);
+  const mapSystems     = useMapStore((s) => s.map.systems);
+  const mapConnections = useMapStore((s) => s.map.connections);
+  const setPinnedHighlight = useMapStore((s) => s.setPinnedRouteHighlight);
+  const onMap = useMemo(
+    () => (route ? routeMapHighlight(route, mapSystems, mapConnections) : null),
+    [route, mapSystems, mapConnections],
+  );
+  useEffect(() => {
+    setPinnedHighlight(highlightOn ? onMap : null);
+  }, [highlightOn, onMap, setPinnedHighlight]);
+  useEffect(() => () => setPinnedHighlight(null), [setPinnedHighlight]);
+
   const swap = () => {
     if (!from || !to) return;
     setFromOverride(to);
@@ -338,6 +354,16 @@ export function RoutePlannerPane() {
             <span className="route-planner__mode">
               {t(routeMode === 'secure' ? 'a0.modeSecure' : 'a0.modeShortest')}
             </span>
+            <button
+              type="button"
+              className={`sys-btn route-planner__highlight${highlightOn && onMap ? ' route-planner__highlight--on' : ''}`}
+              aria-pressed={highlightOn && !!onMap}
+              disabled={!onMap}
+              onClick={() => setHighlightOn((v) => !v)}
+              data-tooltip={onMap ? t('routePlanner.highlightHint') : t('routePlanner.highlightNone')}
+            >
+              {highlightOn && onMap ? t('routePlanner.highlightOff') : t('routePlanner.highlight')}
+            </button>
           </div>
           <RouteSquares route={route} />
           {canSetAutopilot(route) && (

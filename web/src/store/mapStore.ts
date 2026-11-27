@@ -305,6 +305,10 @@ interface MapStore {
   // isn't part of the route. null = nothing highlighted.
   routeHighlight: { systemIds: string[]; connectionIds: string[] } | null;
   setRouteHighlight: (v: { systemIds: string[]; connectionIds: string[] } | null) => void;
+  // A highlight that stays until turned off (the Route Planner's "Highlight
+  // on map"). The hover highlight above wins while it's set.
+  pinnedRouteHighlight: { systemIds: string[]; connectionIds: string[] } | null;
+  setPinnedRouteHighlight: (v: { systemIds: string[]; connectionIds: string[] } | null) => void;
 
   // Route/centre origin override: point jump calcs + centring at another of
   // the account's characters (e.g. a scout on the chain exit) instead of the
@@ -721,6 +725,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     centerRequestEveId: null,
     centerRequestNodeId: null,
     routeHighlight: null,
+    pinnedRouteHighlight: null,
     routeOrigin: null,
     routeFromSystem: null,
     setRouteFromSystem: (o) => set({ routeFromSystem: o }),
@@ -1089,6 +1094,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     requestCenterOnNode: (nodeId) => set({ centerRequestNodeId: nodeId }),
     clearCenterRequest: () => set({ centerRequestEveId: null, centerRequestNodeId: null }),
     setRouteHighlight: (v) => set({ routeHighlight: v }),
+    setPinnedRouteHighlight: (v) => set({ pinnedRouteHighlight: v }),
 
     setRouteOrigin: (o) => set({ routeOrigin: o }),
 

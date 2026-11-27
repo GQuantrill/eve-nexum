@@ -2961,7 +2961,11 @@
     "setRoute": "Route instellen",
     "setDestinationHint": "Stuurt {{to}} als bestemming naar je autopilot in het spel en wist je waypoints. Het spel plant zelf de weg via stargates vanaf waar je bent: wormgaten en shortcuts van deze route gebruikt het niet.",
     "setRouteHint": "Stuurt {{from}} als bestemming en daarna {{to}} als waypoint, zodat de autopilot je eerst naar het begin brengt (overgeslagen als je er al bent). Het spel plant elk deel via stargates.",
-    "setRouteJspace": "{{from}} ligt niet in k-space, dus het spel kan het niet als waypoint nemen. Gebruik Bestemming instellen."
+    "setRouteJspace": "{{from}} ligt niet in k-space, dus het spel kan het niet als waypoint nemen. Gebruik Bestemming instellen.",
+    "highlight": "Op kaart tonen",
+    "highlightOff": "Niet meer tonen",
+    "highlightHint": "Licht de systemen en verbindingen van deze route op de geopende kaart op en dimt de rest.",
+    "highlightNone": "Geen van de systemen van deze route staat op de geopende kaart."
   },
   "flagPresets": {
     "title": "Markeringsvoorinstellingen",

@@ -213,7 +213,10 @@ export function MapCanvas() {
   const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
   const activeMapId          = useMapStore((s) => s.activeMapId);
-  const routeHighlight       = useMapStore((s) => s.routeHighlight);
+  // A hovered saved chain wins; otherwise a pinned one (Route Planner).
+  const hoverHighlight       = useMapStore((s) => s.routeHighlight);
+  const pinnedHighlight      = useMapStore((s) => s.pinnedRouteHighlight);
+  const routeHighlight       = hoverHighlight ?? pinnedHighlight;
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
   // Snap's grid drawn as lines (default) or dots on the snap points (Settings).
   const [snapGridStyle]      = useUserSetting<'lines' | 'dots'>('nexum.snapGridStyle', 'lines');

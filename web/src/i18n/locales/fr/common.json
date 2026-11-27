@@ -2961,7 +2961,11 @@
     "setRoute": "Définir l'itinéraire",
     "setDestinationHint": "Envoie {{to}} comme destination à votre pilote automatique et efface vos points de passage. Le jeu trace son propre chemin par portails depuis votre position : il n'utilise pas les trous de ver ni les raccourcis de cet itinéraire.",
     "setRouteHint": "Envoie {{from}} comme destination, puis {{to}} comme point de passage après, pour que le pilote automatique vous amène d'abord au départ (ignoré si vous y êtes déjà). Le jeu trace chaque étape par portails.",
-    "setRouteJspace": "{{from}} n'est pas en k-space, le jeu ne peut donc pas l'utiliser comme point de passage. Utilisez Définir la destination."
+    "setRouteJspace": "{{from}} n'est pas en k-space, le jeu ne peut donc pas l'utiliser comme point de passage. Utilisez Définir la destination.",
+    "highlight": "Afficher sur la carte",
+    "highlightOff": "Ne plus afficher",
+    "highlightHint": "Met en évidence les systèmes et liaisons de cet itinéraire sur la carte ouverte, et estompe le reste.",
+    "highlightNone": "Aucun système de cet itinéraire n'est sur la carte ouverte."
   },
   "flagPresets": {
     "title": "Modèles de marqueur",

@@ -2961,7 +2961,11 @@
     "setRoute": "Route setzen",
     "setDestinationHint": "Sendet {{to}} als Ziel an deinen Autopiloten im Spiel und löscht deine Wegpunkte. Das Spiel plant den Weg selbst über Stargates ab deinem Standort: Wurmlöcher und Abkürzungen dieser Route nutzt es nicht.",
     "setRouteHint": "Sendet {{from}} als Ziel und danach {{to}} als Wegpunkt, sodass der Autopilot dich zuerst zum Start bringt (entfällt, wenn du schon dort bist). Das Spiel plant jede Etappe über Stargates.",
-    "setRouteJspace": "{{from}} liegt nicht im K-Space, daher kann das Spiel es nicht als Wegpunkt nehmen. Nutze „Ziel festlegen“."
+    "setRouteJspace": "{{from}} liegt nicht im K-Space, daher kann das Spiel es nicht als Wegpunkt nehmen. Nutze „Ziel festlegen“.",
+    "highlight": "Auf Karte zeigen",
+    "highlightOff": "Nicht mehr zeigen",
+    "highlightHint": "Hebt die Systeme und Verbindungen dieser Route auf der geöffneten Karte hervor und blendet den Rest ab.",
+    "highlightNone": "Keines der Systeme dieser Route ist auf der geöffneten Karte."
   },
   "flagPresets": {
     "title": "Flaggen-Vorlagen",
