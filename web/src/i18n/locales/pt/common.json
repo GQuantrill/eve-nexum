@@ -3307,6 +3307,9 @@
     "watch": "Vigiar este piloto",
     "unwatch": "Deixar de vigiar",
     "heatShowing": "A mostrar {{name}}",
-    "heatPick": "Escolha um piloto no painel Intel"
+    "heatPick": "Escolha um piloto no painel Intel",
+    "markOnMap": "Marcar no mapa",
+    "markOnMapHint": "Marcar cada sistema onde um piloto vigiado foi visto",
+    "seenHere": "Pilotos vigiados vistos aqui: {{list}}"
   }
 }

@@ -4,8 +4,10 @@ import { Handle, Position, useConnection } from '@xyflow/react';
 import {
   HouseIcon, ShieldIcon, CastleTurretIcon, LockIcon, WarningIcon, SkullIcon, LightningIcon,
   SunIcon, SnowflakeIcon, SwordIcon, SparkleIcon, DiamondsFourIcon, SignOutIcon,
-  PushPinIcon,
+  PushPinIcon, BinocularsIcon,
 } from '../../icons';
+import { usePilotSights } from '../../context/PilotSightContext';
+import { timeAgo } from '../../i18n/format';
 import type { NodeProps } from '@xyflow/react';
 import type { MapSystem } from '../../types';
 import { CLASS_COLORS, CLASS_LABELS, EFFECT_ICONS, EFFECT_LABELS, EFFECT_MODIFIERS } from '../../data/wormholes';
@@ -216,6 +218,8 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
     [watchEntries, sys, watchSigTypes, watchLeadsTo],
   );
   const watchDef        = watch ? watchMarker(watch.marker) : null;
+  // Watched pilots (Intel panel) seen in this system in the last 30 days.
+  const pilotSights     = usePilotSights(sys.eveSystemId);
   const watchTip        = watch ? (watch.note.trim() || t(`watchMarker.${watch.marker}`)) : undefined;
 
   // Content filter (map-wide spotlight): when active, systems whose scanned
@@ -439,6 +443,25 @@ export const SystemNode = memo(({ data, selected }: NodeProps) => {
           <watchDef.Icon size={11} weight="fill" />
         </span>
       )}
+
+      {/* Bottom-left: watched pilots seen here, bright when one was seen in
+          the last day. The tooltip names them and when. */}
+      {pilotSights && pilotSights.length > 0 && (() => {
+        const tip = t('pilots.seenHere', {
+          list: pilotSights.map((p) => `${p.name} (${timeAgo(t, p.at)})`).join(', '),
+        });
+        return (
+          <span
+            className="system-node__pilot-corner"
+            data-recent={now - pilotSights[0].at < 86_400_000 ? '' : undefined}
+            data-tooltip={tip}
+            aria-label={tip}
+          >
+            <BinocularsIcon size={10} weight="fill" />
+            {pilotSights.length > 1 && <span className="system-node__pilot-count">{pilotSights.length}</span>}
+          </span>
+        );
+      })()}
 
       {easyConnect && (
         <>

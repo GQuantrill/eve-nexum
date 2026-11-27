@@ -17,6 +17,8 @@ export interface Sighting {
 
 /** Synced settings (server allowlist in routes/auth.ts). */
 export const WATCH_KEY      = 'nexum.pilots.watched';
+/** Mark the systems watched pilots were seen in on the map (default on). */
+export const HIGHLIGHT_KEY  = 'nexum.pilots.highlight';
 /** The pilot the map's "Watched pilot" heatmap shows, or null. */
 export const HEAT_PILOT_KEY = 'nexum.pilots.heatPilot';
 /** Only one map's sightings, or '' for every map. */
@@ -69,5 +71,24 @@ export function summarise(rows: Sighting[]): Map<number, SightingSummary> {
 export function heatBySystem(rows: Sighting[], characterId: number): Map<number, number> {
   const out = new Map<number, number>();
   for (const r of rows) if (r.characterId === characterId) out.set(r.eveSystemId, (out.get(r.eveSystemId) ?? 0) + 1);
+  return out;
+}
+
+export interface PilotSight { name: string; at: number }
+
+/** Per system, each of these pilots seen there and when they last were,
+ *  newest first: the map's sighting markers. */
+export function sightsBySystem(rows: Sighting[], ids: ReadonlySet<number>): Map<number, PilotSight[]> {
+  const out = new Map<number, PilotSight[]>();
+  const done = new Set<string>();
+  for (const r of rows) {   // newest first, so the first per pilot and system is the latest
+    if (!ids.has(r.characterId)) continue;
+    const key = `${r.eveSystemId}:${r.characterId}`;
+    if (done.has(key)) continue;
+    done.add(key);
+    const list = out.get(r.eveSystemId) ?? [];
+    list.push({ name: r.name, at: new Date(r.seenAt).getTime() });
+    out.set(r.eveSystemId, list);
+  }
   return out;
 }

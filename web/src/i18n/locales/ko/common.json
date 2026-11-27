@@ -3299,6 +3299,9 @@
     "watch": "이 파일럿 주시",
     "unwatch": "주시 해제",
     "heatShowing": "{{name}} 표시 중",
-    "heatPick": "인텔 패널에서 파일럿을 선택하세요"
+    "heatPick": "인텔 패널에서 파일럿을 선택하세요",
+    "markOnMap": "지도에 표시",
+    "markOnMapHint": "주시 중인 파일럿이 목격된 모든 성계에 표시",
+    "seenHere": "여기서 목격된 주시 파일럿: {{list}}"
   }
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitiseWatched, summarise, heatBySystem, type Sighting } from './pilotWatch';
+import { sanitiseWatched, summarise, heatBySystem, sightsBySystem, type Sighting } from './pilotWatch';
 import { namesPilot } from '../desktop/intel';
 
 const row = (characterId: number, eveSystemId: number, seenAt: string): Sighting => ({
@@ -26,5 +26,16 @@ describe('pilot watch', () => {
     expect(namesPilot('Jita  Bob Pilot  Other Guy +2', 'bob pilot')).toBe(true);
     expect(namesPilot('Jita Bobby Pilots', 'Bob Pilot')).toBe(false);
     expect(namesPilot("Amarr Mr. O'Neil nv", "Mr. O'Neil")).toBe(true);
+  });
+});
+
+describe('sighting markers', () => {
+  it('lists each watched pilot once per system, newest first', () => {
+    const rows = [row(1, 10, '2026-11-27T12:00:00Z'), row(2, 10, '2026-11-27T11:00:00Z'), row(1, 10, '2026-11-27T10:00:00Z'), row(3, 10, '2026-11-27T09:00:00Z')];
+    const m = sightsBySystem(rows, new Set([1, 2]));
+    expect(m.get(10)).toEqual([
+      { name: 'P1', at: Date.parse('2026-11-27T12:00:00Z') },
+      { name: 'P2', at: Date.parse('2026-11-27T11:00:00Z') },
+    ]);
   });
 });

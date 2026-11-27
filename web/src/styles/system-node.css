@@ -118,6 +118,35 @@
   box-shadow: 0 0 0 2px var(--watch-color, var(--accent-bright)), 0 0 10px 1px var(--watch-color, var(--accent-bright));
 }
 
+/* Bottom-left: watched pilots (Intel panel) seen in this system. Dim when the
+   latest sighting is over a day old. */
+.system-node__pilot-corner {
+  position: absolute;
+  bottom: -9px;
+  left: -9px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1;
+  border-radius: 9px;
+  background: var(--surface-base);
+  color: var(--cv-stand-bad);
+  border: 1px solid var(--cv-stand-bad);
+  opacity: 0.55;
+  pointer-events: auto;
+  z-index: 3;
+}
+.system-node__pilot-corner[data-recent] {
+  opacity: 1;
+  box-shadow: 0 0 6px var(--cv-stand-bad);
+}
+.system-node__pilot-count { font-size: 9px; font-weight: 700; }
+
 .system-node__watch-corner {
   position: absolute;
   top: -9px;

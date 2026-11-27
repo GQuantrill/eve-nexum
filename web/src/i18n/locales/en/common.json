@@ -3307,6 +3307,9 @@
     "watch": "Watch this pilot",
     "unwatch": "Stop watching",
     "heatShowing": "Showing {{name}}",
-    "heatPick": "Pick a pilot in the Intel panel"
+    "heatPick": "Pick a pilot in the Intel panel",
+    "markOnMap": "Mark on map",
+    "markOnMapHint": "Put a marker on every system a watched pilot was seen in",
+    "seenHere": "Watched pilots seen here: {{list}}"
   }
 }

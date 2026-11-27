@@ -3307,6 +3307,9 @@
     "watch": "Suivre ce pilote",
     "unwatch": "Ne plus suivre",
     "heatShowing": "Affiche {{name}}",
-    "heatPick": "Choisissez un pilote dans le panneau Intel"
+    "heatPick": "Choisissez un pilote dans le panneau Intel",
+    "markOnMap": "Marquer sur la carte",
+    "markOnMapHint": "Marquer chaque système où un pilote suivi a été vu",
+    "seenHere": "Pilotes suivis vus ici : {{list}}"
   }
 }

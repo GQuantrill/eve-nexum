@@ -3307,6 +3307,9 @@
     "watch": "Deze piloot volgen",
     "unwatch": "Niet meer volgen",
     "heatShowing": "Toont {{name}}",
-    "heatPick": "Kies een piloot in het Intel-paneel"
+    "heatPick": "Kies een piloot in het Intel-paneel",
+    "markOnMap": "Op kaart markeren",
+    "markOnMapHint": "Elk systeem markeren waarin een gevolgde piloot is gezien",
+    "seenHere": "Gevolgde piloten hier gezien: {{list}}"
   }
 }

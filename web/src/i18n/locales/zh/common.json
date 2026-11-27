@@ -3299,6 +3299,9 @@
     "watch": "关注此飞行员",
     "unwatch": "取消关注",
     "heatShowing": "正在显示 {{name}}",
-    "heatPick": "请在情报面板中选择飞行员"
+    "heatPick": "请在情报面板中选择飞行员",
+    "markOnMap": "在地图上标记",
+    "markOnMapHint": "在每个见过关注飞行员的星系上做标记",
+    "seenHere": "在此见过的关注飞行员：{{list}}"
   }
 }

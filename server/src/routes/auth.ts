@@ -1029,6 +1029,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   // ── Pilot tracking (Intel panel): who the pilot watches, which one the map
   // heatmap shows, and which map's sightings to show. Per-pilot.
   'nexum.pilots.watched',
+  'nexum.pilots.highlight',
   'nexum.pilots.heatPilot',
   'nexum.pilots.mapFilter',
 ]);

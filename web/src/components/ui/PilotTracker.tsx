@@ -13,7 +13,7 @@ import type { HeatMetric } from '../../utils/heatmap';
 import type { LocalData, LocalPilot, StoredScan } from '../../utils/dscanView';
 import {
   sanitiseWatched, sanitiseHeatPilot, summarise, MAX_WATCHED,
-  WATCH_KEY, HEAT_PILOT_KEY, MAP_FILTER_KEY,
+  WATCH_KEY, HEAT_PILOT_KEY, MAP_FILTER_KEY, HIGHLIGHT_KEY,
   type Sighting, type WatchedPilot,
 } from '../../utils/pilotWatch';
 import { Select } from './Select';
@@ -59,6 +59,7 @@ export function PilotTracker() {
   const [heatPilotRaw, setHeatPilot] = useUserSetting<WatchedPilot | null>(HEAT_PILOT_KEY, null);
   const heatPilot = sanitiseHeatPilot(heatPilotRaw);
   const [heatMetric, setHeatMetric] = useUserSetting<HeatMetric>('nexum.map.heatmap', 'none');
+  const [markOnMap, setMarkOnMap] = useUserSetting<boolean>(HIGHLIGHT_KEY, true);
   const [mapFilterRaw, setMapFilter] = useUserSetting<string>(MAP_FILTER_KEY, '');
   const mapFilter = typeof mapFilterRaw === 'string' && maps.some((m) => m.id === mapFilterRaw) ? mapFilterRaw : '';
 
@@ -151,9 +152,13 @@ export function PilotTracker() {
     if (!q) return;
     setAddError(null);
     try {
-      const { match } = await api<{ match: WatchedPilot | null }>(`/api/search/characters?q=${encodeURIComponent(q)}`);
-      if (!match) { setAddError(t('pilots.noSuchPilot', { name: q })); return; }
-      if (!isWatched(match.id)) toggleWatch(match);
+      const { match } = await api<{ match: { id: number | string; name: string } | null }>(
+        `/api/search/characters?q=${encodeURIComponent(q)}`);
+      // A pilot who has logged in here comes back with the id as a string
+      // (a BIGINT column), so make it a number before it's kept.
+      const id = Number(match?.id);
+      if (!match || !Number.isInteger(id) || id <= 0) { setAddError(t('pilots.noSuchPilot', { name: q })); return; }
+      if (!isWatched(id)) toggleWatch({ id, name: match.name });
       setAddName('');
     } catch {
       setAddError(t('dscan.errors.failed'));
@@ -256,6 +261,10 @@ export function PilotTracker() {
       <section className={styles.section}>
         <div className={styles.sectionHead}>
           <span>{t('pilots.watched', { count: watched.length })}</span>
+          <label className={styles.toggle} data-tooltip={t('pilots.markOnMapHint')}>
+            <input type="checkbox" checked={markOnMap !== false} onChange={(e) => setMarkOnMap(e.target.checked)} />
+            {t('pilots.markOnMap')}
+          </label>
         </div>
         {watched.length === 0 && <p className={styles.hint}>{t('pilots.watchedEmpty')}</p>}
         <ul className={styles.list}>
