@@ -2953,7 +2953,11 @@
     "nameToSave": "保存名称…",
     "save": "保存",
     "loadPlan": "载入此路线",
-    "deletePlan": "删除此路线"
+    "deletePlan": "删除此路线",
+    "setRoute": "设置路线",
+    "setDestinationHint": "将 {{to}} 作为目的地发送到游戏内自动导航，并清除你的路径点。游戏会从你所在位置自行通过星门规划路线，不会使用这条路线中的虫洞或捷径。",
+    "setRouteHint": "先将 {{from}} 设为目的地，再把 {{to}} 作为其后的路径点，让自动导航先带你到起点（如果你已在那里则跳过）。游戏会通过星门规划每一段。",
+    "setRouteJspace": "{{from}} 不在 K 空间，游戏无法将其作为路径点。请使用“设为目的地”。"
   },
   "flagPresets": {
     "title": "标记预设",

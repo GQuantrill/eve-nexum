@@ -10,7 +10,8 @@ import { useMapStore } from '../../store/mapStore';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { RouteSquares } from './routeUi';
 import { canSetAutopilot } from '../../utils/routeActions';
-import { setDestination } from '../../api/waypoint';
+import { setDestination, addWaypoint } from '../../api/waypoint';
+import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { jumps as jumpsLabel } from '../../i18n/format';
 import { XIcon, ArrowsLeftRightIcon, CrosshairIcon } from '../../icons';
 
@@ -219,6 +220,21 @@ export function RoutePlannerPane() {
   const routes = useRoute(from?.id ?? null, targets);
   const route = to ? routes[String(to.id)] : undefined;
 
+  // Set Route: the autopilot goes to From first, then To. EVE's waypoint list
+  // runs in order and Set Destination clears it, so From goes as the
+  // destination and To is added after it. Skipped when the pilot is already
+  // in From, as the game would only treat it as reached.
+  const location = useCharacterLocation();
+  const setRoute = async () => {
+    if (!from || !to) return;
+    const here = location.online ? location.system?.eveSystemId : null;
+    try {
+      if (here === from.id) { await setDestination(to.id, to.name); return; }
+      await setDestination(from.id, from.name);
+      await addWaypoint(to.id, to.name);
+    } catch { /* toasted by the waypoint helpers */ }
+  };
+
   const swap = () => {
     if (!from || !to) return;
     setFromOverride(to);
@@ -325,13 +341,27 @@ export function RoutePlannerPane() {
           </div>
           <RouteSquares route={route} />
           {canSetAutopilot(route) && (
-            <button
-              type="button"
-              className="sys-btn"
-              onClick={() => { setDestination(to.id, to.name).catch(() => {}); }}
-            >
-              {t('waypoint.setDestination')}
-            </button>
+            <div className="route-planner__actions">
+              <button
+                type="button"
+                className="sys-btn"
+                onClick={() => { setDestination(to.id, to.name).catch(() => {}); }}
+                data-tooltip={t('routePlanner.setDestinationHint', { to: to.name })}
+              >
+                {t('waypoint.setDestination')}
+              </button>
+              <button
+                type="button"
+                className="sys-btn"
+                disabled={!route.path[0]?.kspace}
+                onClick={setRoute}
+                data-tooltip={route.path[0]?.kspace
+                  ? t('routePlanner.setRouteHint', { from: from.name, to: to.name })
+                  : t('routePlanner.setRouteJspace', { from: from.name })}
+              >
+                {t('routePlanner.setRoute')}
+              </button>
+            </div>
           )}
         </div>
       ) : (

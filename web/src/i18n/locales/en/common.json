@@ -2957,7 +2957,11 @@
     "nameToSave": "Name to save…",
     "save": "Save",
     "loadPlan": "Load this route",
-    "deletePlan": "Delete this route"
+    "deletePlan": "Delete this route",
+    "setRoute": "Set Route",
+    "setDestinationHint": "Sends {{to}} to your in-game autopilot as the destination and clears your waypoints. The game plots its own way there by stargates from wherever you are: it won't use this route's wormholes or shortcuts.",
+    "setRouteHint": "Sends {{from}} as your destination, then {{to}} as a waypoint after it, so the autopilot takes you to the start first (skipped if you're already there). The game plots each leg by stargates.",
+    "setRouteJspace": "{{from}} isn't in k-space, so the game can't take it as a waypoint. Use Set Destination."
   },
   "flagPresets": {
     "title": "Flag presets",

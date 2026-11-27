@@ -655,3 +655,11 @@
   &:hover { color: var(--text-bright); }
   svg { display: block; }
 }
+
+/* Route Planner: Set Destination and Set Route side by side, equal widths. */
+.route-planner__actions {
+  display: flex;
+  gap: 6px;
+
+  > .sys-btn { flex: 1; }
+}

@@ -2957,7 +2957,11 @@
     "nameToSave": "Nome para guardar…",
     "save": "Guardar",
     "loadPlan": "Carregar esta rota",
-    "deletePlan": "Eliminar esta rota"
+    "deletePlan": "Eliminar esta rota",
+    "setRoute": "Definir rota",
+    "setDestinationHint": "Envia {{to}} como destino para o piloto automático e limpa os teus waypoints. O jogo traça o seu próprio caminho por portais estelares a partir de onde estás: não usa os buracos de minhoca nem atalhos desta rota.",
+    "setRouteHint": "Envia {{from}} como destino e depois {{to}} como waypoint, para que o piloto automático te leve primeiro ao início (ignorado se já lá estiveres). O jogo traça cada troço por portais estelares.",
+    "setRouteJspace": "{{from}} não está em k-space, por isso o jogo não o aceita como waypoint. Usa Definir destino."
   },
   "flagPresets": {
     "title": "Predefinições de marca",

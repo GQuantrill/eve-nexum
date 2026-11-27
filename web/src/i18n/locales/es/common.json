@@ -2957,7 +2957,11 @@
     "nameToSave": "Nombre para guardar…",
     "save": "Guardar",
     "loadPlan": "Cargar esta ruta",
-    "deletePlan": "Eliminar esta ruta"
+    "deletePlan": "Eliminar esta ruta",
+    "setRoute": "Fijar ruta",
+    "setDestinationHint": "Envía {{to}} como destino a tu piloto automático y borra tus puntos de ruta. El juego traza su propio camino por puertas estelares desde donde estés: no usa los agujeros de gusano ni atajos de esta ruta.",
+    "setRouteHint": "Envía {{from}} como destino y luego {{to}} como punto de ruta, para que el piloto automático te lleve primero al inicio (se omite si ya estás allí). El juego traza cada tramo por puertas estelares.",
+    "setRouteJspace": "{{from}} no está en k-space, así que el juego no puede tomarlo como punto de ruta. Usa Establecer destino."
   },
   "flagPresets": {
     "title": "Plantillas de marca",
