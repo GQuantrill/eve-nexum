@@ -34,15 +34,17 @@ export function isServerKind(k: string): k is ServerKind {
   return k.startsWith('service:') && k.slice(8) in STATION_SERVICES;
 }
 
-interface SystemRow { id: number; name: string; security: number; region_id: number | null }
+interface SystemRow { id: number; name: string; security: number; region_id: number | null; region_name: string | null }
 let systems: SystemRow[] | null = null;
 
 /** Every k-space system on the gate network, loaded once. */
 async function kspaceSystems(): Promise<SystemRow[]> {
   if (systems) return systems;
-  const { rows } = await db.query<{ id: number; name: string; security: string; region_id: number | null }>(
-    `SELECT id, name, security::text AS security, region_id FROM solar_systems
-      WHERE id IN (SELECT DISTINCT system_id FROM map_stargates)`);
+  const { rows } = await db.query<{ id: number; name: string; security: string; region_id: number | null; region_name: string | null }>(
+    `SELECT s.id, s.name, s.security::text AS security, s.region_id, r.name AS region_name
+       FROM solar_systems s
+       LEFT JOIN map_regions r ON r.id = s.region_id
+      WHERE s.id IN (SELECT DISTINCT system_id FROM map_stargates)`);
   systems = rows.map((r) => ({ ...r, security: Number(r.security) }));
   return systems;
 }
@@ -59,10 +61,26 @@ async function stationSystems(where = 'TRUE', params: unknown[] = []): Promise<S
   return new Set(rows.map((r) => r.solar_system_id));
 }
 
-/** The kind's systems, and for blue loot the items each buys. */
-export async function serverKindTargets(
-  kind: ServerKind,
-): Promise<{ ids: Set<number>; detail?: Map<number, number[]> }> {
+type KindTargets = { ids: ReadonlySet<number>; detail?: ReadonlyMap<number, number[]> };
+
+// Each kind's answer, kept for a while: Useful Systems asks on every jump, and
+// these barely change (NPC stations with a game update, blue loot buyers every
+// few hours), so a refresh shows up here within TTL_MS. The promise is kept, so
+// requests arriving together share one query; a failed one isn't kept.
+const TTL_MS = 10 * 60_000;
+const cache = new Map<ServerKind, { at: number; value: Promise<KindTargets> }>();
+
+/** The kind's systems, and for blue loot the items each buys. Read-only: shared between requests. */
+export function serverKindTargets(kind: ServerKind): Promise<KindTargets> {
+  const hit = cache.get(kind);
+  if (hit && Date.now() - hit.at < TTL_MS) return hit.value;
+  const value = loadKindTargets(kind);
+  cache.set(kind, { at: Date.now(), value });
+  value.catch(() => { if (cache.get(kind)?.value === value) cache.delete(kind); });
+  return value;
+}
+
+async function loadKindTargets(kind: ServerKind): Promise<KindTargets> {
   const all = await kspaceSystems();
   switch (kind) {
     case 'hub':
@@ -87,5 +105,14 @@ export async function serverKindTargets(
   }
 }
 
+/**
+ * Every k-space system's region, for the nearest regions: the nearest system
+ * of each region (but the start's own) stands for it.
+ */
+export async function systemRegions(): Promise<Map<number, { id: number; name: string }>> {
+  const all = await kspaceSystems();
+  return new Map(all.flatMap((s) => (s.region_id != null ? [[s.id, { id: s.region_id, name: s.region_name ?? '' }] as const] : [])));
+}
+
 /** Tests only. */
-export function resetNearestSetsForTest(): void { systems = null; }
+export function resetNearestSetsForTest(): void { systems = null; cache.clear(); }

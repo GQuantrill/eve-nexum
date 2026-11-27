@@ -20,6 +20,8 @@ export interface EdgeMeta {
   /** Which of the user's maps contributed this hop — the closest-systems pane
    *  unions them all, so a hole can come from a map that isn't on screen. */
   mapName?:  string;
+  /** The signature to warp to in the system the hop leaves, when known. */
+  sig?:      string;
 }
 
 export interface RoutePathNode {
@@ -97,7 +99,18 @@ export function useRoute(
   whScope: 'active' | 'all' = 'active',
   opts: { viaScout?: 'thera' | 'turnur' } = {},
 ): Record<string, RouteEntry> {
-  const [data, setData] = useState<Record<string, RouteEntry>>({});
+  return useRouteResult(from, targets, whScope, opts).routes;
+}
+
+/** useRoute, plus whether the answer is in for the current request: lets a
+ *  pane tell "still asking" from "asked, and nothing is reachable". */
+export function useRouteResult(
+  from: number | null,
+  targets: number[],
+  whScope: 'active' | 'all' = 'active',
+  opts: { viaScout?: 'thera' | 'turnur' } = {},
+): { routes: Record<string, RouteEntry>; settled: boolean } {
+  const [data, setData] = useState<{ url: string | null; routes: Record<string, RouteEntry> }>({ url: null, routes: {} });
   const routeMode   = useMapStore((s) => s.routeMode);
   const activeMapId = useMapStore((s) => s.activeMapId);
   const [inclThera]     = useUserSetting<boolean>('nexum.route.includeThera', false);
@@ -126,15 +139,10 @@ export function useRoute(
   const wantAnsi = inclAnsiblex  && (allScope || !!activeMapId);
   const chainRevision = useChainRevision(wantWh || wantAnsi);
 
-  useEffect(() => {
-    if (!from || !targetsKey) {
-      // Deliberate: clears this pane's own state when the record it shows changes.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setData({});
-      return;
-    }
-    let cancelled = false;
-    let url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}`;
+  // The request, as a pure function of the inputs; null when there's nothing to ask.
+  let url: string | null = null;
+  if (from && targetsKey) {
+    url = `/api/route?from=${from}&to=${targetsKey}&mode=${routeMode}`;
     if (wantThera)  url += '&includeThera=true';
     if (wantTurnur) url += '&includeTurnur=true';
     if (wantWh)     url += '&includeWormholes=true';
@@ -142,13 +150,26 @@ export function useRoute(
     if (avoidEol && (wantThera || wantTurnur || wantWh)) url += '&avoidEol=true';
     if (avoidKey)   url += `&avoid=${avoidKey}`;
     if (wantWh || wantAnsi) url += allScope ? '&whScope=all' : `&mapId=${activeMapId}`;
-    api<Record<string, RouteEntry>>(url)
-      .then(r => { if (!cancelled) setData(r); })
-      .catch(() => { if (!cancelled) setData({}); });
-    return () => { cancelled = true; };
-  }, [from, targetsKey, routeMode, wantThera, wantTurnur, wantWh, wantAnsi, allScope, activeMapId, flagRevision, avoidKey, chainRevision, avoidEol]);
+  }
 
-  return data;
+  useEffect(() => {
+    if (!url) {
+      // Deliberate: clears this pane's own state when the record it shows changes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setData({ url: null, routes: {} });
+      return;
+    }
+    let cancelled = false;
+    const asked = url;
+    api<Record<string, RouteEntry>>(asked)
+      .then(r => { if (!cancelled) setData({ url: asked, routes: r }); })
+      .catch(() => { if (!cancelled) setData({ url: asked, routes: {} }); });
+    return () => { cancelled = true; };
+    // flagRevision / chainRevision: the server's inputs changed though the url didn't.
+  }, [url, flagRevision, chainRevision]);
+
+  // Settled when the answer held is the one for the current request.
+  return { routes: data.routes, settled: url !== null && data.url === url };
 }
 
 /** The route options useRoute sends, as a JSON body, for requests that aren't

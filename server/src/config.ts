@@ -164,18 +164,13 @@ const tokenEncryptionKey = isHex64Key
   ? TOKEN_ENC_RAW.toLowerCase()
   : createHash('sha256').update(TOKEN_ENC_RAW).digest('hex');
 
-// Opt-in anonymous deployment ping. OFF by default — a self-hosted instance
-// phones home to nobody unless the operator opts in. When on, the server sends
-// only { version, instanceId } once a day so the project can count active
-// installs. Two ways to opt in:
-//   - NEXUM_TELEMETRY=1 (uses the default eve-nexum.com collector), or
-//   - simply setting NEXUM_TELEMETRY_URL to a non-empty value — populating a
-//     collector endpoint is itself treated as consent (comment it out / leave it
-//     unset to stay opted out).
-// Key off the RAW env var here, not the resolved URL below: the resolved URL
-// always falls back to the default, so testing it would opt everyone in.
-const TELEMETRY_URL_SET = (process.env.NEXUM_TELEMETRY_URL ?? '').trim().length > 0;
-const TELEMETRY_ENABLED = /^(1|true|yes|on)$/i.test(process.env.NEXUM_TELEMETRY ?? '') || true;
+// Anonymous deployment ping. ON by default; NEXUM_TELEMETRY=0 (or false / no /
+// off) turns it off. Once a day the server sends the app version, a random
+// per-instance id and aggregate counts (maps, users, active users, which
+// features are in use) so the project can see how many people use Nexum,
+// self-hosted installs included. No names, ids, map contents or IPs.
+// NEXUM_TELEMETRY_URL points it at another collector.
+const TELEMETRY_ENABLED = !/^(0|false|no|off)$/i.test((process.env.NEXUM_TELEMETRY ?? '').trim());
 const TELEMETRY_URL = process.env.NEXUM_TELEMETRY_URL?.trim() || 'https://eve-nexum.com/api/telemetry';
 
 export const config = {

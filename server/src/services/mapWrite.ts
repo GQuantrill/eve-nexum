@@ -104,7 +104,7 @@ export async function createSignature(mapId: string, systemId: string, d: Signat
      SELECT ins.inserted, ins.id, ins.sig_id AS "sigId", ins.sig_type AS "sigType", ins.name, ins.notes,
             ins.wh_type AS "whType", ins.wh_leads_to AS "whLeadsTo",
             ins.ghost_type AS "ghostType", ins.mass_status AS "massStatus",
-            ins.time_status AS "timeStatus", ins.created_at AS "createdAt",
+            ins.time_status AS "timeStatus", ins.wh_size AS "whSize", ins.created_at AS "createdAt",
             u.character_name AS "createdByName", u.character_id AS "createdByCharId"
        FROM ins LEFT JOIN users u ON u.id = ins.created_by_user_id`,
     [systemId, d.sigId, d.sigType, d.name, d.notes, d.whType, d.whLeadsTo, d.ghostType,
@@ -150,11 +150,14 @@ function resolveScanType(sigRowId: string, sigType: unknown): void {
 
 // Signature fields whose new value goes in the audit entry (short codes);
 // names and notes are listed by name only.
-const AUDITED_SIG_VALUES = new Set(['sigId', 'sigType', 'whType', 'whLeadsTo', 'massStatus', 'timeStatus']);
+const AUDITED_SIG_VALUES = new Set(['sigId', 'sigType', 'whType', 'whLeadsTo', 'massStatus', 'timeStatus', 'whSize']);
+
+/** A signature's staged hole size: one of the connection sizes, or '' for unknown. */
+const WH_SIZES = new Set(['', 'xl', 'large', 'medium', 'small']);
 
 const SIG_COLS: Record<string, string> = {
   sigId: 'sig_id', sigType: 'sig_type', name: 'name', notes: 'notes', whType: 'wh_type', whLeadsTo: 'wh_leads_to',
-  ghostType: 'ghost_type', massStatus: 'mass_status', timeStatus: 'time_status',
+  ghostType: 'ghost_type', massStatus: 'mass_status', timeStatus: 'time_status', whSize: 'wh_size',
   // Re-copying a hole that is still listed refreshes both, which is what keeps
   // the grace period meaningful: scout_last_seen is "the feed still had it".
   scoutConnectionId: 'scout_connection_id',
@@ -183,6 +186,12 @@ export async function updateSignature(
     log.warn('signature scan id cleared', JSON.stringify({
       mapId, systemId, sigRowId: sigId, userId: actor.userId, clientId: actor.clientId,
     }));
+  }
+
+  // Anything but a known size is dropped rather than stored.
+  if ('whSize' in updates && !WH_SIZES.has(updates.whSize as string)) {
+    updates = { ...updates };
+    delete updates.whSize;
   }
 
   const sets: string[] = ['updated_at = NOW()'];

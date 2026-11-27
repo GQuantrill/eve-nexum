@@ -56,7 +56,7 @@ export interface BackupConnection {
 
 export interface BackupSignature {
   id: string; systemId: string; sigId: string; sigType: string; name: string; notes: string;
-  whType: string; whLeadsTo: string; ghostType: string; massStatus: string; timeStatus: string;
+  whType: string; whLeadsTo: string; ghostType: string; massStatus: string; timeStatus: string; whSize?: string;
   scoutConnectionId: string | null; createdAt: string | null; updatedAt: string | null;
 }
 
@@ -125,7 +125,7 @@ export async function buildMapBackup(mapId: string): Promise<MapBackup | null> {
     db.query<Omit<BackupSignature, 'createdAt' | 'updatedAt'> & { createdAt: Date | null; updatedAt: Date | null }>(
       `SELECT g.id, g.system_id AS "systemId", g.sig_id AS "sigId", g.sig_type AS "sigType", g.name, g.notes,
               g.wh_type AS "whType", g.wh_leads_to AS "whLeadsTo", g.ghost_type AS "ghostType",
-              g.mass_status AS "massStatus", g.time_status AS "timeStatus",
+              g.mass_status AS "massStatus", g.time_status AS "timeStatus", g.wh_size AS "whSize",
               g.scout_connection_id AS "scoutConnectionId", g.created_at AS "createdAt", g.updated_at AS "updatedAt"
          FROM map_signatures g JOIN map_systems s ON s.id = g.system_id
         WHERE s.map_id = $1 ORDER BY g.created_at, g.id`, [mapId]),
@@ -320,6 +320,8 @@ export function parseMapBackup(raw: unknown, now = Date.now()): Omit<MapBackup, 
       ghostType: str(o.ghostType, 100),
       massStatus: oneOf(o.massStatus, MASS_STATUS, ''),
       timeStatus: oneOf(o.timeStatus, TIME_STATUS, ''),
+      // Older backups have none.
+      whSize: oneOf(o.whSize, SIZES, ''),
       scoutConnectionId: typeof o.scoutConnectionId === 'string' && SCOUT_RE.test(o.scoutConnectionId) ? o.scoutConnectionId : null,
       createdAt: time(o.createdAt, now),
       updatedAt: time(o.updatedAt, now),
@@ -476,6 +478,7 @@ export async function restoreMapBackup(
     if (key) seenScan.set(key, id);
     sigRows.push([
       id, sys, g.sigId, g.sigType, g.name, g.notes, g.whType, g.whLeadsTo, g.ghostType, g.massStatus, g.timeStatus,
+      g.whSize ?? '',
       // Keeps its age: a wormhole signature's lifetime runs from when it was scanned.
       g.createdAt ?? new Date().toISOString(), g.updatedAt ?? g.createdAt ?? new Date().toISOString(),
       userId, true, g.scoutConnectionId,
@@ -483,7 +486,7 @@ export async function restoreMapBackup(
   }
   const signatures = await insertBatch(client, 'map_signatures',
     ['id', 'system_id', 'sig_id', 'sig_type', 'name', 'notes', 'wh_type', 'wh_leads_to', 'ghost_type', 'mass_status',
-     'time_status', 'created_at', 'updated_at', 'created_by_user_id', 'from_merge', 'scout_connection_id'],
+     'time_status', 'wh_size', 'created_at', 'updated_at', 'created_by_user_id', 'from_merge', 'scout_connection_id'],
     sigRows);
 
   // One connection per pair of systems, no loops.

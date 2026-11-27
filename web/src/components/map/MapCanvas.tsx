@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { routeTo } from '../../utils/routePlannerTarget';
 import { useTranslation } from 'react-i18next';
 import {
   ReactFlow, Background, Controls, ControlButton, MiniMap,
@@ -44,6 +45,7 @@ import {
   UploadSimpleIcon,
   UsersThreeIcon,
   PushPinIcon,
+  NavigationArrowIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -211,7 +213,10 @@ export function MapCanvas() {
   const selectSystem         = useMapStore((s) => s.selectSystem);
   const selectedConnectionId = useMapStore((s) => s.selectedConnectionId);
   const activeMapId          = useMapStore((s) => s.activeMapId);
-  const routeHighlight       = useMapStore((s) => s.routeHighlight);
+  // A hovered saved chain wins; otherwise a pinned one (Route Planner).
+  const hoverHighlight       = useMapStore((s) => s.routeHighlight);
+  const pinnedHighlight      = useMapStore((s) => s.pinnedRouteHighlight);
+  const routeHighlight       = hoverHighlight ?? pinnedHighlight;
   const snapToGrid           = useMapStore((s) => s.snapToGrid);
   // Snap's grid drawn as lines (default) or dots on the snap points (Settings).
   const [snapGridStyle]      = useUserSetting<'lines' | 'dots'>('nexum.snapGridStyle', 'lines');
@@ -269,6 +274,8 @@ export function MapCanvas() {
   const currentSystemId      = useMapStore((s) => s.currentSystemId);
   const routeOrigin          = useMapStore((s) => s.routeOrigin);
   const setRouteOrigin       = useMapStore((s) => s.setRouteOrigin);
+  const routeFromSystem      = useMapStore((s) => s.routeFromSystem);
+  const setRouteFromSystem   = useMapStore((s) => s.setRouteFromSystem);
   const requestCenterOnEveSystem = useMapStore((s) => s.requestCenterOnEveSystem);
   const accountLocations     = useAccountLocations();
   // Who's viewing this map and where — read by the bulk-remove sweeps so they
@@ -1514,7 +1521,6 @@ export function MapCanvas() {
       }] : [];
 
       const waypointItems = !multiSelected && sys?.eveSystemId ? [
-        { separator: true as const },
         {
           label: t('waypoint.setDestination'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
@@ -1526,6 +1532,8 @@ export function MapCanvas() {
           action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
         ...sendToItem(sys.eveSystemId, sys.name),
+      ] : [];
+      const jumpRangeItems = !multiSelected && sys?.eveSystemId ? [
         {
           label: t('ctxMenu.jumpRangeFrom'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
@@ -1539,7 +1547,6 @@ export function MapCanvas() {
       ] : [];
 
       const multiItems = multiSelected ? [
-        { separator: true as const },
         {
           label: t("ctxMenu.lockSelected", { count: selectedNodes.length }),
           icon: <LockIcon size={16} weight="regular" color="#f5c518" />,
@@ -1592,6 +1599,32 @@ export function MapCanvas() {
                 updateSystem(contextMenu.nodeId!, { isHome: true });
               },
             },
+      ] : [];
+
+      // "Route from here": route panes (Closest Systems, A0, scout exits...)
+      // count jumps from this system rather than from a character, e.g. an
+      // exit nobody is sitting in. Until cleared; single selection only.
+      const routeFromItem = !multiSelected && sys?.eveSystemId != null ? [
+        routeFromSystem?.eveSystemId === sys.eveSystemId
+          ? {
+              label: t('ctxMenu.stopRouteFromHere'),
+              icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
+              action: () => setRouteFromSystem(null),
+            }
+          : {
+              label: t('ctxMenu.routeFromHere'),
+              icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
+              action: () => {
+                setRouteFromSystem({ eveSystemId: sys.eveSystemId!, systemName: sys.name, systemClass: sys.systemClass });
+                routeTo({ id: sys.eveSystemId!, name: sys.name, end: 'from' });
+              },
+            },
+        // The other end: this system into the Route Planner's To field.
+        {
+          label:  t('ctxMenu.routeToHere'),
+          icon:   <NavigationArrowIcon size={16} weight="regular" color="#3ddc84" style={{ transform: 'scaleX(-1)' }} />,
+          action: () => routeTo({ id: sys.eveSystemId!, name: sys.name, end: 'to' }),
+        },
       ] : [];
 
       // Display-only alias — rename the node on this map. Toggles to "Clear alias"
@@ -1817,46 +1850,51 @@ export function MapCanvas() {
         submenu: adjacentSubmenu(),
       }] : [];
 
-      return [
-        {
-          label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
-          icon:  sys?.locked
-            ? <LockOpenIcon size={16} weight="regular" color="#f5c518" />
-            : <LockIcon     size={16} weight="regular" color="#f5c518" />,
-          action: () => lockSystem(contextMenu.nodeId!),
+      const lockItem: ContextMenuItem = {
+        label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
+        icon:  sys?.locked
+          ? <LockOpenIcon size={16} weight="regular" color="#f5c518" />
+          : <LockIcon     size={16} weight="regular" color="#f5c518" />,
+        action: () => lockSystem(contextMenu.nodeId!),
+      };
+      const keepItem: ContextMenuItem = {
+        label: sys?.keep ? t('ctxMenu.unkeepSystem') : t('ctxMenu.keepSystem'),
+        icon:  <PushPinIcon size={16} weight={sys?.keep ? 'fill' : 'regular'} color="#5a9af8" />,
+        action: () => { if (sys) updateSystem(sys.id, { keep: !sys.keep }); },
+      };
+      const removeItem: ContextMenuItem[] = !sys?.locked ? [{
+        label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
+        icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
+        action: () => {
+          if (multiSelected) {
+            selectedNodes
+              .filter((n) => !systems.find((s) => s.id === n.id)?.locked)
+              .forEach((n) => removeSystem(n.id));
+          } else {
+            removeSystem(contextMenu.nodeId!);
+          }
         },
-        {
-          label: sys?.keep ? t('ctxMenu.unkeepSystem') : t('ctxMenu.keepSystem'),
-          icon:  <PushPinIcon size={16} weight={sys?.keep ? 'fill' : 'regular'} color="#5a9af8" />,
-          action: () => { if (sys) updateSystem(sys.id, { keep: !sys.keep }); },
-        },
-        ...(!sys?.locked ? [{
-          label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
-          icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
-          action: () => {
-            if (multiSelected) {
-              selectedNodes
-                .filter((n) => !systems.find((s) => s.id === n.id)?.locked)
-                .forEach((n) => removeSystem(n.id));
-            } else {
-              removeSystem(contextMenu.nodeId!);
-            }
-          },
-        }] : []),
-        ...connectItem,
-        ...addConnectedItem,
-        ...homeItem,
-        ...copyNameItem,
-        ...copySystemsItem,
-        ...chainItem,
-        ...aliasItem,
-        ...tagItem,
-        ...intelItem,
-        ...labelItem,
-        ...adjacentItem,
-        ...multiItems,
-        ...waypointItems,
+      }] : [];
+
+      // In groups, a divider between each; a group with nothing to offer
+      // (multi-select, w-space, no eve id...) is left out with its divider.
+      const groups: ContextMenuItem[][] = [
+        // The system's standing on the map
+        [...homeItem, lockItem, keepItem, ...multiItems],
+        // Linking it to others
+        [...connectItem, ...addConnectedItem, ...adjacentItem],
+        // Naming and marking it
+        [...aliasItem, ...chainItem, ...tagItem, ...intelItem, ...labelItem],
+        // Taking it elsewhere
+        [...copyNameItem, ...copySystemsItem],
+        // Travel
+        [...waypointItems, ...routeFromItem, ...jumpRangeItems],
+        // Removing it
+        removeItem,
       ];
+      return groups
+        .filter((g) => g.length > 0)
+        .flatMap((g, i) => (i === 0 ? g : [{ separator: true as const }, ...g]));
     }
 
     // Systems a pilot is in: you, anyone else viewing this map, your alts and
@@ -1927,14 +1965,16 @@ export function MapCanvas() {
 
     return [
       {
+        label: t('ctxMenu.selectAll'),
+        icon: <SelectionAllIcon size={14} weight="regular" />,
+        action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
+        disabled: nodes.length === 0,
+      },
+      { separator: true as const },
+      {
         label: t('ctxMenu.addSystem'),
         icon: <PlusIcon size={16} weight="regular" />,
         action: () => setPendingPosition({ x: contextMenu.flowX - 75, y: contextMenu.flowY - 40 }),
-      },
-      {
-        label: t('ctxMenu.pasteSystems'),
-        icon: <ClipboardTextIcon size={16} weight="regular" />,
-        action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
         label: t('ctxMenu.importSystems'),
@@ -1942,11 +1982,11 @@ export function MapCanvas() {
         action: () => setImportAt({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
       {
-        label: t('ctxMenu.selectAll'),
-        icon: <SelectionAllIcon size={14} weight="regular" />,
-        action: () => setNodes((ns) => ns.map((n) => ({ ...n, selected: true }))),
-        disabled: nodes.length === 0,
+        label: t('ctxMenu.pasteSystems'),
+        icon: <ClipboardTextIcon size={16} weight="regular" />,
+        action: () => pasteFromMenu({ x: contextMenu.flowX, y: contextMenu.flowY }),
       },
+      { separator: true as const },
       {
         label: t('ctxMenu.optimizeConnections'),
         icon: <LinkSimpleIcon size={15} weight="regular" />,

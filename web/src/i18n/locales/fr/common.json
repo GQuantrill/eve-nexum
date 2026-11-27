@@ -246,7 +246,8 @@
       "tabs": {
         "users": "Utilisateurs",
         "systems": "Systèmes",
-        "ghostSites": "Sites fantômes"
+        "ghostSites": "Sites fantômes",
+        "usage": "Utilisation"
       },
       "filter": "Filtre",
       "window": "Période",
@@ -740,10 +741,6 @@
     "allMaps": "Calculer sur toutes mes cartes",
     "allMapsHint": "Les distances peuvent emprunter les chaînes de trous de ver de toutes les cartes que vous pouvez voir, pas seulement celle ouverte. Désactivez ceci pour ne router que par la carte à l'écran.",
     "suggest": {
-      "button": "Suggestions",
-      "buttonHint": "Les hubs commerciaux, acheteurs de blue loot, A0, stations et autres les plus proches, à ajouter à cette liste",
-      "title": "Suggestions",
-      "hint": "Les plus proches de chaque type depuis votre position, avec le même itinéraire que cette liste. Ajouter place un système dans votre liste.",
       "failed": "Impossible de charger les suggestions. Réessayez dans un instant.",
       "loading": "Recherche des systèmes les plus proches...",
       "quietHint": "Aucun kill de joueur dans la dernière heure.",
@@ -764,11 +761,11 @@
         "turnur": "Entrées de Turnur",
         "incursion": "Incursions",
         "structure": "Structures de votre corpo",
-        "quiet": "Systèmes calmes"
+        "quiet": "Systèmes calmes",
+        "region": "Régions les plus proches"
       },
       "services": {
-        "cloning": "Baie de clonage",
-        "jumpClone": "Installation de clones de saut",
+        "cloning": "Baie de clonage (clones de saut)",
         "repair": "Réparation",
         "fitting": "Équipement",
         "market": "Marché",
@@ -784,7 +781,10 @@
         "incursion": "Aucune incursion accessible d'ici.",
         "generic": "Rien d'accessible d'ici."
       }
-    }
+    },
+    "inWormhole": "Vous êtes dans un trou de ver, sans portail stellaire. Activez « Inclure la chaîne de trous de ver » dans les réglages d'itinéraire pour compter les sauts via votre chaîne cartographiée, ou faites un clic droit sur une sortie de la carte et choisissez « Itinéraire depuis ici ».",
+    "notOnMap": "Votre système n'est pas sur la carte ouverte. Ouvrez la carte de votre chaîne ou activez « Calculer sur toutes mes cartes ».",
+    "holeNotMapped": "Votre système n'est sur aucune carte visible, donc rien n'est accessible depuis là. Cartographiez votre chaîne, ou faites un clic droit sur une sortie et choisissez « Itinéraire depuis ici »."
   },
   "commandPalette": {
     "placeholder": "Rechercher systèmes et cartes…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
     "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes.",
     "exportSystems": "Exporter les systèmes ({{count}})…",
-    "importSystems": "Importer des systèmes…"
+    "importSystems": "Importer des systèmes…",
+    "routeFromHere": "Itinéraire depuis ici",
+    "stopRouteFromHere": "Ne plus calculer depuis ici",
+    "routeToHere": "Itinéraire jusqu'ici"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -2413,7 +2416,18 @@
     "riskFrig": "Trou frégate",
     "jspaceNoWaypoint": "Les systèmes de trou de ver ne peuvent pas être définis comme destination du pilote automatique.",
     "viaAnsiblex": "Porte de saut Ansiblex",
-    "viaMap": "sur {{map}}"
+    "viaMap": "sur {{map}}",
+    "fromPinned": "Sauts depuis {{system}} (choisi sur la carte)",
+    "clearPinned": "Utiliser ma position",
+    "originSkipped": "Impossible de calculer un itinéraire depuis {{name}}, les sauts partent donc de votre position.",
+    "copyRoute": "Copier l'itinéraire en texte",
+    "copied": "Itinéraire copié",
+    "copyFailed": "Impossible de copier l'itinéraire",
+    "copyWormhole": "trou de ver",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "critique",
+    "copyFrig": "frégate"
   },
   "routeToast": {
     "destinationSet": "Destination définie sur {{system}}",
@@ -2499,7 +2513,8 @@
     "intel": "Intel",
     "popOut": "Ouvrir dans sa propre fenêtre",
     "poppedOut": "Ouvert dans sa propre fenêtre.",
-    "bringBack": "Ramener ici"
+    "bringBack": "Ramener ici",
+    "useful": "Systèmes utiles"
   },
   "sigType": {
     "combat": "Combat",
@@ -2557,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Mène à",
     "colWhState": "État",
-    "colWhStateHint": "Masse et durée de vie restante du trou de ver. Les deux se lisent sur le trou lui-même, donc avant de le franchir.",
+    "colWhStateHint": "La taille, la masse et la durée de vie restante d'un trou de ver. Les trois se lisent sur le trou dans l'espace, donc se notent avant de sauter.",
     "whStateMass": "Masse : cliquer pour pleine / moins de 50 % / moins de 10 %",
     "whStateLife": "Durée de vie : cliquer pour inconnue / moins d’un jour / moins de 4 heures / moins d’une heure / expirée",
     "colName": "Nom",
@@ -2574,7 +2589,10 @@
     "countFiltered": "{{shown}} sur {{total}}",
     "countTotal": "Signatures au total : {{count}}",
     "countHint": "Signatures dans ce système",
-    "countFilteredHint": "Signatures affichées sur le total du système"
+    "countFilteredHint": "Signatures affichées sur le total du système",
+    "whStateSize": "Taille",
+    "whSizeFromType": "d'après son type",
+    "whSizeUnknown": "Non noté"
   },
   "stats": {
     "title": "Statistiques utilisateur",
@@ -2939,7 +2957,15 @@
     "nameToSave": "Nom à enregistrer…",
     "save": "Enregistrer",
     "loadPlan": "Charger cet itinéraire",
-    "deletePlan": "Supprimer cet itinéraire"
+    "deletePlan": "Supprimer cet itinéraire",
+    "setRoute": "Définir l'itinéraire",
+    "setDestinationHint": "Envoie {{to}} comme destination à votre pilote automatique et efface vos points de passage. Le jeu trace son propre chemin par portails depuis votre position : il n'utilise pas les trous de ver ni les raccourcis de cet itinéraire.",
+    "setRouteHint": "Envoie {{from}} comme destination, puis {{to}} comme point de passage après, pour que le pilote automatique vous amène d'abord au départ (ignoré si vous y êtes déjà). Le jeu trace chaque étape par portails.",
+    "setRouteJspace": "{{from}} n'est pas en k-space, le jeu ne peut donc pas l'utiliser comme point de passage. Utilisez Définir la destination.",
+    "highlight": "Afficher sur la carte",
+    "highlightOff": "Ne plus afficher",
+    "highlightHint": "Met en évidence les systèmes et liaisons de cet itinéraire sur la carte ouverte, et estompe le reste.",
+    "highlightNone": "Aucun système de cet itinéraire n'est sur la carte ouverte."
   },
   "flagPresets": {
     "title": "Modèles de marqueur",
@@ -3162,5 +3188,90 @@
     "inUse": "{{label}} est déjà utilisé sur cette carte, ou un numéro en dessous.",
     "beneathOwn": "{{label}} placerait {{from}} sous lui-même : chaque chiffre est un trou de plus depuis home, donc {{label}} est un trou partant de {{from}}.",
     "saveFailed": "Impossible d'enregistrer le numéro de chaîne."
+  },
+  "usage": {
+    "title": "Utilisation de Nexum",
+    "subtitle": "Utilisateurs actifs mensuels sur eve-nexum.com et sur les installations Nexum auto-hébergées.",
+    "updated": "Mis à jour {{time}}",
+    "loading": "Chargement...",
+    "failed": "Impossible de charger les chiffres d'utilisation.",
+    "notFound": "Ce lien a été désactivé ou n'existe pas.",
+    "kpi": {
+      "total": "Utilisateurs actifs, 30 derniers jours",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Pilotes connectés",
+      "selfHosted": "Auto-hébergé",
+      "installs": "Installations : {{count}}",
+      "desktop": "Application de bureau",
+      "desktopNote": "Pilotes, 30 derniers jours"
+    },
+    "chart": {
+      "title": "Utilisateurs actifs mensuels"
+    },
+    "table": {
+      "month": "Mois",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (connectés)",
+      "selfHosted": "Auto-hébergé",
+      "installs": "Installations",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Installations",
+      "modes": "Mode du serveur",
+      "versions": "Versions",
+      "languages": "Langues (pilotes actifs)",
+      "features": "Fonctions utilisées"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corpo",
+      "alliance": "Alliance"
+    },
+    "features": {
+      "chainNumbering": "Cartes avec numéros de chaîne (L+1)",
+      "autoRemove": "Cartes avec suppression automatique",
+      "crossMapSync": "Cartes avec synchronisation inter-cartes",
+      "discord": "Organisations avec alertes Discord"
+    },
+    "notes": {
+      "title": "Méthode de calcul",
+      "live": "eve-nexum.com : utilisateurs actifs selon Google Analytics. Les pilotes connectés sont les personnages ayant utilisé le site au cours des 30 derniers jours.",
+      "selfHosted": "Auto-hébergé : chaque installation envoie chaque jour, de façon anonyme, le nombre de pilotes actifs sur les 30 derniers jours ; un mois retient le dernier chiffre de chaque installation ce mois-là. Les installations sont additionnées : un pilote utilisant deux installations compte deux fois.",
+      "noGa": "Google Analytics n'est pas connecté, eve-nexum.com affiche donc les pilotes connectés.",
+      "old": "Installations sur une version trop ancienne pour envoyer des chiffres, donc non incluses : {{count}}."
+    },
+    "share": {
+      "title": "Lien de partage",
+      "hint": "Toute personne disposant du lien peut voir cette page sans se connecter. Créer un nouveau lien désactive l'ancien.",
+      "create": "Créer un lien",
+      "replace": "Créer un nouveau lien",
+      "remove": "Désactiver le lien",
+      "copy": "Copier",
+      "copied": "Lien copié",
+      "active": "Un lien est actif (créé {{time}}). Il n'est affiché qu'à sa création ; créez-en un nouveau si besoin.",
+      "none": "Aucun lien pour l'instant."
+    }
+  },
+  "useful": {
+    "hint": "Tapez pour n'afficher que les groupes, systèmes ou structures correspondants. Les distances partent de votre point de départ.",
+    "chooseGroups": "Choisir les groupes",
+    "chooseGroupsHint": "Choisissez les groupes affichés par ce panneau. Faites glisser un groupe par sa poignée pour le réordonner.",
+    "allHidden": "Tous les groupes sont masqués. Utilisez l'engrenage pour en afficher.",
+    "addToClosest": "Ajouter aux Systèmes les plus proches",
+    "removeFromClosest": "Retirer des Systèmes les plus proches",
+    "moreHere_one": "+{{count}} autre ici",
+    "moreHere_other": "+{{count}} autres ici",
+    "noStructureKind": "Aucune structure de votre corporation n'est de ce type.",
+    "structureKinds": {
+      "all": "Tout amarrage",
+      "citadel": "Citadelles",
+      "engineering": "Complexes d'ingénierie",
+      "refinery": "Raffineries"
+    },
+    "filter": "Filtrer...",
+    "noMatch": "Aucun résultat.",
+    "regionVia": "Système le plus proche : {{system}}"
   }
 }

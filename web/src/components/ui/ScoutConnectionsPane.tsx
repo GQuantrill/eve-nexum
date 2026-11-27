@@ -6,7 +6,7 @@ import { useWormholeTypes } from '../../hooks/useWormholeTypes';
 import { whSizeForType, whSizeShort } from '../../utils/wormholeSize';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { RouteSquares } from './routeUi';
+import { RouteSquares, RouteOriginNote } from './routeUi';
 import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { truesecColor } from '../../utils/truesec';
@@ -264,11 +264,7 @@ export function ScoutConnectionsPane({ scoutSystem }: Props) {
 
   return (
     <div className="scout-pane">
-      {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
-      ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
-      ) : null}
+      <RouteOriginNote origin={origin} />
       <div className="scout-pane__sort">
         <label className="scout-pane__sort-label" htmlFor={`scout-sort-${scoutSystem}`}>
           {t('scout.sortLabel')}

@@ -246,7 +246,8 @@
       "tabs": {
         "users": "Usuarios",
         "systems": "Sistemas",
-        "ghostSites": "Sitios fantasma"
+        "ghostSites": "Sitios fantasma",
+        "usage": "Uso"
       },
       "filter": "Filtro",
       "window": "Periodo",
@@ -740,10 +741,6 @@
     "allMaps": "Calcular en todos mis mapas",
     "allMapsHint": "Las distancias pueden usar las cadenas de agujeros de gusano de cualquier mapa que puedas ver, no solo el abierto. Desactívalo para enrutar únicamente por el mapa en pantalla.",
     "suggest": {
-      "button": "Sugerencias",
-      "buttonHint": "Los centros comerciales, compradores de blue loot, A0, estaciones y más cercanos para añadir a esta lista",
-      "title": "Sugerencias",
-      "hint": "Lo más cercano de cada tipo desde donde estás, con la misma ruta que esta lista. Añadir pone un sistema en tu lista.",
       "failed": "No se pudieron cargar las sugerencias. Inténtalo de nuevo en un momento.",
       "loading": "Buscando los sistemas más cercanos...",
       "quietHint": "Sin muertes de jugadores en la última hora.",
@@ -764,11 +761,11 @@
         "turnur": "Entradas a Turnur",
         "incursion": "Incursiones",
         "structure": "Estructuras de tu corporación",
-        "quiet": "Sistemas tranquilos"
+        "quiet": "Sistemas tranquilos",
+        "region": "Regiones más cercanas"
       },
       "services": {
-        "cloning": "Bahía de clonación",
-        "jumpClone": "Instalación de clones de salto",
+        "cloning": "Bahía de clonación (clones de salto)",
         "repair": "Reparación",
         "fitting": "Equipamiento",
         "market": "Mercado",
@@ -784,7 +781,10 @@
         "incursion": "Ninguna incursión alcanzable desde aquí.",
         "generic": "Nada alcanzable desde aquí."
       }
-    }
+    },
+    "inWormhole": "Estás en un agujero de gusano, que no tiene puertas estelares. Activa «Incluir cadena de agujeros de gusano» en los ajustes de ruta para contar saltos a través de tu cadena mapeada, o haz clic derecho en una salida del mapa y elige «Ruta desde aquí».",
+    "notOnMap": "Tu sistema no está en el mapa abierto. Abre el mapa con tu cadena o activa «Calcular en todos mis mapas».",
+    "holeNotMapped": "Tu sistema no está en ningún mapa que puedas ver, así que no se puede llegar a nada desde él. Mapea tu cadena o haz clic derecho en una salida y elige «Ruta desde aquí»."
   },
   "commandPalette": {
     "placeholder": "Buscar sistemas y mapas…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "Tu navegador no deja que nexum lea el portapapeles. Pulsa Ctrl+V (Cmd+V en Mac) sobre el mapa.",
     "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas.",
     "exportSystems": "Exportar sistemas ({{count}})…",
-    "importSystems": "Importar sistemas…"
+    "importSystems": "Importar sistemas…",
+    "routeFromHere": "Ruta desde aquí",
+    "stopRouteFromHere": "Dejar de calcular desde aquí",
+    "routeToHere": "Ruta hasta aquí"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2413,7 +2416,18 @@
     "riskFrig": "Agujero de fragata",
     "jspaceNoWaypoint": "Los sistemas de agujero de gusano no se pueden establecer como destino del piloto automático.",
     "viaAnsiblex": "Puerta de salto Ansiblex",
-    "viaMap": "en {{map}}"
+    "viaMap": "en {{map}}",
+    "fromPinned": "Saltos desde {{system}} (elegido en el mapa)",
+    "clearPinned": "Usar mi ubicación",
+    "originSkipped": "No se puede calcular una ruta desde {{name}}, así que los saltos son desde tu ubicación.",
+    "copyRoute": "Copiar ruta como texto",
+    "copied": "Ruta copiada",
+    "copyFailed": "No se pudo copiar la ruta",
+    "copyWormhole": "agujero de gusano",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "crítico",
+    "copyFrig": "fragata"
   },
   "routeToast": {
     "destinationSet": "Destino establecido en {{system}}",
@@ -2499,7 +2513,8 @@
     "intel": "Intel",
     "popOut": "Abrir en su propia ventana",
     "poppedOut": "Abierto en su propia ventana.",
-    "bringBack": "Traer de vuelta"
+    "bringBack": "Traer de vuelta",
+    "useful": "Sistemas útiles"
   },
   "sigType": {
     "combat": "Combate",
@@ -2557,7 +2572,7 @@
     "colWh": "Tipo",
     "colLeadsTo": "Lleva a",
     "colWhState": "Estado",
-    "colWhStateHint": "Masa y vida restante del agujero. Ambas se leen en el propio agujero, así que pueden fijarse antes de saltarlo.",
+    "colWhStateHint": "El tamaño, la masa y la vida restante de un agujero de gusano. Los tres se leen en el agujero, así que se pueden anotar antes de saltar.",
     "whStateMass": "Masa: clic para ciclar completa / menos del 50 % / menos del 10 %",
     "whStateLife": "Vida: clic para ciclar desconocida / menos de 1 día / menos de 4 horas / menos de 1 hora / caducada",
     "colName": "Nombre",
@@ -2574,7 +2589,10 @@
     "countFiltered": "{{shown}} de {{total}}",
     "countTotal": "Firmas totales: {{count}}",
     "countHint": "Firmas en este sistema",
-    "countFilteredHint": "Firmas mostradas del total del sistema"
+    "countFilteredHint": "Firmas mostradas del total del sistema",
+    "whStateSize": "Tamaño",
+    "whSizeFromType": "según su tipo",
+    "whSizeUnknown": "Sin anotar"
   },
   "stats": {
     "title": "Estadísticas de usuario",
@@ -2939,7 +2957,15 @@
     "nameToSave": "Nombre para guardar…",
     "save": "Guardar",
     "loadPlan": "Cargar esta ruta",
-    "deletePlan": "Eliminar esta ruta"
+    "deletePlan": "Eliminar esta ruta",
+    "setRoute": "Fijar ruta",
+    "setDestinationHint": "Envía {{to}} como destino a tu piloto automático y borra tus puntos de ruta. El juego traza su propio camino por puertas estelares desde donde estés: no usa los agujeros de gusano ni atajos de esta ruta.",
+    "setRouteHint": "Envía {{from}} como destino y luego {{to}} como punto de ruta, para que el piloto automático te lleve primero al inicio (se omite si ya estás allí). El juego traza cada tramo por puertas estelares.",
+    "setRouteJspace": "{{from}} no está en k-space, así que el juego no puede tomarlo como punto de ruta. Usa Establecer destino.",
+    "highlight": "Resaltar en el mapa",
+    "highlightOff": "Dejar de resaltar",
+    "highlightHint": "Resalta los sistemas y conexiones de esta ruta en el mapa abierto y atenúa el resto.",
+    "highlightNone": "Ninguno de los sistemas de esta ruta está en el mapa abierto."
   },
   "flagPresets": {
     "title": "Plantillas de marca",
@@ -3162,5 +3188,90 @@
     "inUse": "{{label}} ya está en uso en este mapa, o algún número por debajo.",
     "beneathOwn": "{{label}} pondría {{from}} debajo de sí mismo: cada dígito es un agujero más lejos de home, así que {{label}} es un agujero que sale de {{from}}.",
     "saveFailed": "No se pudo guardar el número de cadena."
+  },
+  "usage": {
+    "title": "Uso de Nexum",
+    "subtitle": "Usuarios activos mensuales en eve-nexum.com y en instalaciones autoalojadas de Nexum.",
+    "updated": "Actualizado {{time}}",
+    "loading": "Cargando...",
+    "failed": "No se pudieron cargar las cifras de uso.",
+    "notFound": "Este enlace se ha desactivado o no existe.",
+    "kpi": {
+      "total": "Usuarios activos, últimos 30 días",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Pilotos con sesión iniciada",
+      "selfHosted": "Autoalojado",
+      "installs": "Instalaciones: {{count}}",
+      "desktop": "App de escritorio",
+      "desktopNote": "Pilotos, últimos 30 días"
+    },
+    "chart": {
+      "title": "Usuarios activos mensuales"
+    },
+    "table": {
+      "month": "Mes",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (con sesión)",
+      "selfHosted": "Autoalojado",
+      "installs": "Instalaciones",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Instalaciones",
+      "modes": "Modo del servidor",
+      "versions": "Versiones",
+      "languages": "Idiomas (pilotos activos)",
+      "features": "Funciones en uso"
+    },
+    "modes": {
+      "solo": "Individual",
+      "corp": "Corp",
+      "alliance": "Alianza"
+    },
+    "features": {
+      "chainNumbering": "Mapas con números de cadena (L+1)",
+      "autoRemove": "Mapas con eliminación automática",
+      "crossMapSync": "Mapas con sincronización entre mapas",
+      "discord": "Organizaciones con avisos de Discord"
+    },
+    "notes": {
+      "title": "Cómo se cuenta",
+      "live": "eve-nexum.com: usuarios activos según Google Analytics. Los pilotos con sesión son personajes que usaron el sitio en los últimos 30 días.",
+      "selfHosted": "Autoalojado: cada instalación envía a diario, de forma anónima, el número de pilotos activos en los últimos 30 días; un mes usa la última cifra de cada instalación en ese mes. Las instalaciones se suman, así que un piloto que usa dos cuenta dos veces.",
+      "noGa": "Google Analytics no está conectado, así que eve-nexum.com muestra pilotos con sesión iniciada.",
+      "old": "Instalaciones con una versión demasiado antigua para enviar cifras, así que no se incluyen: {{count}}."
+    },
+    "share": {
+      "title": "Enlace para compartir",
+      "hint": "Cualquiera con el enlace puede ver esta página sin iniciar sesión. Crear un enlace nuevo desactiva el anterior.",
+      "create": "Crear enlace",
+      "replace": "Crear un enlace nuevo",
+      "remove": "Desactivar enlace",
+      "copy": "Copiar",
+      "copied": "Enlace copiado",
+      "active": "Hay un enlace activo (creado {{time}}). Solo se muestra al crearlo; crea uno nuevo si lo necesitas otra vez.",
+      "none": "Aún no hay enlace."
+    }
+  },
+  "useful": {
+    "hint": "Escribe para mostrar solo los grupos, sistemas o estructuras que coincidan. Las distancias son desde tu inicio de ruta.",
+    "chooseGroups": "Elegir grupos",
+    "chooseGroupsHint": "Elige qué grupos muestra este panel. Arrastra un grupo por su asa para reordenarlo.",
+    "allHidden": "Todos los grupos están ocultos. Usa el engranaje para mostrar alguno.",
+    "addToClosest": "Añadir a Sistemas más cercanos",
+    "removeFromClosest": "Quitar de Sistemas más cercanos",
+    "moreHere_one": "+{{count}} más aquí",
+    "moreHere_other": "+{{count}} más aquí",
+    "noStructureKind": "Ninguna estructura de tu corporación es de este tipo.",
+    "structureKinds": {
+      "all": "Cualquiera con atraque",
+      "citadel": "Ciudadelas",
+      "engineering": "Complejos de ingeniería",
+      "refinery": "Refinerías"
+    },
+    "filter": "Filtrar...",
+    "noMatch": "Nada coincide.",
+    "regionVia": "Sistema más cercano: {{system}}"
   }
 }

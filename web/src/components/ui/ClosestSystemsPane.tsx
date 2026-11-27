@@ -5,57 +5,19 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon, LightbulbIcon } from '../../icons';
-import { ClosestSuggestionsModal } from './ClosestSuggestionsModal';
-import { useRoute, type RouteEntry } from '../../hooks/useRoute';
+import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon } from '../../icons';
+import { useRouteResult, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { useMapStore } from '../../store/mapStore';
 import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { RouteSquares } from './routeUi';
+import { RouteSquares, RouteOriginNote } from './routeUi';
 import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { jumps as jumpsLabel } from '../../i18n/format';
-
-// EVE system IDs for the major trade hubs. Used as the initial seed only —
-// once the user has touched the list, theirs wins.
-const DEFAULT_HUBS: ReadonlyArray<{ id: number; name: string }> = [
-  { id: 30000142, name: 'Jita'    },
-  { id: 30002187, name: 'Amarr'   },
-  { id: 30002510, name: 'Rens'    },
-  { id: 30002659, name: 'Dodixie' },
-  { id: 30002053, name: 'Hek'     },
-];
-
-// Persist both the order AND the resolved names so the pane can label
-// custom systems without making an extra round-trip on every reload.
-const LIST_KEY = 'nexum.closestSystems.list';
-// IDs the user has explicitly hidden when they were the current home.
-// Lets someone keep their home set in-game without it cluttering this
-// pane. If they later change home to a different system, the new home
-// still auto-appears because its ID isn't in this set.
-const HIDDEN_HOME_KEY = 'nexum.closestSystems.hiddenHome';
-// Whether distances may route through the wormhole chains of EVERY map the
-// user can see, or only the active one. Defaults to true, which is how this
-// pane has always behaved — the surprise is not the behaviour but that it was
-// invisible, so the toggle exposes it rather than changing it.
-const ALL_MAPS_KEY = 'nexum.closestSystems.allMaps';
-
-interface StoredEntry { id: number; name: string }
-
-const HUB_DEFAULTS: StoredEntry[] = DEFAULT_HUBS.map((h) => ({ id: h.id, name: h.name }));
-
-function sanitiseList(raw: unknown): StoredEntry[] {
-  if (!Array.isArray(raw)) return HUB_DEFAULTS;
-  return raw
-    .filter((e): e is StoredEntry =>
-      typeof e === 'object' && e !== null
-        && typeof (e as StoredEntry).id === 'number'
-        && typeof (e as StoredEntry).name === 'string')
-    .map((e) => ({ id: e.id, name: e.name }));
-}
+import { LIST_KEY, HIDDEN_HOME_KEY, ALL_MAPS_KEY, HUB_DEFAULTS, sanitiseList, type StoredEntry } from '../../utils/closestList';
 
 interface RowItem {
   id:     number;
@@ -167,7 +129,6 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 export function ClosestSystemsPane() {
   const { t } = useTranslation();
   const aliasName = useSystemAlias();
-  const origin    = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
   // Home rows span every map the user can see, not just the active tab — this
   // pane is a per-user tool. Deduped by eve id.
@@ -178,10 +139,12 @@ export function ClosestSystemsPane() {
   const list = useMemo(() => sanitiseList(listRaw), [listRaw]);
   const [hiddenHomeArr, setHiddenHomeArr] = useUserSetting<number[]>(HIDDEN_HOME_KEY, []);
   const [allMaps, setAllMaps] = useUserSetting<boolean>(ALL_MAPS_KEY, true);
+  // The start follows the same scope as the route: with every map's chains in
+  // play, a hole on any of them is somewhere to start from.
+  const origin    = useRouteOrigin(allMaps ? 'all' : 'active');
   const hiddenHome = useMemo(() => new Set(hiddenHomeArr), [hiddenHomeArr]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [adding, setAdding]     = useState(false);
-  const [suggesting, setSuggesting] = useState(false);
   const [query, setQuery]       = useState('');
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const { results, loading }    = useEsiSearch(query);
@@ -239,7 +202,10 @@ export function ClosestSystemsPane() {
   // they're actually in routes regardless of which tab is active; 'active'
   // restricts it to the open map, for when a hop from a map you aren't looking
   // at is more confusing than helpful.
-  const routes    = useRoute(origin.systemId, targetIds, allMaps ? 'all' : 'active');
+  const { routes, settled } = useRouteResult(origin.systemId, targetIds, allMaps ? 'all' : 'active');
+  // Starting in a hole that none of the chains in play contains: the server
+  // can't place it, so nothing comes back. Say so rather than show bare rows.
+  const holeNotMapped = origin.inWormhole && settled && targetIds.length > 0 && Object.keys(routes).length === 0;
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -299,7 +265,9 @@ export function ClosestSystemsPane() {
   if (!canRoute) {
     return (
       <div className="scout-pane__empty">
-        {t('closest.signIn')}
+        {origin.blocked === 'wormholeOptionOff' ? t('closest.inWormhole')
+          : origin.blocked === 'notOnMap' ? t('closest.notOnMap')
+          : t('closest.signIn')}
       </div>
     );
   }
@@ -314,11 +282,8 @@ export function ClosestSystemsPane() {
 
   return (
     <div className="scout-pane">
-      {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
-      ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
-      ) : null}
+      <RouteOriginNote origin={origin} />
+      {holeNotMapped && <div className="scout-pane__note">{t('closest.holeNotMapped')}</div>}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => String(i.id))} strategy={verticalListSortingStrategy}>
           {items.map((i) => (
@@ -353,14 +318,6 @@ export function ClosestSystemsPane() {
           >
             <PlusIcon size={14} weight="bold" /> {t('addSystem.add')}
           </button>
-          <button
-            type="button"
-            className="sys-btn scout-pane__add"
-            onClick={() => setSuggesting(true)}
-            data-tooltip={t('closest.suggest.buttonHint')}
-          >
-            <LightbulbIcon size={14} weight="bold" /> {t('closest.suggest.button')}
-          </button>
         </div>
       ) : (
         <div className="scout-pane__add-row" ref={addRowRef}>
@@ -387,16 +344,6 @@ export function ClosestSystemsPane() {
         </div>
       )}
 
-      {suggesting && origin.systemId !== null && (
-        <ClosestSuggestionsModal
-          from={origin.systemId}
-          whScope={allMaps ? 'all' : 'active'}
-          onList={existingIds}
-          onAdd={addSystem}
-          onRemove={removeRow}
-          onClose={() => setSuggesting(false)}
-        />
-      )}
 
       {adding && dropdownPos && showResults && results.length > 0 && createPortal(
         <ul

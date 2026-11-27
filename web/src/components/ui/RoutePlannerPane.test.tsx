@@ -32,8 +32,12 @@ vi.mock('../../hooks/useEsiSearch', () => ({
 
 // Systems on the current map -- only their aliases matter to this pane.
 const mapSystems = vi.hoisted(() => ({ list: [] as unknown[] }));
+const noConnections: unknown[] = [];
+const setPinnedRouteHighlight = () => {};
 vi.mock('../../store/mapStore', () => ({
-  useMapStore: (sel: (s: unknown) => unknown) => sel({ routeMode: 'shortest', map: { systems: mapSystems.list } }),
+  useMapStore: (sel: (s: unknown) => unknown) => sel({
+    routeMode: 'shortest', map: { systems: mapSystems.list, connections: noConnections }, setPinnedRouteHighlight,
+  }),
 }));
 
 // RouteSquares brings its own context menu and alias lookups; the pane only

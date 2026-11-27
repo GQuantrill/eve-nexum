@@ -2688,6 +2688,13 @@ select.sig-toolbar-btn option {
   user-select: none;
 }
 
+/* Hole size, before the mass and life chips. The open list shows the full
+   name beside the letter; the cell itself just the letter. An unset size
+   shows the type's size, dimmed, as a hint. */
+.sig-whstate__size { flex: 0 0 auto; }
+.sig-whstate__size .sig-size-opt__long { display: none; }
+.sig-whstate__size--unset .sig-size-opt b { color: var(--text-faint); font-weight: 400; }
+.sig-size-opt { display: inline-flex; gap: 8px; align-items: baseline; }
 .sig-whstate__chip:hover { border-color: var(--border-accent); }
 
 .sig-whstate__chip--mass-destabilized {

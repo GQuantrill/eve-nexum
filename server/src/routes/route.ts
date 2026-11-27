@@ -2,7 +2,7 @@ import { Router, type Request } from 'express';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { createLogger } from '../utils/logger.js';
 import { shortestRoutes, nearestRoutes, type RouteMode, type RouteOverlay } from '../services/routeGraph.js';
-import { isServerKind, serverKindTargets } from '../services/nearestSets.js';
+import { isServerKind, serverKindTargets, systemRegions } from '../services/nearestSets.js';
 import { buildRouteOverlay } from '../services/routeOverlay.js';
 import { expiredScoutIds } from './scout.js';
 import { getMapAccess, visibleMapIds } from './maps.js';
@@ -149,8 +149,17 @@ router.post('/nearest', async (req, res) => {
     const out: Record<string, unknown[]> = {};
     for (const [name, spec] of sets) {
       if (!/^[a-z0-9:-]{1,40}$/i.test(name)) continue;
+      // The nearest regions: one system per region, never the start's own.
+      if (spec === 'region') {
+        const regions = await systemRegions();
+        const own = regions.get(from)?.id;
+        const groupOf = (id: number) => { const r = regions.get(id)?.id; return r === own ? undefined : r; };
+        const found = await nearestRoutes(from, regions.keys(), limit, opts.mode, overlay, opts.avoid, groupOf);
+        out[name] = found.map((r) => ({ ...r, regionName: regions.get(r.id)?.name ?? '' }));
+        continue;
+      }
       let ids: Iterable<number>;
-      let detail: Map<number, number[]> | undefined;
+      let detail: ReadonlyMap<number, number[]> | undefined;
       let exclude: Set<number> | undefined;
       const kind = typeof spec === 'string' ? spec
         : spec && typeof spec === 'object' && !Array.isArray(spec) ? (spec as { kind?: unknown }).kind : undefined;

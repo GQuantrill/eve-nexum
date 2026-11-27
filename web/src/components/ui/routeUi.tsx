@@ -6,6 +6,38 @@ import { setWaypoint } from '../../utils/routeActions';
 import { ContextMenu } from './ContextMenu';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import type { RouteEntry, RoutePathNode, EdgeMeta } from '../../hooks/useRoute';
+import type { RouteOrigin } from '../../hooks/useRouteOrigin';
+import { useMapStore } from '../../store/mapStore';
+import { CopyIcon } from '../../icons';
+import { toast } from '../../utils/toastStore';
+import { routeText } from '../../utils/routeText';
+
+/** Where a route pane's jumps are counted from, when that isn't simply where
+ *  the pilot is: a system picked with "Route from here" (with a way to stop),
+ *  another character, or a last known location. Plus a line when a picked
+ *  origin couldn't be routed from and the pilot's own location was used. */
+export function RouteOriginNote({ origin }: { origin: RouteOrigin }) {
+  const { t } = useTranslation();
+  const aliasName = useSystemAlias();
+  const clearPinned = useMapStore((s) => s.setRouteFromSystem);
+  return (
+    <>
+      {origin.skipped && (
+        <div className="scout-pane__note">{t('route.originSkipped', { name: aliasName(origin.skipped) })}</div>
+      )}
+      {origin.pinnedSystem && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown scout-pane__note--pinned">
+          <span>{t('route.fromPinned', { system: aliasName(origin.name) })}</span>
+          <button type="button" className="sys-btn scout-row__btn" onClick={() => clearPinned(null)}>{t('route.clearPinned')}</button>
+        </div>
+      ) : origin.characterName && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
+      ) : origin.fromLastKnown && origin.name ? (
+        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
+      ) : null}
+    </>
+  );
+}
 
 
 
@@ -64,6 +96,20 @@ export function RouteSquares({ route }: { route: RouteEntry }) {
           />
         </Fragment>
       ))}
+      {route.path.length > 1 && (
+        <button
+          type="button"
+          className="scout-route__copy"
+          onClick={() => {
+            navigator.clipboard?.writeText(routeText(t, route, aliasName))
+              .then(() => toast.success(t('route.copied')), () => toast.error(t('route.copyFailed')));
+          }}
+          aria-label={t('route.copyRoute')}
+          data-tooltip={t('route.copyRoute')}
+        >
+          <CopyIcon size={12} weight="regular" />
+        </button>
+      )}
       {menu && (
         <ContextMenu
           x={menu.x}

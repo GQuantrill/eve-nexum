@@ -33,6 +33,14 @@ export interface RouteOriginOverride {
   systemClass:   string | null;   // for the k-space gate in useRouteOrigin
 }
 
+/** A mapped system picked with "Route from here": route panes count jumps from
+ *  it, whoever is where. Wins over every character origin until cleared. */
+export interface RouteFromSystem {
+  eveSystemId: number;
+  systemName:  string;
+  systemClass: string | null;
+}
+
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -297,12 +305,18 @@ interface MapStore {
   // isn't part of the route. null = nothing highlighted.
   routeHighlight: { systemIds: string[]; connectionIds: string[] } | null;
   setRouteHighlight: (v: { systemIds: string[]; connectionIds: string[] } | null) => void;
+  // A highlight that stays until turned off (the Route Planner's "Highlight
+  // on map"). The hover highlight above wins while it's set.
+  pinnedRouteHighlight: { systemIds: string[]; connectionIds: string[] } | null;
+  setPinnedRouteHighlight: (v: { systemIds: string[]; connectionIds: string[] } | null) => void;
 
   // Route/centre origin override: point jump calcs + centring at another of
   // the account's characters (e.g. a scout on the chain exit) instead of the
   // active character. null = use the active character's live location.
   routeOrigin: RouteOriginOverride | null;
   setRouteOrigin: (o: RouteOriginOverride | null) => void;
+  routeFromSystem: RouteFromSystem | null;
+  setRouteFromSystem: (o: RouteFromSystem | null) => void;
 
   // Undo
   undoStack: UndoCommand[];
@@ -711,7 +725,10 @@ export const useMapStore = create<MapStore>()((set, get) => {
     centerRequestEveId: null,
     centerRequestNodeId: null,
     routeHighlight: null,
+    pinnedRouteHighlight: null,
     routeOrigin: null,
+    routeFromSystem: null,
+    setRouteFromSystem: (o) => set({ routeFromSystem: o }),
     sigRev: {},
     bumpSigRev: (systemId) =>
       set((s) => ({ sigRev: { ...s.sigRev, [systemId]: (s.sigRev[systemId] ?? 0) + 1 } })),
@@ -1077,6 +1094,7 @@ export const useMapStore = create<MapStore>()((set, get) => {
     requestCenterOnNode: (nodeId) => set({ centerRequestNodeId: nodeId }),
     clearCenterRequest: () => set({ centerRequestEveId: null, centerRequestNodeId: null }),
     setRouteHighlight: (v) => set({ routeHighlight: v }),
+    setPinnedRouteHighlight: (v) => set({ pinnedRouteHighlight: v }),
 
     setRouteOrigin: (o) => set({ routeOrigin: o }),
 

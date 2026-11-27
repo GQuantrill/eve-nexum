@@ -246,7 +246,8 @@
       "tabs": {
         "users": "Utilizadores",
         "systems": "Sistemas",
-        "ghostSites": "Sites fantasma"
+        "ghostSites": "Sites fantasma",
+        "usage": "Uso"
       },
       "filter": "Filtro",
       "window": "Período",
@@ -740,10 +741,6 @@
     "allMaps": "Calcular em todos os meus mapas",
     "allMapsHint": "As distâncias podem usar as cadeias de buracos de minhoca de qualquer mapa que consiga ver, não apenas o aberto. Desligue para traçar rotas só pelo mapa no ecrã.",
     "suggest": {
-      "button": "Sugestões",
-      "buttonHint": "Os centros comerciais, compradores de blue loot, A0, estações e mais próximos para adicionar a esta lista",
-      "title": "Sugestões",
-      "hint": "O mais próximo de cada tipo a partir de onde você está, com a mesma rota desta lista. Adicionar coloca um sistema na sua lista.",
       "failed": "Não foi possível carregar as sugestões. Tente novamente em instantes.",
       "loading": "Procurando os sistemas mais próximos...",
       "quietHint": "Nenhum abate de jogador na última hora.",
@@ -764,11 +761,11 @@
         "turnur": "Entradas de Turnur",
         "incursion": "Incursões",
         "structure": "Estruturas da sua corp",
-        "quiet": "Sistemas tranquilos"
+        "quiet": "Sistemas tranquilos",
+        "region": "Regiões mais próximas"
       },
       "services": {
-        "cloning": "Baia de clonagem",
-        "jumpClone": "Instalação de clones de salto",
+        "cloning": "Baia de clonagem (clones de salto)",
         "repair": "Reparo",
         "fitting": "Equipamento",
         "market": "Mercado",
@@ -784,7 +781,10 @@
         "incursion": "Nenhuma incursão alcançável daqui.",
         "generic": "Nada alcançável daqui."
       }
-    }
+    },
+    "inWormhole": "Estás num buraco de minhoca, que não tem portais estelares. Ativa «Incluir cadeia de buracos de minhoca» nas definições de rota para contar saltos pela tua cadeia mapeada, ou clica com o botão direito numa saída do mapa e escolhe «Rota a partir daqui».",
+    "notOnMap": "O teu sistema não está no mapa aberto. Abre o mapa com a tua cadeia ou ativa «Calcular em todos os meus mapas».",
+    "holeNotMapped": "O teu sistema não está em nenhum mapa que possas ver, por isso nada é alcançável a partir dele. Mapeia a tua cadeia ou clica com o botão direito numa saída e escolhe «Rota a partir daqui»."
   },
   "commandPalette": {
     "placeholder": "Procurar sistemas e mapas…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "O seu navegador não deixa o nexum ler a área de transferência. Prima Ctrl+V (Cmd+V no Mac) no mapa.",
     "pasteNoSystems": "Não há sistemas copiados na área de transferência. Clique primeiro com o botão direito em sistemas e escolha Copiar sistemas.",
     "exportSystems": "Exportar sistemas ({{count}})…",
-    "importSystems": "Importar sistemas…"
+    "importSystems": "Importar sistemas…",
+    "routeFromHere": "Rota a partir daqui",
+    "stopRouteFromHere": "Deixar de calcular a partir daqui",
+    "routeToHere": "Rota até aqui"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2413,7 +2416,18 @@
     "riskFrig": "Buraco de fragata",
     "jspaceNoWaypoint": "Sistemas de buraco de minhoca não podem ser definidos como destino do piloto automático.",
     "viaAnsiblex": "Portão de salto Ansiblex",
-    "viaMap": "em {{map}}"
+    "viaMap": "em {{map}}",
+    "fromPinned": "Saltos a partir de {{system}} (escolhido no mapa)",
+    "clearPinned": "Usar a minha localização",
+    "originSkipped": "Não é possível calcular rota a partir de {{name}}, por isso os saltos são a partir da tua localização.",
+    "copyRoute": "Copiar rota como texto",
+    "copied": "Rota copiada",
+    "copyFailed": "Não foi possível copiar a rota",
+    "copyWormhole": "buraco de minhoca",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "crítico",
+    "copyFrig": "fragata"
   },
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",
@@ -2499,7 +2513,8 @@
     "intel": "Intel",
     "popOut": "Abrir em janela própria",
     "poppedOut": "Aberto em janela própria.",
-    "bringBack": "Trazer de volta"
+    "bringBack": "Trazer de volta",
+    "useful": "Sistemas úteis"
   },
   "sigType": {
     "combat": "Combate",
@@ -2557,7 +2572,7 @@
     "colWh": "Tipo",
     "colLeadsTo": "Leva a",
     "colWhState": "Estado",
-    "colWhStateHint": "Massa e vida restante do buraco. Ambas se leem no próprio buraco, por isso podem ser definidas antes de o saltar.",
+    "colWhStateHint": "O tamanho, a massa e a vida restante de um buraco de minhoca. Os três leem-se no buraco, por isso podem ser anotados antes de saltar.",
     "whStateMass": "Massa: clicar para completa / menos de 50 % / menos de 10 %",
     "whStateLife": "Vida: clicar para desconhecida / menos de 1 dia / menos de 4 horas / menos de 1 hora / expirada",
     "colName": "Nome",
@@ -2574,7 +2589,10 @@
     "countFiltered": "{{shown}} de {{total}}",
     "countTotal": "Total de assinaturas: {{count}}",
     "countHint": "Assinaturas neste sistema",
-    "countFilteredHint": "Assinaturas mostradas do total do sistema"
+    "countFilteredHint": "Assinaturas mostradas do total do sistema",
+    "whStateSize": "Tamanho",
+    "whSizeFromType": "pelo tipo",
+    "whSizeUnknown": "Não anotado"
   },
   "stats": {
     "title": "Estatísticas de utilizador",
@@ -2939,7 +2957,15 @@
     "nameToSave": "Nome para guardar…",
     "save": "Guardar",
     "loadPlan": "Carregar esta rota",
-    "deletePlan": "Eliminar esta rota"
+    "deletePlan": "Eliminar esta rota",
+    "setRoute": "Definir rota",
+    "setDestinationHint": "Envia {{to}} como destino para o piloto automático e limpa os teus waypoints. O jogo traça o seu próprio caminho por portais estelares a partir de onde estás: não usa os buracos de minhoca nem atalhos desta rota.",
+    "setRouteHint": "Envia {{from}} como destino e depois {{to}} como waypoint, para que o piloto automático te leve primeiro ao início (ignorado se já lá estiveres). O jogo traça cada troço por portais estelares.",
+    "setRouteJspace": "{{from}} não está em k-space, por isso o jogo não o aceita como waypoint. Usa Definir destino.",
+    "highlight": "Destacar no mapa",
+    "highlightOff": "Deixar de destacar",
+    "highlightHint": "Destaca os sistemas e ligações desta rota no mapa aberto e esbate o resto.",
+    "highlightNone": "Nenhum sistema desta rota está no mapa aberto."
   },
   "flagPresets": {
     "title": "Predefinições de marca",
@@ -3162,5 +3188,90 @@
     "inUse": "{{label}} já está em uso neste mapa, ou algum número abaixo dele.",
     "beneathOwn": "{{label}} colocaria {{from}} abaixo de si mesmo: cada dígito é um buraco mais longe de home, então {{label}} é um buraco saindo de {{from}}.",
     "saveFailed": "Não foi possível salvar o número de cadeia."
+  },
+  "usage": {
+    "title": "Uso do Nexum",
+    "subtitle": "Utilizadores ativos mensais em eve-nexum.com e em instalações Nexum auto-hospedadas.",
+    "updated": "Atualizado {{time}}",
+    "loading": "A carregar...",
+    "failed": "Não foi possível carregar os números de uso.",
+    "notFound": "Este link foi desativado ou não existe.",
+    "kpi": {
+      "total": "Utilizadores ativos, últimos 30 dias",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Pilotos com sessão iniciada",
+      "selfHosted": "Auto-hospedado",
+      "installs": "Instalações: {{count}}",
+      "desktop": "App de desktop",
+      "desktopNote": "Pilotos, últimos 30 dias"
+    },
+    "chart": {
+      "title": "Utilizadores ativos mensais"
+    },
+    "table": {
+      "month": "Mês",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (com sessão)",
+      "selfHosted": "Auto-hospedado",
+      "installs": "Instalações",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Instalações",
+      "modes": "Modo do servidor",
+      "versions": "Versões",
+      "languages": "Idiomas (pilotos ativos)",
+      "features": "Funcionalidades em uso"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Aliança"
+    },
+    "features": {
+      "chainNumbering": "Mapas com números de cadeia (L+1)",
+      "autoRemove": "Mapas com remoção automática",
+      "crossMapSync": "Mapas com sincronização entre mapas",
+      "discord": "Organizações com alertas do Discord"
+    },
+    "notes": {
+      "title": "Como é contado",
+      "live": "eve-nexum.com: utilizadores ativos segundo o Google Analytics. Pilotos com sessão são personagens que usaram o site nos últimos 30 dias.",
+      "selfHosted": "Auto-hospedado: cada instalação envia diariamente, de forma anónima, o número de pilotos ativos nos últimos 30 dias; um mês usa o último valor de cada instalação nesse mês. As instalações são somadas, por isso um piloto em duas instalações conta duas vezes.",
+      "noGa": "O Google Analytics não está ligado, por isso eve-nexum.com mostra pilotos com sessão iniciada.",
+      "old": "Instalações numa versão demasiado antiga para enviar números, por isso não incluídas: {{count}}."
+    },
+    "share": {
+      "title": "Link partilhável",
+      "hint": "Qualquer pessoa com o link pode ver esta página sem iniciar sessão. Criar um link novo desativa o antigo.",
+      "create": "Criar link",
+      "replace": "Criar um link novo",
+      "remove": "Desativar link",
+      "copy": "Copiar",
+      "copied": "Link copiado",
+      "active": "Há um link ativo (criado {{time}}). Só é mostrado ao ser criado; crie um novo se voltar a precisar dele.",
+      "none": "Ainda não há link."
+    }
+  },
+  "useful": {
+    "hint": "Escreve para mostrar só os grupos, sistemas ou estruturas que correspondem. As distâncias contam a partir do início da rota.",
+    "chooseGroups": "Escolher grupos",
+    "chooseGroupsHint": "Escolhe que grupos este painel mostra. Arrasta um grupo pela pega para o reordenar.",
+    "allHidden": "Todos os grupos estão ocultos. Usa a engrenagem para mostrar alguns.",
+    "addToClosest": "Adicionar a Sistemas mais próximos",
+    "removeFromClosest": "Remover de Sistemas mais próximos",
+    "moreHere_one": "+{{count}} mais aqui",
+    "moreHere_other": "+{{count}} mais aqui",
+    "noStructureKind": "Nenhuma estrutura da tua corporação é deste tipo.",
+    "structureKinds": {
+      "all": "Qualquer com atracagem",
+      "citadel": "Cidadelas",
+      "engineering": "Complexos de engenharia",
+      "refinery": "Refinarias"
+    },
+    "filter": "Filtrar...",
+    "noMatch": "Nada corresponde.",
+    "regionVia": "Sistema mais próximo: {{system}}"
   }
 }

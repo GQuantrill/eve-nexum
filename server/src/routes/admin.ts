@@ -6,6 +6,7 @@ import { db } from '../db.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { requireAdminRead } from '../middleware/requireAdminRead.js';
 import { requireReportsAccess, isReportsCharacter, corpScopeFor } from '../middleware/requireReportsAccess.js';
+import { buildUsageReport, createUsageShare, deleteUsageShare, usageShareStatus } from '../services/usageStats.js';
 import { isAdmin, isAllianceAdmin } from '../middleware/authContext.js';
 import { config } from '../config.js';
 import { isDiscordWebhookUrl } from '../services/discord.js';
@@ -1255,6 +1256,24 @@ const USER_FILTERS = new Set([
 // window. With no filter (default) every user is returned. A window also
 // bounds the count columns (systems added/deleted, signatures by type) to
 // activity inside it; the "last ..." timestamps stay lifetime.
+// ── Usage (all installs) ────────────────────────────────────────────────
+// Monthly active users on this site and across self-hosted installs, and the
+// shareable link to the same page. The reports character only: it's every
+// install's numbers, not one org's.
+reportsRouter.get('/usage', async (req, res) => {
+  if (!isReportsCharacter(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  res.json({ report: await buildUsageReport(), share: await usageShareStatus() });
+});
+reportsRouter.post('/usage/share', async (req, res) => {
+  if (!isReportsCharacter(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  res.json({ token: await createUsageShare() });
+});
+reportsRouter.delete('/usage/share', async (req, res) => {
+  if (!isReportsCharacter(req)) { res.status(403).json({ error: 'Forbidden' }); return; }
+  await deleteUsageShare();
+  res.json({ ok: true });
+});
+
 reportsRouter.get('/users', async (req, res) => {
   const scope = corpScopeFor(req);
   if (scope === null) { res.status(403).json({ error: 'No corp affiliation' }); return; }

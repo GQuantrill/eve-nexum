@@ -25,6 +25,8 @@ import { Doughnut, Line } from 'react-chartjs-2';
 import { CaretUpIcon, CaretDownIcon, XIcon, ArrowSquareOutIcon } from '../../icons';
 import { createPortal } from 'react-dom';
 import styles from './AdminPage.module.css';
+import usageStyles from '../usage/Usage.module.css';
+import { UsageView, type UsageReport } from '../usage/UsageView';
 import { useScopeHeld } from '../../hooks/useScopeHeld';
 import { encodeOrgBackground, reloadOrgBackgrounds, BgImageError } from '../../utils/mapBackground';
 import { promptForScope } from '../../utils/scopePrompt';
@@ -1420,20 +1422,22 @@ function FlagPresetsTab() {
 
 // ── Reports tab ─────────────────────────────────────────────────────────────
 
-type ReportKind = 'users' | 'systems' | 'ghost-sites';
+type ReportKind = 'users' | 'systems' | 'ghost-sites' | 'usage';
 
 const REPORTS: { key: ReportKind }[] = [
   { key: 'users'       },
   { key: 'systems'     },
   { key: 'ghost-sites' },
+  { key: 'usage'       },
 ];
 
 // 'ghost-sites' doesn't map cleanly onto a dotted i18n key, so spell the
 // sub-tab labels out rather than building keys dynamically.
-const REPORT_TAB_KEY: Record<ReportKind, 'admin.reports.tabs.users' | 'admin.reports.tabs.systems' | 'admin.reports.tabs.ghostSites'> = {
+const REPORT_TAB_KEY: Record<ReportKind, 'admin.reports.tabs.users' | 'admin.reports.tabs.systems' | 'admin.reports.tabs.ghostSites' | 'admin.reports.tabs.usage'> = {
   users:         'admin.reports.tabs.users',
   systems:       'admin.reports.tabs.systems',
   'ghost-sites': 'admin.reports.tabs.ghostSites',
+  usage:         'admin.reports.tabs.usage',
 };
 
 type WindowKey = 'all' | '24h' | 'week' | 'month' | 'quarter' | 'year';
@@ -1479,7 +1483,7 @@ function ReportsTab() {
   const { user } = useAuth();
   const canSeeReports = !!user?.canViewReports;
   const visibleReports = useMemo(
-    () => REPORTS.filter((r) => r.key !== 'ghost-sites' || canSeeReports),
+    () => REPORTS.filter((r) => (r.key !== 'ghost-sites' && r.key !== 'usage') || canSeeReports),
     [canSeeReports],
   );
   const kind = pathToReport(path, canSeeReports);
@@ -1502,6 +1506,7 @@ function ReportsTab() {
       {kind === 'users'       && <UsersReport />}
       {kind === 'systems'     && <SystemsReport />}
       {kind === 'ghost-sites' && canSeeReports && <GhostSitesReport />}
+      {kind === 'usage'       && canSeeReports && <UsageReportTab />}
     </>
   );
 }
@@ -1509,7 +1514,72 @@ function ReportsTab() {
 function pathToReport(path: string, canSeeReports: boolean): ReportKind {
   if (path.startsWith('/admin/reports/systems'))                       return 'systems';
   if (path.startsWith('/admin/reports/ghost-sites') && canSeeReports)  return 'ghost-sites';
+  if (path.startsWith('/admin/reports/usage') && canSeeReports)        return 'usage';
   return 'users';
+}
+
+// ── Usage report (all installs) ─────────────────────────────────────────────
+
+function UsageReportTab() {
+  const { t, i18n } = useTranslation();
+  const [data, setData] = useState<{ report: UsageReport; share: { active: boolean; createdAt: string | null } } | null>(null);
+  const [failed, setFailed] = useState(false);
+  const [link, setLink] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    api<{ report: UsageReport; share: { active: boolean; createdAt: string | null } }>('/api/admin/reports/usage')
+      .then((d) => { setData(d); setFailed(false); })
+      .catch(() => setFailed(true));
+  }, []);
+  useEffect(() => { load(); }, [load]);
+
+  const makeLink = () => {
+    api<{ token: string }>('/api/admin/reports/usage/share', { method: 'POST' })
+      .then((r) => { setLink(`${window.location.origin}/#/usage/${r.token}`); load(); })
+      .catch(() => toast.error(t('usage.failed')));
+  };
+  const removeLink = () => {
+    api('/api/admin/reports/usage/share', { method: 'DELETE' })
+      .then(() => { setLink(null); load(); })
+      .catch(() => toast.error(t('usage.failed')));
+  };
+  const copy = () => {
+    if (!link) return;
+    void navigator.clipboard?.writeText(link).then(() => toast.success(t('usage.share.copied')));
+  };
+
+  if (failed) return <p className={styles.pgEmpty}>{t('usage.failed')}</p>;
+  if (!data) return <p className={styles.pgEmpty}>{t('usage.loading')}</p>;
+  return (
+    <>
+      <div className={usageStyles.share}>
+        <h3 className={usageStyles.cardTitle}>{t('usage.share.title')}</h3>
+        <p className={usageStyles.shareHint}>{t('usage.share.hint')}</p>
+        {link && (
+          <div className={usageStyles.shareRow}>
+            <input className={`input ${usageStyles.shareLink}`} readOnly value={link} onFocus={(e) => e.currentTarget.select()} />
+            <button type="button" className="btn btn--primary" onClick={copy}>{t('usage.share.copy')}</button>
+          </div>
+        )}
+        {!link && (
+          <p className={usageStyles.shareHint}>
+            {data.share.active && data.share.createdAt
+              ? t('usage.share.active', { time: new Date(data.share.createdAt).toLocaleString(i18n.language) })
+              : t('usage.share.none')}
+          </p>
+        )}
+        <div className={usageStyles.shareRow}>
+          <button type="button" className="btn btn--ghost" onClick={makeLink}>
+            {data.share.active ? t('usage.share.replace') : t('usage.share.create')}
+          </button>
+          {data.share.active && (
+            <button type="button" className="btn btn--ghost" onClick={removeLink}>{t('usage.share.remove')}</button>
+          )}
+        </div>
+      </div>
+      <UsageView report={data.report} />
+    </>
+  );
 }
 
 // ── Users report ────────────────────────────────────────────────────────────

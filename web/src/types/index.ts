@@ -144,6 +144,9 @@ export interface Signature {
    *  See utils/whState.ts. */
   massStatus: MassStatus | '';
   timeStatus: TimeStatus | '';
+  /** The hole's size as read off show-info before jumping it, '' when not
+   *  noted. Staging, like mass/life: the connection's size takes over. */
+  whSize?: ConnectionSize | '';
   /** A chain number reserved on this hole before anyone jumped it (L+1): the
    *  system it leads to takes it when jumped. Null when none, or expired. */
   chainLabel?: string | null;

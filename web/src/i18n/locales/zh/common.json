@@ -246,7 +246,8 @@
       "tabs": {
         "users": "用户",
         "systems": "星系",
-        "ghostSites": "幽灵站点"
+        "ghostSites": "幽灵站点",
+        "usage": "使用情况"
       },
       "filter": "筛选",
       "window": "时间段",
@@ -740,10 +741,6 @@
     "allMaps": "跨所有地图计算路线",
     "allMapsHint": "距离可以使用你能看到的任何地图上的虫洞链，而不仅是当前打开的地图。关闭后将只通过屏幕上的地图计算路线。",
     "suggest": {
-      "button": "建议",
-      "buttonHint": "将最近的交易中心、蓝色战利品收购点、A0 星系、空间站等加入此列表",
-      "title": "建议",
-      "hint": "从你所在位置出发每类最近的几个，航线与此列表相同。点击添加即可把星系放入列表。",
       "failed": "无法加载建议，请稍后再试。",
       "loading": "正在查找最近的星系……",
       "quietHint": "过去一小时内没有玩家击杀。",
@@ -764,11 +761,11 @@
         "turnur": "Turnur 入口",
         "incursion": "入侵",
         "structure": "你军团的建筑",
-        "quiet": "安静星系"
+        "quiet": "安静星系",
+        "region": "最近的星域"
       },
       "services": {
-        "cloning": "克隆舱",
-        "jumpClone": "跳跃克隆设施",
+        "cloning": "克隆舱（跳跃克隆）",
         "repair": "维修",
         "fitting": "装配",
         "market": "市场",
@@ -784,7 +781,10 @@
         "incursion": "从这里无法到达任何入侵。",
         "generic": "从这里无法到达。"
       }
-    }
+    },
+    "inWormhole": "你在虫洞中，那里没有星门。在路线设置中开启“包含虫洞链”，即可通过已绘制的链计算跳跃数；或在地图上右键点击一个出口，选择“从这里规划路线”。",
+    "notOnMap": "你所在的星系不在当前打开的地图上。请打开含有你的链的地图，或开启“跨所有地图计算路线”。",
+    "holeNotMapped": "你所在的星系不在你能看到的任何地图上，因此从这里无法到达任何地方。请绘制你的链，或右键点击一个出口并选择“从这里规划路线”。"
   },
   "commandPalette": {
     "placeholder": "搜索星系和地图…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "你的浏览器不允许 nexum 读取剪贴板。请改为在地图上按 Ctrl+V（Mac 上为 Cmd+V）。",
     "pasteNoSystems": "剪贴板上没有复制的星系。请先右键点击星系并选择“复制星系”。",
     "exportSystems": "导出星系（{{count}}）…",
-    "importSystems": "导入星系…"
+    "importSystems": "导入星系…",
+    "routeFromHere": "从这里规划路线",
+    "stopRouteFromHere": "停止从这里规划路线",
+    "routeToHere": "规划路线到这里"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -2413,7 +2416,18 @@
     "riskFrig": "护卫舰洞",
     "jspaceNoWaypoint": "虫洞星系无法设为自动驾驶目的地。",
     "viaAnsiblex": "Ansiblex 跳跃门",
-    "viaMap": "来自 {{map}}"
+    "viaMap": "来自 {{map}}",
+    "fromPinned": "从 {{system}} 起的跳跃数（在地图上选定）",
+    "clearPinned": "使用我的位置",
+    "originSkipped": "无法从 {{name}} 规划路线，因此跳跃数从你自己的位置计算。",
+    "copyRoute": "以文本复制路线",
+    "copied": "路线已复制",
+    "copyFailed": "无法复制路线",
+    "copyWormhole": "虫洞",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "临界",
+    "copyFrig": "护卫舰"
   },
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",
@@ -2497,7 +2511,8 @@
     "intel": "情报",
     "popOut": "在独立窗口中打开",
     "poppedOut": "已在独立窗口中打开。",
-    "bringBack": "放回此处"
+    "bringBack": "放回此处",
+    "useful": "实用星系"
   },
   "sigType": {
     "combat": "战斗",
@@ -2555,7 +2570,7 @@
     "colWh": "类型",
     "colLeadsTo": "通往",
     "colWhState": "状态",
-    "colWhStateHint": "虫洞的质量与剩余寿命。二者在太空中看洞即可得知，因此跳跃前就能记录。",
+    "colWhStateHint": "虫洞的大小、质量和剩余寿命。三者都能在太空中直接从虫洞上看到，因此可以在跳跃前填写。",
     "whStateMass": "质量：点击切换 充足 / 低于 50% / 低于 10%",
     "whStateLife": "寿命：点击切换 未知 / 不足 1 天 / 不足 4 小时 / 不足 1 小时 / 已过期",
     "colName": "名称",
@@ -2572,7 +2587,10 @@
     "countFiltered": "{{total}} 中的 {{shown}}",
     "countTotal": "信号总数：{{count}}",
     "countHint": "该星系的信号",
-    "countFilteredHint": "已显示的信号数 / 星系总数"
+    "countFilteredHint": "已显示的信号数 / 星系总数",
+    "whStateSize": "大小",
+    "whSizeFromType": "按类型推断",
+    "whSizeUnknown": "未记录"
   },
   "stats": {
     "title": "用户统计",
@@ -2935,7 +2953,15 @@
     "nameToSave": "保存名称…",
     "save": "保存",
     "loadPlan": "载入此路线",
-    "deletePlan": "删除此路线"
+    "deletePlan": "删除此路线",
+    "setRoute": "设置路线",
+    "setDestinationHint": "将 {{to}} 作为目的地发送到游戏内自动导航，并清除你的路径点。游戏会从你所在位置自行通过星门规划路线，不会使用这条路线中的虫洞或捷径。",
+    "setRouteHint": "先将 {{from}} 设为目的地，再把 {{to}} 作为其后的路径点，让自动导航先带你到起点（如果你已在那里则跳过）。游戏会通过星门规划每一段。",
+    "setRouteJspace": "{{from}} 不在 K 空间，游戏无法将其作为路径点。请使用“设为目的地”。",
+    "highlight": "在地图上高亮",
+    "highlightOff": "取消高亮",
+    "highlightHint": "在当前地图上高亮这条路线的星系和连接，并淡化其余部分。",
+    "highlightNone": "这条路线的星系都不在当前地图上。"
   },
   "flagPresets": {
     "title": "标记预设",
@@ -3158,5 +3184,89 @@
     "inUse": "{{label}} 在此地图上已被使用，或其下已有编号。",
     "beneathOwn": "{{label}} 会把 {{from}} 放到它自己下面：每一位数字代表离 home 再远一个洞，所以 {{label}} 是从 {{from}} 出去的洞。",
     "saveFailed": "无法保存链编号。"
+  },
+  "usage": {
+    "title": "Nexum 使用情况",
+    "subtitle": "eve-nexum.com 与自托管 Nexum 实例的月活跃用户。",
+    "updated": "更新于 {{time}}",
+    "loading": "加载中...",
+    "failed": "无法加载使用数据。",
+    "notFound": "此链接已关闭或不存在。",
+    "kpi": {
+      "total": "活跃用户（近 30 天）",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "已登录飞行员",
+      "selfHosted": "自托管",
+      "installs": "实例数：{{count}}",
+      "desktop": "桌面应用",
+      "desktopNote": "飞行员（近 30 天）"
+    },
+    "chart": {
+      "title": "月活跃用户"
+    },
+    "table": {
+      "month": "月份",
+      "live": "eve-nexum.com（Analytics）",
+      "signedIn": "eve-nexum.com（已登录）",
+      "selfHosted": "自托管",
+      "installs": "实例数",
+      "total": "合计"
+    },
+    "breakdown": {
+      "title": "实例",
+      "modes": "服务器模式",
+      "versions": "版本",
+      "languages": "语言（活跃飞行员）",
+      "features": "使用中的功能"
+    },
+    "modes": {
+      "solo": "个人",
+      "corp": "军团",
+      "alliance": "联盟"
+    },
+    "features": {
+      "chainNumbering": "启用链编号（L+1）的地图",
+      "autoRemove": "启用自动移除的地图",
+      "crossMapSync": "启用跨地图同步的地图",
+      "discord": "启用 Discord 提醒的组织"
+    },
+    "notes": {
+      "title": "统计方式",
+      "live": "eve-nexum.com：Google Analytics 统计的活跃用户。已登录飞行员指近 30 天使用过本站的角色。",
+      "selfHosted": "自托管：每个实例每天匿名发送近 30 天活跃飞行员数；每月取各实例当月最后一次的数值。各实例相加，因此同时使用两个实例的飞行员会被计算两次。",
+      "noGa": "未连接 Google Analytics，因此 eve-nexum.com 显示已登录飞行员。",
+      "old": "版本过旧、无法发送数据而未计入的实例：{{count}}。"
+    },
+    "share": {
+      "title": "分享链接",
+      "hint": "任何拿到链接的人无需登录即可查看此页面。生成新链接会关闭旧链接。",
+      "create": "生成链接",
+      "replace": "生成新链接",
+      "remove": "关闭链接",
+      "copy": "复制",
+      "copied": "链接已复制",
+      "active": "链接已开启（生成于 {{time}}）。链接只在生成时显示，如需再次使用请生成新链接。",
+      "none": "尚无链接。"
+    }
+  },
+  "useful": {
+    "hint": "输入文字，只显示匹配的分组、星系或建筑。距离从你的路线起点算起。",
+    "chooseGroups": "选择分组",
+    "chooseGroupsHint": "选择此面板显示哪些分组。拖动分组的手柄可调整顺序。",
+    "allHidden": "所有分组都已隐藏。点击齿轮显示一些。",
+    "addToClosest": "添加到最近星系",
+    "removeFromClosest": "从最近星系移除",
+    "moreHere_other": "此处另有 {{count}} 个",
+    "noStructureKind": "你的军团没有这一类的建筑。",
+    "structureKinds": {
+      "all": "所有可停靠",
+      "citadel": "堡垒",
+      "engineering": "工程复合体",
+      "refinery": "精炼厂"
+    },
+    "filter": "筛选...",
+    "noMatch": "没有匹配项。",
+    "regionVia": "最近的星系：{{system}}"
   }
 }

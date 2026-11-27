@@ -246,7 +246,8 @@
       "tabs": {
         "users": "ユーザー",
         "systems": "星系",
-        "ghostSites": "ゴーストサイト"
+        "ghostSites": "ゴーストサイト",
+        "usage": "利用状況"
       },
       "filter": "フィルター",
       "window": "期間",
@@ -740,10 +741,6 @@
     "allMaps": "すべてのマップで経路を計算",
     "allMapsHint": "距離の計算に、開いているマップだけでなく閲覧できるすべてのマップのワームホールチェーンを使用できます。オフにすると画面上のマップだけで経路を計算します。",
     "suggest": {
-      "button": "おすすめ",
-      "buttonHint": "最寄りのトレードハブ、ブルールート買取所、A0、ステーションなどをこのリストに追加",
-      "title": "おすすめ",
-      "hint": "現在地から種類ごとに最寄りのものを、このリストと同じ経路で探します。追加でリストに入れます。",
       "failed": "おすすめを読み込めませんでした。少ししてからもう一度お試しください。",
       "loading": "最寄りの星系を探しています...",
       "quietHint": "直近1時間にプレイヤーのキルはありません。",
@@ -764,11 +761,11 @@
         "turnur": "Turnur の入口",
         "incursion": "インカージョン",
         "structure": "コーポのストラクチャ",
-        "quiet": "静かな星系"
+        "quiet": "静かな星系",
+        "region": "最寄りのリージョン"
       },
       "services": {
-        "cloning": "クローンベイ",
-        "jumpClone": "ジャンプクローン施設",
+        "cloning": "クローンベイ（ジャンプクローン）",
         "repair": "修理",
         "fitting": "装備",
         "market": "マーケット",
@@ -784,7 +781,10 @@
         "incursion": "ここから行けるインカージョンはありません。",
         "generic": "ここから行ける場所はありません。"
       }
-    }
+    },
+    "inWormhole": "ワームホール内にいるため、スターゲートがありません。ルート設定で「ワームホールチェーンを含める」をオンにすると、マップ済みのチェーン経由でジャンプ数を計算します。または、マップ上の出口を右クリックして「ここからルート」を選んでください。",
+    "notOnMap": "あなたの星系は開いているマップにありません。チェーンのあるマップを開くか、「すべてのマップで経路を計算」をオンにしてください。",
+    "holeNotMapped": "あなたの星系は見られるどのマップにもないため、ここからはどこにも到達できません。チェーンをマップするか、出口を右クリックして「ここからルート」を選んでください。"
   },
   "commandPalette": {
     "placeholder": "星系とマップを検索…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "ブラウザが nexum にクリップボードの読み取りを許可していません。代わりにマップ上で Ctrl+V（Mac では Cmd+V）を押してください。",
     "pasteNoSystems": "クリップボードにコピーした星系がありません。先に星系を右クリックして「星系をコピー」を選んでください。",
     "exportSystems": "星系をエクスポート（{{count}}）…",
-    "importSystems": "星系をインポート…"
+    "importSystems": "星系をインポート…",
+    "routeFromHere": "ここからルート",
+    "stopRouteFromHere": "ここからのルートをやめる",
+    "routeToHere": "ここまでのルート"
   },
   "customIntel": {
     "title": "カスタムインテル",
@@ -2413,7 +2416,18 @@
     "riskFrig": "フリゲートホール",
     "jspaceNoWaypoint": "ワームホールシステムはオートパイロットの目的地に設定できません。",
     "viaAnsiblex": "Ansiblex ジャンプゲート",
-    "viaMap": "{{map}} より"
+    "viaMap": "{{map}} より",
+    "fromPinned": "{{system}} からのジャンプ数（マップで選択）",
+    "clearPinned": "自分の位置を使う",
+    "originSkipped": "{{name}} からはルートを計算できないため、自分の位置からのジャンプ数です。",
+    "copyRoute": "ルートをテキストでコピー",
+    "copied": "ルートをコピーしました",
+    "copyFailed": "ルートをコピーできませんでした",
+    "copyWormhole": "ワームホール",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "臨界",
+    "copyFrig": "フリゲート"
   },
   "routeToast": {
     "destinationSet": "目的地を {{system}} に設定しました",
@@ -2497,7 +2511,8 @@
     "intel": "インテル",
     "popOut": "別ウィンドウで開く",
     "poppedOut": "別ウィンドウで開いています。",
-    "bringBack": "元に戻す"
+    "bringBack": "元に戻す",
+    "useful": "便利な星系"
   },
   "sigType": {
     "combat": "コンバット",
@@ -2555,7 +2570,7 @@
     "colWh": "タイプ",
     "colLeadsTo": "接続先",
     "colWhState": "状態",
-    "colWhStateHint": "ワームホールの質量と残り寿命。どちらも宇宙空間でホールを見れば分かるため、ジャンプ前に入力できます。",
+    "colWhStateHint": "ワームホールのサイズ、質量、残り寿命。いずれも宇宙でホールから読み取れるので、ジャンプ前に記録できます。",
     "whStateMass": "質量: クリックで 満杯 / 50%未満 / 10%未満",
     "whStateLife": "寿命: クリックで 不明 / 1日未満 / 4時間未満 / 1時間未満 / 期限切れ",
     "colName": "名前",
@@ -2572,7 +2587,10 @@
     "countFiltered": "{{total}} 件中 {{shown}} 件",
     "countTotal": "シグネチャ合計: {{count}}",
     "countHint": "このシステムのシグネチャ",
-    "countFilteredHint": "システム全体のうち表示されているシグネチャ"
+    "countFilteredHint": "システム全体のうち表示されているシグネチャ",
+    "whStateSize": "サイズ",
+    "whSizeFromType": "タイプから",
+    "whSizeUnknown": "未記録"
   },
   "stats": {
     "title": "ユーザー統計",
@@ -2935,7 +2953,15 @@
     "nameToSave": "保存する名前…",
     "save": "保存",
     "loadPlan": "このルートを読み込む",
-    "deletePlan": "このルートを削除"
+    "deletePlan": "このルートを削除",
+    "setRoute": "ルートを設定",
+    "setDestinationHint": "{{to}} をゲーム内オートパイロットの目的地として送り、ウェイポイントを消去します。ゲームは現在地からスターゲートで独自に経路を引くため、このルートのワームホールや近道は使いません。",
+    "setRouteHint": "{{from}} を目的地として送り、その後に {{to}} をウェイポイントとして追加するので、オートパイロットはまず出発地へ向かいます（すでにそこにいる場合は省略）。各区間はゲームがスターゲートで経路を引きます。",
+    "setRouteJspace": "{{from}} はKスペースではないため、ゲームはウェイポイントとして受け付けません。「目的地に設定」を使ってください。",
+    "highlight": "マップで強調",
+    "highlightOff": "強調をやめる",
+    "highlightHint": "開いているマップでこのルートの星系と接続を強調し、それ以外を暗くします。",
+    "highlightNone": "このルートの星系は開いているマップにありません。"
   },
   "flagPresets": {
     "title": "フラグのプリセット",
@@ -3158,5 +3184,89 @@
     "inUse": "{{label}} はこのマップですでに使われているか、その下の番号が使われています。",
     "beneathOwn": "{{label}} だと {{from}} が自分の下に入ってしまいます。数字1桁がホームから1ホール先を表すので、{{label}} は {{from}} から出るホールです。",
     "saveFailed": "チェーン番号を保存できませんでした。"
+  },
+  "usage": {
+    "title": "Nexum 利用状況",
+    "subtitle": "eve-nexum.com とセルフホストの Nexum の月間アクティブユーザー。",
+    "updated": "更新：{{time}}",
+    "loading": "読み込み中...",
+    "failed": "利用状況を読み込めませんでした。",
+    "notFound": "このリンクは無効にされたか、存在しません。",
+    "kpi": {
+      "total": "アクティブユーザー（過去30日）",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "ログイン中のパイロット",
+      "selfHosted": "セルフホスト",
+      "installs": "インストール数：{{count}}",
+      "desktop": "デスクトップアプリ",
+      "desktopNote": "パイロット（過去30日）"
+    },
+    "chart": {
+      "title": "月間アクティブユーザー"
+    },
+    "table": {
+      "month": "月",
+      "live": "eve-nexum.com（Analytics）",
+      "signedIn": "eve-nexum.com（ログイン）",
+      "selfHosted": "セルフホスト",
+      "installs": "インストール数",
+      "total": "合計"
+    },
+    "breakdown": {
+      "title": "インストール",
+      "modes": "サーバーモード",
+      "versions": "バージョン",
+      "languages": "言語（アクティブなパイロット）",
+      "features": "使用中の機能"
+    },
+    "modes": {
+      "solo": "個人",
+      "corp": "コーポレーション",
+      "alliance": "アライアンス"
+    },
+    "features": {
+      "chainNumbering": "チェーン番号（L+1）を使うマップ",
+      "autoRemove": "自動削除を使うマップ",
+      "crossMapSync": "マップ間同期を使うマップ",
+      "discord": "Discord通知を使う組織"
+    },
+    "notes": {
+      "title": "集計方法",
+      "live": "eve-nexum.com：Google Analytics によるアクティブユーザー数。ログイン中のパイロットは過去30日にサイトを使ったキャラクターです。",
+      "selfHosted": "セルフホスト：各インストールが過去30日のアクティブなパイロット数を毎日匿名で送信し、各月はその月の各インストールの最後の値を使います。インストールごとに合算するため、2つのインストールを使うパイロットは2回数えられます。",
+      "noGa": "Google Analytics が未接続のため、eve-nexum.com はログイン中のパイロット数を表示しています。",
+      "old": "バージョンが古く数値を送信しないため含まれないインストール：{{count}}。"
+    },
+    "share": {
+      "title": "共有リンク",
+      "hint": "リンクを知っている人は誰でもログインなしでこのページを見られます。新しいリンクを作ると古いリンクは無効になります。",
+      "create": "リンクを作成",
+      "replace": "新しいリンクを作成",
+      "remove": "リンクを無効にする",
+      "copy": "コピー",
+      "copied": "リンクをコピーしました",
+      "active": "リンクは有効です（{{time}} に作成）。リンクは作成時にしか表示されないため、再び必要なら新しく作成してください。",
+      "none": "リンクはまだありません。"
+    }
+  },
+  "useful": {
+    "hint": "入力すると、一致するグループ・星系・ストラクチャーだけを表示します。距離はルートの出発地からです。",
+    "chooseGroups": "グループを選択",
+    "chooseGroupsHint": "このパネルに表示するグループを選びます。ハンドルをドラッグして並べ替えます。",
+    "allHidden": "すべてのグループが非表示です。歯車から表示できます。",
+    "addToClosest": "最寄りの星系に追加",
+    "removeFromClosest": "最寄りの星系から削除",
+    "moreHere_other": "ここに他 {{count}} 件",
+    "noStructureKind": "コーポレーションのストラクチャーにこの種類はありません。",
+    "structureKinds": {
+      "all": "ドッキング可能すべて",
+      "citadel": "シタデル",
+      "engineering": "エンジニアリングコンプレックス",
+      "refinery": "精製所"
+    },
+    "filter": "絞り込み...",
+    "noMatch": "一致するものがありません。",
+    "regionVia": "最寄りの星系: {{system}}"
   }
 }

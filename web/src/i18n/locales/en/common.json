@@ -258,7 +258,8 @@
       "tabs": {
         "users": "Users",
         "systems": "Systems",
-        "ghostSites": "Ghost sites"
+        "ghostSites": "Ghost sites",
+        "usage": "Usage"
       },
       "filter": "Filter",
       "window": "Window",
@@ -740,10 +741,6 @@
     "allMaps": "Route across all my maps",
     "allMapsHint": "Distances may use the wormhole chains of every map you can see, not just the open one. Turn this off to route only through the map on screen.",
     "suggest": {
-      "button": "Suggestions",
-      "buttonHint": "The closest trade hubs, blue loot buyers, A0s, stations and more, to add to this list",
-      "title": "Suggestions",
-      "hint": "The closest of each, from where you are, routed the way this list is. Add puts a system on your list.",
       "failed": "Couldn't load suggestions. Try again in a moment.",
       "loading": "Finding the closest systems...",
       "quietHint": "No player kills in the last hour.",
@@ -764,11 +761,11 @@
         "turnur": "Turnur entrances",
         "incursion": "Incursions",
         "structure": "Your corp's structures",
-        "quiet": "Quiet systems"
+        "quiet": "Quiet systems",
+        "region": "Nearest regions"
       },
       "services": {
-        "cloning": "Clone bay",
-        "jumpClone": "Jump clone facility",
+        "cloning": "Clone bay (jump clones)",
         "repair": "Repair",
         "fitting": "Fitting",
         "market": "Market",
@@ -784,7 +781,10 @@
         "incursion": "No incursions reachable from here.",
         "generic": "None reachable from here."
       }
-    }
+    },
+    "inWormhole": "You're in a wormhole, which has no stargates. Turn on \"Include wormhole chain\" in the Route settings to count jumps out through your mapped chain, or right-click an exit on the map and pick \"Route from here\".",
+    "notOnMap": "Your system isn't on the open map. Open the map with your chain, or turn on \"Route across all my maps\".",
+    "holeNotMapped": "Your system isn't on any map you can see, so nothing can be reached from it. Map your chain, or right-click an exit and pick \"Route from here\"."
   },
   "commandPalette": {
     "placeholder": "Search systems and maps…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
     "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first.",
     "exportSystems": "Export systems ({{count}})…",
-    "importSystems": "Import systems…"
+    "importSystems": "Import systems…",
+    "routeFromHere": "Route from here",
+    "stopRouteFromHere": "Stop routing from here",
+    "routeToHere": "Route to here"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -2413,7 +2416,18 @@
     "riskCritical": "Critical mass",
     "riskFrig": "Frigate hole",
     "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination.",
-    "viaMap": "on {{map}}"
+    "viaMap": "on {{map}}",
+    "fromPinned": "Jumps from {{system}} (picked on the map)",
+    "clearPinned": "Use my location",
+    "originSkipped": "Can't route from {{name}}, so jumps are from your own location.",
+    "copyRoute": "Copy route as text",
+    "copied": "Route copied",
+    "copyFailed": "Couldn't copy the route",
+    "copyWormhole": "wormhole",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "crit",
+    "copyFrig": "frig"
   },
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",
@@ -2499,7 +2513,8 @@
     "intel": "Intel",
     "popOut": "Open in its own window",
     "poppedOut": "Opened in its own window.",
-    "bringBack": "Bring back"
+    "bringBack": "Bring back",
+    "useful": "Useful Systems"
   },
   "sigType": {
     "combat": "Combat",
@@ -2557,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Leads To",
     "colWhState": "State",
-    "colWhStateHint": "A wormhole's mass and remaining life. You can read both off the hole in space, so they can be set before you jump it.",
+    "colWhStateHint": "A wormhole's size, mass and remaining life. You can read all three off the hole in space, so they can be set before you jump it.",
     "whStateMass": "Mass: click to cycle full / under 50% / under 10%",
     "whStateLife": "Life: click to cycle unknown / under 1 day / under 4 hours / under 1 hour / expired",
     "colName": "Name",
@@ -2574,7 +2589,10 @@
     "countFiltered": "{{shown}} of {{total}}",
     "countTotal": "Total Sigs: {{count}}",
     "countHint": "Signatures in this system",
-    "countFilteredHint": "Signatures shown of the system total"
+    "countFilteredHint": "Signatures shown of the system total",
+    "whStateSize": "Size",
+    "whSizeFromType": "from its type",
+    "whSizeUnknown": "Not noted"
   },
   "stats": {
     "title": "User Stats",
@@ -2939,7 +2957,15 @@
     "nameToSave": "Name to save…",
     "save": "Save",
     "loadPlan": "Load this route",
-    "deletePlan": "Delete this route"
+    "deletePlan": "Delete this route",
+    "setRoute": "Set Route",
+    "setDestinationHint": "Sends {{to}} to your in-game autopilot as the destination and clears your waypoints. The game plots its own way there by stargates from wherever you are: it won't use this route's wormholes or shortcuts.",
+    "setRouteHint": "Sends {{from}} as your destination, then {{to}} as a waypoint after it, so the autopilot takes you to the start first (skipped if you're already there). The game plots each leg by stargates.",
+    "setRouteJspace": "{{from}} isn't in k-space, so the game can't take it as a waypoint. Use Set Destination.",
+    "highlight": "Highlight on map",
+    "highlightOff": "Stop highlighting",
+    "highlightHint": "Light up this route's systems and links on the open map, and dim the rest.",
+    "highlightNone": "None of this route's systems are on the open map."
   },
   "flagPresets": {
     "title": "Flag presets",
@@ -3162,5 +3188,90 @@
     "inUse": "{{label}} is already in use on this map, or something beneath it is.",
     "beneathOwn": "{{label}} would put {{from}} beneath itself: each digit is one hole further from home, so {{label}} is a hole out of {{from}}.",
     "saveFailed": "Couldn't save the chain number."
+  },
+  "usage": {
+    "title": "Nexum usage",
+    "subtitle": "Monthly active users on eve-nexum.com and on self-hosted Nexum installs.",
+    "updated": "Updated {{time}}",
+    "loading": "Loading...",
+    "failed": "Couldn't load the usage figures.",
+    "notFound": "This link has been turned off or doesn't exist.",
+    "kpi": {
+      "total": "Active users, last 30 days",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Signed-in pilots",
+      "selfHosted": "Self-hosted",
+      "installs": "Installs: {{count}}",
+      "desktop": "Desktop app",
+      "desktopNote": "Pilots, last 30 days"
+    },
+    "chart": {
+      "title": "Monthly active users"
+    },
+    "table": {
+      "month": "Month",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (signed in)",
+      "selfHosted": "Self-hosted",
+      "installs": "Installs",
+      "total": "Total"
+    },
+    "breakdown": {
+      "title": "Installs",
+      "modes": "Server mode",
+      "versions": "Versions",
+      "languages": "Languages (active pilots)",
+      "features": "Features in use"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Alliance"
+    },
+    "features": {
+      "chainNumbering": "Maps with chain numbers (L+1)",
+      "autoRemove": "Maps with auto-remove",
+      "crossMapSync": "Maps with cross-map sync",
+      "discord": "Orgs with Discord alerts"
+    },
+    "notes": {
+      "title": "How these are counted",
+      "live": "eve-nexum.com: active users as counted by Google Analytics. Signed-in pilots are characters that used the site in the last 30 days.",
+      "selfHosted": "Self-hosted: each install sends an anonymous daily count of pilots active in the last 30 days, and a month uses each install's last count that month. Installs are added together, so a pilot who uses two installs counts twice.",
+      "noGa": "Google Analytics isn't connected, so eve-nexum.com shows signed-in pilots.",
+      "old": "Installs on a version too old to send counts, so not included: {{count}}."
+    },
+    "share": {
+      "title": "Shareable link",
+      "hint": "Anyone with the link can see this page without signing in. Making a new link turns the old one off.",
+      "create": "Make link",
+      "replace": "Make a new link",
+      "remove": "Turn off link",
+      "copy": "Copy",
+      "copied": "Link copied",
+      "active": "A link is on (made {{time}}). It's only shown when made, so make a new one if you need it again.",
+      "none": "No link yet."
+    }
+  },
+  "useful": {
+    "hint": "Type to show only the groups, systems or structures that match. Distances are from where you route.",
+    "chooseGroups": "Choose groups",
+    "chooseGroupsHint": "Pick which groups this panel shows. Drag a group by its handle to reorder it.",
+    "allHidden": "Every group is hidden. Use the cog to show some.",
+    "addToClosest": "Add to Closest Systems",
+    "removeFromClosest": "Remove from Closest Systems",
+    "moreHere_one": "+{{count}} more here",
+    "moreHere_other": "+{{count}} more here",
+    "noStructureKind": "None of your corp's structures are of this kind.",
+    "structureKinds": {
+      "all": "Any dockable",
+      "citadel": "Citadels",
+      "engineering": "Engineering complexes",
+      "refinery": "Refineries"
+    },
+    "filter": "Filter...",
+    "noMatch": "Nothing matches.",
+    "regionVia": "Nearest system: {{system}}"
   }
 }

@@ -258,7 +258,8 @@
       "tabs": {
         "users": "Gebruikers",
         "systems": "Systemen",
-        "ghostSites": "Ghost sites"
+        "ghostSites": "Ghost sites",
+        "usage": "Gebruik"
       },
       "filter": "Filter",
       "window": "Tijdvak",
@@ -740,10 +741,6 @@
     "allMaps": "Over al mijn kaarten routeren",
     "allMapsHint": "Afstanden mogen de wormgatketens gebruiken van elke kaart die je kunt zien, niet alleen de geopende. Zet dit uit om alleen via de kaart op het scherm te routeren.",
     "suggest": {
-      "button": "Suggesties",
-      "buttonHint": "De dichtstbijzijnde handelshubs, blue-loot-kopers, A0's, stations en meer om aan deze lijst toe te voegen",
-      "title": "Suggesties",
-      "hint": "Steeds de dichtstbijzijnde vanaf waar je bent, gerouteerd zoals deze lijst. Toevoegen zet een systeem op je lijst.",
       "failed": "Suggesties laden mislukt. Probeer het zo opnieuw.",
       "loading": "Dichtstbijzijnde systemen zoeken...",
       "quietHint": "Geen spelerkills in het afgelopen uur.",
@@ -764,11 +761,11 @@
         "turnur": "Turnur-ingangen",
         "incursion": "Incursions",
         "structure": "Structuren van je corp",
-        "quiet": "Rustige systemen"
+        "quiet": "Rustige systemen",
+        "region": "Dichtstbijzijnde regio's"
       },
       "services": {
-        "cloning": "Kloonbank",
-        "jumpClone": "Jump clone-faciliteit",
+        "cloning": "Kloonbank (jump clones)",
         "repair": "Reparatie",
         "fitting": "Fitting",
         "market": "Markt",
@@ -784,7 +781,10 @@
         "incursion": "Vanaf hier is geen incursion bereikbaar.",
         "generic": "Niets bereikbaar vanaf hier."
       }
-    }
+    },
+    "inWormhole": "Je zit in een wormgat, en daar zijn geen stargates. Zet \"Wormgatketen meenemen\" aan in de route-instellingen om sprongen via je gemapte keten te tellen, of klik met rechts op een uitgang op de kaart en kies \"Route vanaf hier\".",
+    "notOnMap": "Je systeem staat niet op de geopende kaart. Open de kaart met je keten, of zet \"Over al mijn kaarten routeren\" aan.",
+    "holeNotMapped": "Je systeem staat op geen enkele kaart die je kunt zien, dus vanaf daar is niets bereikbaar. Map je keten, of klik met rechts op een uitgang en kies \"Route vanaf hier\"."
   },
   "commandPalette": {
     "placeholder": "Zoek systemen en kaarten…",
@@ -1030,7 +1030,10 @@
     "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
     "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren.",
     "exportSystems": "Systemen exporteren ({{count}})…",
-    "importSystems": "Systemen importeren…"
+    "importSystems": "Systemen importeren…",
+    "routeFromHere": "Route vanaf hier",
+    "stopRouteFromHere": "Niet meer vanaf hier routeren",
+    "routeToHere": "Route hierheen"
   },
   "customIntel": {
     "title": "Eigen intel",
@@ -2413,7 +2416,18 @@
     "riskCritical": "Kritieke massa",
     "riskFrig": "Frigate hole",
     "jspaceNoWaypoint": "Wormgatsystemen kunnen niet als autopilot-bestemming worden ingesteld.",
-    "viaMap": "op {{map}}"
+    "viaMap": "op {{map}}",
+    "fromPinned": "Sprongen vanaf {{system}} (gekozen op de kaart)",
+    "clearPinned": "Mijn locatie gebruiken",
+    "originSkipped": "Vanaf {{name}} kan niet worden gerouteerd, dus de sprongen zijn vanaf je eigen locatie.",
+    "copyRoute": "Route als tekst kopiëren",
+    "copied": "Route gekopieerd",
+    "copyFailed": "Kon de route niet kopiëren",
+    "copyWormhole": "wormgat",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "kritiek",
+    "copyFrig": "fregat"
   },
   "routeToast": {
     "destinationSet": "Bestemming ingesteld op {{system}}",
@@ -2499,7 +2513,8 @@
     "intel": "Intel",
     "popOut": "Openen in eigen venster",
     "poppedOut": "Geopend in een eigen venster.",
-    "bringBack": "Terughalen"
+    "bringBack": "Terughalen",
+    "useful": "Nuttige systemen"
   },
   "sigType": {
     "combat": "Gevecht",
@@ -2557,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Leidt naar",
     "colWhState": "Status",
-    "colWhStateHint": "De massa en resterende levensduur van een wormgat. Je leest ze allebei af aan het gat zelf, dus je kunt ze instellen voordat je erdoor springt.",
+    "colWhStateHint": "De grootte, massa en resterende levensduur van een wormgat. Alle drie zijn bij het gat af te lezen, dus je kunt ze instellen voordat je springt.",
     "whStateMass": "Massa: klik om te wisselen tussen vol / onder 50% / onder 10%",
     "whStateLife": "Levensduur: klik om te wisselen tussen onbekend / onder 1 dag / onder 4 uur / onder 1 uur / verlopen",
     "colName": "Naam",
@@ -2574,7 +2589,10 @@
     "countFiltered": "{{shown}} van {{total}}",
     "countTotal": "Totaal sigs: {{count}}",
     "countHint": "Signaturen in dit systeem",
-    "countFilteredHint": "Getoonde signaturen van het totaal in het systeem"
+    "countFilteredHint": "Getoonde signaturen van het totaal in het systeem",
+    "whStateSize": "Grootte",
+    "whSizeFromType": "volgens type",
+    "whSizeUnknown": "Niet genoteerd"
   },
   "stats": {
     "title": "Gebruikersstatistieken",
@@ -2939,7 +2957,15 @@
     "nameToSave": "Naam om op te slaan…",
     "save": "Opslaan",
     "loadPlan": "Deze route laden",
-    "deletePlan": "Deze route verwijderen"
+    "deletePlan": "Deze route verwijderen",
+    "setRoute": "Route instellen",
+    "setDestinationHint": "Stuurt {{to}} als bestemming naar je autopilot in het spel en wist je waypoints. Het spel plant zelf de weg via stargates vanaf waar je bent: wormgaten en shortcuts van deze route gebruikt het niet.",
+    "setRouteHint": "Stuurt {{from}} als bestemming en daarna {{to}} als waypoint, zodat de autopilot je eerst naar het begin brengt (overgeslagen als je er al bent). Het spel plant elk deel via stargates.",
+    "setRouteJspace": "{{from}} ligt niet in k-space, dus het spel kan het niet als waypoint nemen. Gebruik Bestemming instellen.",
+    "highlight": "Op kaart tonen",
+    "highlightOff": "Niet meer tonen",
+    "highlightHint": "Licht de systemen en verbindingen van deze route op de geopende kaart op en dimt de rest.",
+    "highlightNone": "Geen van de systemen van deze route staat op de geopende kaart."
   },
   "flagPresets": {
     "title": "Markeringsvoorinstellingen",
@@ -3162,5 +3188,90 @@
     "inUse": "{{label}} is al in gebruik op deze kaart, of een nummer eronder.",
     "beneathOwn": "{{label}} zou {{from}} onder zichzelf plaatsen: elk cijfer is één hole verder van home, dus {{label}} is een hole vanuit {{from}}.",
     "saveFailed": "Het ketennummer kon niet worden opgeslagen."
+  },
+  "usage": {
+    "title": "Nexum-gebruik",
+    "subtitle": "Maandelijks actieve gebruikers op eve-nexum.com en op zelf-gehoste Nexum-installaties.",
+    "updated": "Bijgewerkt {{time}}",
+    "loading": "Laden...",
+    "failed": "De gebruikscijfers konden niet worden geladen.",
+    "notFound": "Deze link is uitgezet of bestaat niet.",
+    "kpi": {
+      "total": "Actieve gebruikers, laatste 30 dagen",
+      "live": "eve-nexum.com",
+      "liveGaNote": "Google Analytics",
+      "liveSignedInNote": "Ingelogde piloten",
+      "selfHosted": "Zelf gehost",
+      "installs": "Installaties: {{count}}",
+      "desktop": "Desktop-app",
+      "desktopNote": "Piloten, laatste 30 dagen"
+    },
+    "chart": {
+      "title": "Maandelijks actieve gebruikers"
+    },
+    "table": {
+      "month": "Maand",
+      "live": "eve-nexum.com (Analytics)",
+      "signedIn": "eve-nexum.com (ingelogd)",
+      "selfHosted": "Zelf gehost",
+      "installs": "Installaties",
+      "total": "Totaal"
+    },
+    "breakdown": {
+      "title": "Installaties",
+      "modes": "Servermodus",
+      "versions": "Versies",
+      "languages": "Talen (actieve piloten)",
+      "features": "Gebruikte functies"
+    },
+    "modes": {
+      "solo": "Solo",
+      "corp": "Corp",
+      "alliance": "Alliantie"
+    },
+    "features": {
+      "chainNumbering": "Kaarten met ketennummers (L+1)",
+      "autoRemove": "Kaarten met automatisch verwijderen",
+      "crossMapSync": "Kaarten met synchronisatie tussen kaarten",
+      "discord": "Organisaties met Discord-meldingen"
+    },
+    "notes": {
+      "title": "Hoe dit wordt geteld",
+      "live": "eve-nexum.com: actieve gebruikers volgens Google Analytics. Ingelogde piloten zijn characters die de site de laatste 30 dagen gebruikten.",
+      "selfHosted": "Zelf gehost: elke installatie stuurt dagelijks anoniem het aantal piloten dat de laatste 30 dagen actief was; een maand gebruikt de laatste telling van elke installatie in die maand. Installaties worden opgeteld, dus een piloot op twee installaties telt dubbel.",
+      "noGa": "Google Analytics is niet gekoppeld, dus eve-nexum.com toont ingelogde piloten.",
+      "old": "Installaties op een versie die te oud is om cijfers te sturen, dus niet meegeteld: {{count}}."
+    },
+    "share": {
+      "title": "Deelbare link",
+      "hint": "Iedereen met de link kan deze pagina zien zonder in te loggen. Een nieuwe link zet de oude uit.",
+      "create": "Link maken",
+      "replace": "Nieuwe link maken",
+      "remove": "Link uitzetten",
+      "copy": "Kopiëren",
+      "copied": "Link gekopieerd",
+      "active": "Er staat een link aan (gemaakt {{time}}). Hij wordt alleen bij het maken getoond; maak een nieuwe als je hem weer nodig hebt.",
+      "none": "Nog geen link."
+    }
+  },
+  "useful": {
+    "hint": "Typ om alleen passende groepen, systemen of structuren te tonen. Afstanden gelden vanaf je routestart.",
+    "chooseGroups": "Groepen kiezen",
+    "chooseGroupsHint": "Kies welke groepen dit paneel toont. Sleep een groep aan de greep om de volgorde te wijzigen.",
+    "allHidden": "Alle groepen zijn verborgen. Gebruik het tandwiel om er enkele te tonen.",
+    "addToClosest": "Toevoegen aan Dichtstbijzijnde systemen",
+    "removeFromClosest": "Verwijderen uit Dichtstbijzijnde systemen",
+    "moreHere_one": "+{{count}} meer hier",
+    "moreHere_other": "+{{count}} meer hier",
+    "noStructureKind": "Geen van de structuren van je corp is van dit type.",
+    "structureKinds": {
+      "all": "Alles om te docken",
+      "citadel": "Citadels",
+      "engineering": "Engineering complexes",
+      "refinery": "Raffinaderijen"
+    },
+    "filter": "Filteren...",
+    "noMatch": "Niets gevonden.",
+    "regionVia": "Dichtstbijzijnde systeem: {{system}}"
   }
 }

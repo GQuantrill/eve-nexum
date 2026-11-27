@@ -5,7 +5,7 @@ import { jumps } from '../../i18n/format';
 import { useA0Systems } from '../../hooks/useA0Systems';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
 import { useRoute } from '../../hooks/useRoute';
-import { RouteSquares } from './routeUi';
+import { RouteSquares, RouteOriginNote } from './routeUi';
 import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useMapStore } from '../../store/mapStore';
@@ -60,11 +60,7 @@ export function A0Pane() {
 
   return (
     <div className="scout-pane">
-      {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
-      ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
-      ) : null}
+      <RouteOriginNote origin={origin} />
       <div className="scout-pane__note">{t('a0.showing', { count: TOP_N })}</div>
       {closest.map(s => {
         const route   = routes[String(s.id)];

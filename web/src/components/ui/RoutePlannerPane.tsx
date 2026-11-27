@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouteToRequests } from '../../utils/routePlannerTarget';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../api/client';
 import { useSearchKeys } from '../../hooks/useSearchKeys';
@@ -9,7 +10,9 @@ import { useMapStore } from '../../store/mapStore';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { RouteSquares } from './routeUi';
 import { canSetAutopilot } from '../../utils/routeActions';
-import { setDestination } from '../../api/waypoint';
+import { setDestination, addWaypoint } from '../../api/waypoint';
+import { useCharacterLocation } from '../../hooks/useCharacterLocation';
+import { routeMapHighlight } from '../../utils/routeMapHighlight';
 import { jumps as jumpsLabel } from '../../i18n/format';
 import { XIcon, ArrowsLeftRightIcon, CrosshairIcon } from '../../icons';
 
@@ -200,6 +203,11 @@ export function RoutePlannerPane() {
   // the location poll.
   const [fromOverride, setFromOverride] = useState<Picked | null | undefined>(undefined);
   const [to, setTo] = useState<Picked | null>(null);
+  // "Route to here" / "Route from here" from the map's right-click menu.
+  useRouteToRequests((t) => {
+    const picked = { id: t.id, name: t.name };
+    if (t.end === 'to') setTo(picked); else setFromOverride(picked);
+  });
   const from: Picked | null = fromOverride !== undefined
     ? fromOverride
     : (origin.systemId != null ? { id: origin.systemId, name: origin.name ?? String(origin.systemId) } : null);
@@ -212,6 +220,36 @@ export function RoutePlannerPane() {
   const targets = from && to && from.id !== to.id ? [to.id] : [];
   const routes = useRoute(from?.id ?? null, targets);
   const route = to ? routes[String(to.id)] : undefined;
+
+  // Set Route: the autopilot goes to From first, then To. EVE's waypoint list
+  // runs in order and Set Destination clears it, so From goes as the
+  // destination and To is added after it. Skipped when the pilot is already
+  // in From, as the game would only treat it as reached.
+  const location = useCharacterLocation();
+  const setRoute = async () => {
+    if (!from || !to) return;
+    const here = location.online ? location.system?.eveSystemId : null;
+    try {
+      if (here === from.id) { await setDestination(to.id, to.name); return; }
+      await setDestination(from.id, from.name);
+      await addWaypoint(to.id, to.name);
+    } catch { /* toasted by the waypoint helpers */ }
+  };
+
+  // Highlight on map: the route's systems and links on the open map, until
+  // turned off, the route changes to nothing on this map, or the pane closes.
+  const [highlightOn, setHighlightOn] = useState(false);
+  const mapSystems     = useMapStore((s) => s.map.systems);
+  const mapConnections = useMapStore((s) => s.map.connections);
+  const setPinnedHighlight = useMapStore((s) => s.setPinnedRouteHighlight);
+  const onMap = useMemo(
+    () => (route ? routeMapHighlight(route, mapSystems, mapConnections) : null),
+    [route, mapSystems, mapConnections],
+  );
+  useEffect(() => {
+    setPinnedHighlight(highlightOn ? onMap : null);
+  }, [highlightOn, onMap, setPinnedHighlight]);
+  useEffect(() => () => setPinnedHighlight(null), [setPinnedHighlight]);
 
   const swap = () => {
     if (!from || !to) return;
@@ -319,18 +357,60 @@ export function RoutePlannerPane() {
           </div>
           <RouteSquares route={route} />
           {canSetAutopilot(route) && (
-            <button
-              type="button"
-              className="sys-btn"
-              onClick={() => { setDestination(to.id, to.name).catch(() => {}); }}
-            >
-              {t('waypoint.setDestination')}
-            </button>
+            <div className="route-planner__actions">
+              <button
+                type="button"
+                className="sys-btn"
+                onClick={() => { setDestination(to.id, to.name).catch(() => {}); }}
+                data-tooltip={t('routePlanner.setDestinationHint', { to: to.name })}
+              >
+                {t('waypoint.setDestination')}
+              </button>
+              <button
+                type="button"
+                className="sys-btn"
+                disabled={!route.path[0]?.kspace}
+                onClick={setRoute}
+                data-tooltip={route.path[0]?.kspace
+                  ? t('routePlanner.setRouteHint', { from: from.name, to: to.name })
+                  : t('routePlanner.setRouteJspace', { from: from.name })}
+              >
+                {t('routePlanner.setRoute')}
+              </button>
+            </div>
           )}
+          <button
+            type="button"
+            className={`sys-btn${highlightOn && onMap ? ' route-planner__highlight--on' : ''}`}
+            aria-pressed={highlightOn && !!onMap}
+            disabled={!onMap}
+            onClick={() => setHighlightOn((v) => !v)}
+            data-tooltip={onMap ? t('routePlanner.highlightHint') : t('routePlanner.highlightNone')}
+          >
+            {highlightOn && onMap ? t('routePlanner.highlightOff') : t('routePlanner.highlight')}
+          </button>
         </div>
       ) : (
         <div className="scout-pane__empty">{t('routePlanner.noRoute')}</div>
       )}
+
+      {/* Save this route: always right under the result. */}
+      <div className="route-planner__save">
+        <input
+          className="chains-new__name"
+          value={saveName}
+          placeholder={t('routePlanner.nameToSave')}
+          onChange={(e) => setSaveName(e.target.value)}
+        />
+        <button
+          type="button"
+          className="sys-btn"
+          disabled={!from || !to || from.id === to.id || !saveName.trim() || busy}
+          onClick={savePlan}
+        >
+          {t('routePlanner.save')}
+        </button>
+      </div>
 
       {/* ── Saved routes ── */}
       <div className="route-planner__saved">
@@ -360,22 +440,6 @@ export function RoutePlannerPane() {
             ))}
           </div>
         )}
-        <div className="route-planner__save">
-          <input
-            className="chains-new__name"
-            value={saveName}
-            placeholder={t('routePlanner.nameToSave')}
-            onChange={(e) => setSaveName(e.target.value)}
-          />
-          <button
-            type="button"
-            className="sys-btn"
-            disabled={!from || !to || from.id === to.id || !saveName.trim() || busy}
-            onClick={savePlan}
-          >
-            {t('routePlanner.save')}
-          </button>
-        </div>
       </div>
     </div>
   );
