@@ -197,3 +197,16 @@ describe('linking the backing sig', () => {
     expect(backing()).toBe('s1');
   });
 });
+
+describe('a size noted on the sig before the jump', () => {
+  it('goes to the connection when the sig is linked, and the sig copy is cleared', () => {
+    seedTwoHolesToOneSystem();
+    const consumed: string[] = [];
+    const noted = { ...(sig('S-1', 'K162', 'J222222') as object), whSize: 'medium' } as never;
+    reevaluateConnectionsForSystem('home', [noted], undefined, false, (id) => consumed.push(id));
+    const c = useMapStore.getState().map.connections[0];
+    expect(c.sourceSignatureId).toBe('S-1');
+    expect(c.size).toBe('medium');
+    expect(consumed).toEqual(['S-1']);
+  });
+});

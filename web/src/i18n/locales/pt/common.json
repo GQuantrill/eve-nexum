@@ -2572,7 +2572,7 @@
     "colWh": "Tipo",
     "colLeadsTo": "Leva a",
     "colWhState": "Estado",
-    "colWhStateHint": "Massa e vida restante do buraco. Ambas se leem no próprio buraco, por isso podem ser definidas antes de o saltar.",
+    "colWhStateHint": "O tamanho, a massa e a vida restante de um buraco de minhoca. Os três leem-se no buraco, por isso podem ser anotados antes de saltar.",
     "whStateMass": "Massa: clicar para completa / menos de 50 % / menos de 10 %",
     "whStateLife": "Vida: clicar para desconhecida / menos de 1 dia / menos de 4 horas / menos de 1 hora / expirada",
     "colName": "Nome",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} de {{total}}",
     "countTotal": "Total de assinaturas: {{count}}",
     "countHint": "Assinaturas neste sistema",
-    "countFilteredHint": "Assinaturas mostradas do total do sistema"
+    "countFilteredHint": "Assinaturas mostradas do total do sistema",
+    "whStateSize": "Tamanho",
+    "whSizeFromType": "pelo tipo",
+    "whSizeUnknown": "Não anotado"
   },
   "stats": {
     "title": "Estatísticas de utilizador",

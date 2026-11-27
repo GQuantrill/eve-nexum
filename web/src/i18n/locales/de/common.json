@@ -2572,7 +2572,7 @@
     "colWh": "Typ",
     "colLeadsTo": "Führt zu",
     "colWhState": "Status",
-    "colWhStateHint": "Masse und Restlebensdauer eines Wurmlochs. Beides lässt sich im All am Loch ablesen, also schon vor dem Sprung eintragbar.",
+    "colWhStateHint": "Größe, Masse und Restlebensdauer eines Wurmlochs. Alle drei lassen sich im All am Loch ablesen und daher vor dem Sprung eintragen.",
     "whStateMass": "Masse: klicken für voll / unter 50 % / unter 10 %",
     "whStateLife": "Lebensdauer: klicken für unbekannt / unter 1 Tag / unter 4 Stunden / unter 1 Stunde / abgelaufen",
     "colName": "Name",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} von {{total}}",
     "countTotal": "Signaturen gesamt: {{count}}",
     "countHint": "Signaturen in diesem System",
-    "countFilteredHint": "Angezeigte Signaturen von der Gesamtzahl des Systems"
+    "countFilteredHint": "Angezeigte Signaturen von der Gesamtzahl des Systems",
+    "whStateSize": "Größe",
+    "whSizeFromType": "laut Typ",
+    "whSizeUnknown": "Nicht notiert"
   },
   "stats": {
     "title": "Benutzerstatistik",

@@ -1279,6 +1279,10 @@ export async function migrate() {
     -- connection is the single copy both sides read), and these are cleared.
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS mass_status TEXT NOT NULL DEFAULT '';
     ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS time_status TEXT NOT NULL DEFAULT '';
+    -- The hole's size, seen on show-info before jumping it (xl/large/medium/
+    -- small, '' unknown). Staging like mass/life: the connection's size takes
+    -- over once a connection backs the sig.
+    ALTER TABLE map_signatures ADD COLUMN IF NOT EXISTS wh_size TEXT NOT NULL DEFAULT '';
 
     ALTER TABLE map_connections ADD COLUMN IF NOT EXISTS broken_at TIMESTAMPTZ;
     UPDATE map_connections SET broken_at = NOW() WHERE broken = TRUE AND broken_at IS NULL;

@@ -1,4 +1,4 @@
-import type { MapConnection, MassStatus, Signature, TimeStatus } from '../types';
+import type { ConnectionSize, MapConnection, MassStatus, Signature, TimeStatus } from '../types';
 import type { WormholeSpec } from '../hooks/useWormholeTypes';
 import { effectiveExpiryMs, lifeBucket } from './whLifetime';
 
@@ -75,11 +75,20 @@ export function effectiveWhState(
  * null when the sig noted nothing, so an empty observation can't wipe a value
  * already recorded on the connection from the other side.
  */
-export function pendingWhState(sig: Signature): Partial<WhState> | null {
-  const patch: Partial<WhState> = {};
+export function pendingWhState(sig: Signature): Partial<WhState & { whSize: ConnectionSize }> | null {
+  const patch: Partial<WhState & { whSize: ConnectionSize }> = {};
   if (sig.massStatus) patch.massStatus = sig.massStatus;
   if (sig.timeStatus) patch.timeStatus = sig.timeStatus;
+  if (sig.whSize) patch.whSize = sig.whSize;
   return Object.keys(patch).length > 0 ? patch : null;
+}
+
+/**
+ * The size to SHOW for a signature: the connection's once one backs it, else
+ * what was noted on the sig, else '' (the type's size is offered as a hint).
+ */
+export function effectiveWhSize(sig: Signature, conn: MapConnection | undefined): ConnectionSize | '' {
+  return conn ? conn.size : (sig.whSize ?? '');
 }
 
 /**

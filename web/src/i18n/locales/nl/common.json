@@ -2572,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Leidt naar",
     "colWhState": "Status",
-    "colWhStateHint": "De massa en resterende levensduur van een wormgat. Je leest ze allebei af aan het gat zelf, dus je kunt ze instellen voordat je erdoor springt.",
+    "colWhStateHint": "De grootte, massa en resterende levensduur van een wormgat. Alle drie zijn bij het gat af te lezen, dus je kunt ze instellen voordat je springt.",
     "whStateMass": "Massa: klik om te wisselen tussen vol / onder 50% / onder 10%",
     "whStateLife": "Levensduur: klik om te wisselen tussen onbekend / onder 1 dag / onder 4 uur / onder 1 uur / verlopen",
     "colName": "Naam",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} van {{total}}",
     "countTotal": "Totaal sigs: {{count}}",
     "countHint": "Signaturen in dit systeem",
-    "countFilteredHint": "Getoonde signaturen van het totaal in het systeem"
+    "countFilteredHint": "Getoonde signaturen van het totaal in het systeem",
+    "whStateSize": "Grootte",
+    "whSizeFromType": "volgens type",
+    "whSizeUnknown": "Niet genoteerd"
   },
   "stats": {
     "title": "Gebruikersstatistieken",

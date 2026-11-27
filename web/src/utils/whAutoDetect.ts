@@ -184,6 +184,9 @@ export function reevaluateConnectionsForSystem(
           const staged = pendingWhState(linkSig);
           if (staged) {
             if (staged.massStatus && !conn.massStatus) patch.massStatus = staged.massStatus;
+            // A connection always has a size (large until known), so a size
+            // seen at the hole wins: it was read off the hole itself.
+            if (staged.whSize) patch.size = staged.whSize;
             // Life is an expiry with the bucket derived from it, so hand the
             // staged EOL over as an expiry — copying the bucket alone would be
             // recomputed away seconds later.

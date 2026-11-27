@@ -2572,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Mène à",
     "colWhState": "État",
-    "colWhStateHint": "Masse et durée de vie restante du trou de ver. Les deux se lisent sur le trou lui-même, donc avant de le franchir.",
+    "colWhStateHint": "La taille, la masse et la durée de vie restante d'un trou de ver. Les trois se lisent sur le trou dans l'espace, donc se notent avant de sauter.",
     "whStateMass": "Masse : cliquer pour pleine / moins de 50 % / moins de 10 %",
     "whStateLife": "Durée de vie : cliquer pour inconnue / moins d’un jour / moins de 4 heures / moins d’une heure / expirée",
     "colName": "Nom",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} sur {{total}}",
     "countTotal": "Signatures au total : {{count}}",
     "countHint": "Signatures dans ce système",
-    "countFilteredHint": "Signatures affichées sur le total du système"
+    "countFilteredHint": "Signatures affichées sur le total du système",
+    "whStateSize": "Taille",
+    "whSizeFromType": "d'après son type",
+    "whSizeUnknown": "Non noté"
   },
   "stats": {
     "title": "Statistiques utilisateur",

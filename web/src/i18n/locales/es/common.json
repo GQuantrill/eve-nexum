@@ -2572,7 +2572,7 @@
     "colWh": "Tipo",
     "colLeadsTo": "Lleva a",
     "colWhState": "Estado",
-    "colWhStateHint": "Masa y vida restante del agujero. Ambas se leen en el propio agujero, así que pueden fijarse antes de saltarlo.",
+    "colWhStateHint": "El tamaño, la masa y la vida restante de un agujero de gusano. Los tres se leen en el agujero, así que se pueden anotar antes de saltar.",
     "whStateMass": "Masa: clic para ciclar completa / menos del 50 % / menos del 10 %",
     "whStateLife": "Vida: clic para ciclar desconocida / menos de 1 día / menos de 4 horas / menos de 1 hora / caducada",
     "colName": "Nombre",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} de {{total}}",
     "countTotal": "Firmas totales: {{count}}",
     "countHint": "Firmas en este sistema",
-    "countFilteredHint": "Firmas mostradas del total del sistema"
+    "countFilteredHint": "Firmas mostradas del total del sistema",
+    "whStateSize": "Tamaño",
+    "whSizeFromType": "según su tipo",
+    "whSizeUnknown": "Sin anotar"
   },
   "stats": {
     "title": "Estadísticas de usuario",

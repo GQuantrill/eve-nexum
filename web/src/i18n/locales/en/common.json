@@ -2572,7 +2572,7 @@
     "colWh": "Type",
     "colLeadsTo": "Leads To",
     "colWhState": "State",
-    "colWhStateHint": "A wormhole's mass and remaining life. You can read both off the hole in space, so they can be set before you jump it.",
+    "colWhStateHint": "A wormhole's size, mass and remaining life. You can read all three off the hole in space, so they can be set before you jump it.",
     "whStateMass": "Mass: click to cycle full / under 50% / under 10%",
     "whStateLife": "Life: click to cycle unknown / under 1 day / under 4 hours / under 1 hour / expired",
     "colName": "Name",
@@ -2589,7 +2589,10 @@
     "countFiltered": "{{shown}} of {{total}}",
     "countTotal": "Total Sigs: {{count}}",
     "countHint": "Signatures in this system",
-    "countFilteredHint": "Signatures shown of the system total"
+    "countFilteredHint": "Signatures shown of the system total",
+    "whStateSize": "Size",
+    "whSizeFromType": "from its type",
+    "whSizeUnknown": "Not noted"
   },
   "stats": {
     "title": "User Stats",

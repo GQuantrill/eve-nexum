@@ -15,9 +15,10 @@ import { useShareMode } from '../../context/ShareModeContext';
 import { systemDisplayName } from '../../utils/systemName';
 import { useUserSetting } from '../../hooks/useUserSetting';
 import { usePopover } from '../../hooks/usePopover';
-import type { Signature, SigType, MapConnection, MassStatus, TimeStatus } from '../../types';
+import type { Signature, SigType, MapConnection, MassStatus, TimeStatus, ConnectionSize } from '../../types';
 import { SigTypeIcon } from './SigTypeIcon';
-import { connectionForSig, effectiveWhState, lifePatch, LIFE_CYCLE } from '../../utils/whState';
+import { connectionForSig, effectiveWhState, effectiveWhSize, lifePatch, LIFE_CYCLE } from '../../utils/whState';
+import { whSizeForType, whSizeLabel, whSizeShort } from '../../utils/wormholeSize';
 import { leadsToForTypeChange, isDrifterHole } from '../../utils/whDest';
 import { ConfirmModal } from './ConfirmModal';
 import { shouldSkipConfirm } from '../../utils/confirmPref';
@@ -176,7 +177,7 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
   conn:        MapConnection | undefined;
   whTypes:     ReturnType<typeof useWormholeTypes>;
   isShareMode: boolean;
-  onChange:    (patch: { massStatus?: MassStatus | ''; timeStatus?: TimeStatus | '' }) => void;
+  onChange:    (patch: { massStatus?: MassStatus | ''; timeStatus?: TimeStatus | ''; whSize?: ConnectionSize | '' }) => void;
 }) {
   const { t } = useTranslation();
   // Drive off the shared tick rather than the module's `tickNow` directly:
@@ -212,9 +213,16 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
                   : state.timeStatus === 'expired'     ? '!'
                   : '\u2013';
 
+  // Size: the connection's, else what was noted here. Until one is noted, the
+  // blank choice shows the size the wormhole type implies, as a hint.
+  const size = effectiveWhSize(sig, conn);
+  const typeSize = whSizeForType(sig.whType, whTypes);
+  const sizeTitle = `${t('signatures.whStateSize')}${size ? `: ${whSizeLabel(t, size)}` : typeSize ? `: ${whSizeLabel(t, typeSize)} (${t('signatures.whSizeFromType')})` : ''}`;
+
   if (isShareMode) {
     return (
       <span className="sig-whstate">
+        <span className="sig-whstate__chip" title={sizeTitle}>{size ? whSizeShort(size) : typeSize ? whSizeShort(typeSize) : '\u2013'}</span>
         <span className={`sig-whstate__chip sig-whstate__chip--mass-${state.massStatus || 'none'}`}>{massLabel}</span>
         <span className={`sig-whstate__chip sig-whstate__chip--time-${state.timeStatus || 'none'}`}>{timeLabel}</span>
       </span>
@@ -225,6 +233,28 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
 
   return (
     <span className="sig-whstate">
+      <Select
+        className={`sig-whstate__size${size ? '' : ' sig-whstate__size--unset'}`}
+        value={size}
+        ariaLabel={t('signatures.whStateSize')}
+        title={sizeTitle}
+        onChange={(v) => onChange({ whSize: v as ConnectionSize | '' })}
+        options={[
+          // The cell shows the short form; the open list adds the full name.
+          { value: '', text: t('signatures.whSizeUnknown'), label: (
+            <span className="sig-size-opt">
+              <b>{typeSize ? whSizeShort(typeSize) : '\u2013'}</b>
+              <span className="sig-size-opt__long">{t('signatures.whSizeUnknown')}</span>
+            </span>
+          ) },
+          ...(['small', 'medium', 'large', 'xl'] as const).map((s) => ({ value: s, text: whSizeLabel(t, s), label: (
+            <span className="sig-size-opt">
+              <b>{whSizeShort(s)}</b>
+              <span className="sig-size-opt__long">{whSizeLabel(t, s)}</span>
+            </span>
+          ) })),
+        ]}
+      />
       <button
         type="button"
         className={`sig-whstate__chip sig-whstate__chip--mass-${state.massStatus || 'none'}`}
@@ -849,7 +879,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
   // edge showing the same thing. Until then they stage on the signature.
   const setWhState = (
     sig: Signature,
-    patch: { massStatus?: MassStatus | ''; timeStatus?: TimeStatus | '' },
+    patch: { massStatus?: MassStatus | ''; timeStatus?: TimeStatus | ''; whSize?: ConnectionSize | '' },
   ) => {
     const conn = connectionForSig(sig.id, mapConnections);
     if (conn) {
@@ -862,6 +892,8 @@ export function SignaturePane({ systemId }: { systemId: string }) {
         // Setting the bucket on its own is recomputed away within seconds, which
         // is why marking EOL used to come back as "< 1 day".
         ...(patch.timeStatus !== undefined ? lifePatch(patch.timeStatus, conn, whTypes) : {}),
+        // A connection always has a size; unknown goes back to the default.
+        ...(patch.whSize !== undefined ? { size: patch.whSize || 'large' } : {}),
       });
       return;
     }
@@ -938,7 +970,7 @@ export function SignaturePane({ systemId }: { systemId: string }) {
       // single source of truth; without it the sig would quietly disagree with
       // the connection the moment either side changed.
       reevaluateConnectionsForSystem(systemId, nextSigs, existing, false, (sigRowId) =>
-        updateSig(sigRowId, { massStatus: '', timeStatus: '' }));
+        updateSig(sigRowId, { massStatus: '', timeStatus: '', whSize: '' }));
     }
 
     pendingUpdates.current.set(id, { ...(pendingUpdates.current.get(id) ?? {}), ...updates });

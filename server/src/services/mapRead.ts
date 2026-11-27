@@ -185,7 +185,7 @@ export async function loadSystemSignatures(systemId: string) {
     // those rows, which is a far worse bug than an unattributed one.
     `SELECT s.id, s.sig_id AS "sigId", s.sig_type AS "sigType", s.name, s.notes,
             s.wh_type AS "whType", s.wh_leads_to AS "whLeadsTo", s.ghost_type AS "ghostType",
-            s.mass_status AS "massStatus", s.time_status AS "timeStatus",
+            s.mass_status AS "massStatus", s.time_status AS "timeStatus", s.wh_size AS "whSize",
             CASE WHEN s.chain_reserved_at > NOW() - interval '${RESERVATION_HOURS} hours'
                  THEN s.chain_label END AS "chainLabel",
             s.created_at AS "createdAt", s.updated_at AS "updatedAt",
