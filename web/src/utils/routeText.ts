@@ -2,36 +2,31 @@ import type { TFunction } from 'i18next';
 import type { RouteEntry } from '../hooks/useRoute';
 
 /**
- * A route as one line of plain text, to paste to people who don't use nexum:
+ * A route as one line of plain text, to paste to people who don't use nexum.
+ * Every system on the way, in order: a stargate jump is a plain arrow, a
+ * shortcut names how to take it:
  *
- *   M-0EE8 -(ABC-123)-> J123456 -(DEF-456 EOL)-> Mastakomon -(12 jumps)-> Jita
+ *   M-0EE8 -(ABC-123)-> J123456 (Home) -(DEF-456 EOL)-> Mastakomon -> Sobaseki -> Jita
  *
- * Each shortcut hop is named by the signature to warp to in the system it
- * leaves (else the hole's type, else what kind of hop it is), with EOL /
- * critical / frigate flags. A run of stargate jumps collapses to its count:
- * the in-game autopilot plots those, and a 20-name gate list in chat only
- * hides the holes that matter. Real system names, not this map's aliases:
- * the reader has never seen the map.
+ * A shortcut hop is named by the signature to warp to in the system it leaves
+ * (else the hole's type, else what kind of hop it is), with EOL / critical /
+ * frigate flags. Real system names, since that's what the reader can find in
+ * game, with this map's alias after in brackets where one is set.
  */
-export function routeText(t: TFunction, route: RouteEntry): string {
-  const path = route.path;
-  if (path.length === 0) return '';
-  let out = path[0].name;
-  let gates = 0;
-  const flushGates = (to: string) => {
-    out += ` -(${t('units.jumps', { count: gates })})-> ${to}`;
-    gates = 0;
+export function routeText(
+  t: TFunction,
+  route: RouteEntry,
+  aliasOf: (name: string) => string = (n) => n,
+): string {
+  const label = (name: string) => {
+    const alias = aliasOf(name);
+    return alias && alias !== name ? `${name} (${alias})` : name;
   };
-  for (let i = 1; i < path.length; i++) {
-    const node = path[i];
+  return route.path.map((node, i) => {
+    if (i === 0) return label(node.name);
     const via = node.via;
-    if (!via) {
-      gates++;
-      // Close the run where the next hop isn't a gate, or the route ends.
-      if (i === path.length - 1 || path[i + 1].via) flushGates(node.name);
-      continue;
-    }
-    const name = via.sig || via.whType || t(
+    if (!via) return ` -> ${label(node.name)}`;
+    const how = via.sig || via.whType || t(
       via.kind === 'thera' ? 'route.viaThera'
       : via.kind === 'turnur' ? 'route.viaTurnur'
       : via.kind === 'ansiblex' ? 'route.copyAnsiblex'
@@ -41,7 +36,6 @@ export function routeText(t: TFunction, route: RouteEntry): string {
       via.critical && t('route.copyCrit'),
       via.frig && t('route.copyFrig'),
     ].filter(Boolean);
-    out += ` -(${[name, ...flags].join(' ')})-> ${node.name}`;
-  }
-  return out;
+    return ` -(${[how, ...flags].join(' ')})-> ${label(node.name)}`;
+  }).join('');
 }

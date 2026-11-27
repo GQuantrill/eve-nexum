@@ -101,7 +101,7 @@ export function RouteSquares({ route }: { route: RouteEntry }) {
           type="button"
           className="scout-route__copy"
           onClick={() => {
-            navigator.clipboard?.writeText(routeText(t, route))
+            navigator.clipboard?.writeText(routeText(t, route, aliasName))
               .then(() => toast.success(t('route.copied')), () => toast.error(t('route.copyFailed')));
           }}
           aria-label={t('route.copyRoute')}
