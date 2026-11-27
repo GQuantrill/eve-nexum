@@ -16,6 +16,9 @@ export interface EdgeMeta {
    *  the user can see, so without this a hole from a corp map they aren't
    *  looking at is indistinguishable from one in the open chain. */
   mapName?:  string;
+  /** The signature to warp to in the system the hop LEAVES, when known
+   *  (e.g. 'ABC-123'): what a pilot following the route needs. */
+  sig?:      string;
 }
 
 // A per-request overlay of extra edges (+ their node info + edge metadata)

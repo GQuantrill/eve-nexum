@@ -2421,7 +2421,15 @@
     "viaMap": "op {{map}}",
     "fromPinned": "Sprongen vanaf {{system}} (gekozen op de kaart)",
     "clearPinned": "Mijn locatie gebruiken",
-    "originSkipped": "Vanaf {{name}} kan niet worden gerouteerd, dus de sprongen zijn vanaf je eigen locatie."
+    "originSkipped": "Vanaf {{name}} kan niet worden gerouteerd, dus de sprongen zijn vanaf je eigen locatie.",
+    "copyRoute": "Route als tekst kopiëren",
+    "copied": "Route gekopieerd",
+    "copyFailed": "Kon de route niet kopiëren",
+    "copyWormhole": "wormgat",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "kritiek",
+    "copyFrig": "fregat"
   },
   "routeToast": {
     "destinationSet": "Bestemming ingesteld op {{system}}",

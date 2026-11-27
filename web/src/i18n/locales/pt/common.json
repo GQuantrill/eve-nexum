@@ -2421,7 +2421,15 @@
     "viaMap": "em {{map}}",
     "fromPinned": "Saltos a partir de {{system}} (escolhido no mapa)",
     "clearPinned": "Usar a minha localização",
-    "originSkipped": "Não é possível calcular rota a partir de {{name}}, por isso os saltos são a partir da tua localização."
+    "originSkipped": "Não é possível calcular rota a partir de {{name}}, por isso os saltos são a partir da tua localização.",
+    "copyRoute": "Copiar rota como texto",
+    "copied": "Rota copiada",
+    "copyFailed": "Não foi possível copiar a rota",
+    "copyWormhole": "buraco de minhoca",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "crítico",
+    "copyFrig": "fragata"
   },
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",

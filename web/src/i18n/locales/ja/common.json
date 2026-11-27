@@ -2421,7 +2421,15 @@
     "viaMap": "{{map}} より",
     "fromPinned": "{{system}} からのジャンプ数（マップで選択）",
     "clearPinned": "自分の位置を使う",
-    "originSkipped": "{{name}} からはルートを計算できないため、自分の位置からのジャンプ数です。"
+    "originSkipped": "{{name}} からはルートを計算できないため、自分の位置からのジャンプ数です。",
+    "copyRoute": "ルートをテキストでコピー",
+    "copied": "ルートをコピーしました",
+    "copyFailed": "ルートをコピーできませんでした",
+    "copyWormhole": "ワームホール",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "臨界",
+    "copyFrig": "フリゲート"
   },
   "routeToast": {
     "destinationSet": "目的地を {{system}} に設定しました",

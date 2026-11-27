@@ -2421,7 +2421,15 @@
     "viaMap": "来自 {{map}}",
     "fromPinned": "从 {{system}} 起的跳跃数（在地图上选定）",
     "clearPinned": "使用我的位置",
-    "originSkipped": "无法从 {{name}} 规划路线，因此跳跃数从你自己的位置计算。"
+    "originSkipped": "无法从 {{name}} 规划路线，因此跳跃数从你自己的位置计算。",
+    "copyRoute": "以文本复制路线",
+    "copied": "路线已复制",
+    "copyFailed": "无法复制路线",
+    "copyWormhole": "虫洞",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "临界",
+    "copyFrig": "护卫舰"
   },
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",

@@ -2421,7 +2421,15 @@
     "viaMap": "on {{map}}",
     "fromPinned": "Jumps from {{system}} (picked on the map)",
     "clearPinned": "Use my location",
-    "originSkipped": "Can't route from {{name}}, so jumps are from your own location."
+    "originSkipped": "Can't route from {{name}}, so jumps are from your own location.",
+    "copyRoute": "Copy route as text",
+    "copied": "Route copied",
+    "copyFailed": "Couldn't copy the route",
+    "copyWormhole": "wormhole",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "crit",
+    "copyFrig": "frig"
   },
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",

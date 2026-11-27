@@ -8,6 +8,9 @@ import { useSystemAlias } from '../../hooks/useSystemAlias';
 import type { RouteEntry, RoutePathNode, EdgeMeta } from '../../hooks/useRoute';
 import type { RouteOrigin } from '../../hooks/useRouteOrigin';
 import { useMapStore } from '../../store/mapStore';
+import { CopyIcon } from '../../icons';
+import { toast } from '../../utils/toastStore';
+import { routeText } from '../../utils/routeText';
 
 /** Where a route pane's jumps are counted from, when that isn't simply where
  *  the pilot is: a system picked with "Route from here" (with a way to stop),
@@ -93,6 +96,20 @@ export function RouteSquares({ route }: { route: RouteEntry }) {
           />
         </Fragment>
       ))}
+      {route.path.length > 1 && (
+        <button
+          type="button"
+          className="scout-route__copy"
+          onClick={() => {
+            navigator.clipboard?.writeText(routeText(t, route))
+              .then(() => toast.success(t('route.copied')), () => toast.error(t('route.copyFailed')));
+          }}
+          aria-label={t('route.copyRoute')}
+          data-tooltip={t('route.copyRoute')}
+        >
+          <CopyIcon size={12} weight="regular" />
+        </button>
+      )}
       {menu && (
         <ContextMenu
           x={menu.x}

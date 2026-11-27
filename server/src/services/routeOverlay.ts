@@ -24,12 +24,14 @@ function emptyOverlay(): RouteOverlay {
 
 // A wormhole/scout link is one logical edge; add it in BOTH directions to match
 // the base stargate graph (which stores reverse twins as separate rows).
-function addEdge(o: RouteOverlay, a: number, b: number, meta: EdgeMeta): void {
-  for (const [x, y] of [[a, b], [b, a]] as const) {
+// `sigA` / `sigB` are the hole's signature in a and in b: each direction
+// carries the one in the system it leaves.
+function addEdge(o: RouteOverlay, a: number, b: number, meta: EdgeMeta, sigA?: string | null, sigB?: string | null): void {
+  for (const [x, y, sig] of [[a, b, sigA], [b, a, sigB]] as const) {
     let list = o.adj.get(x);
     if (!list) { list = []; o.adj.set(x, list); }
     list.push(y);
-    o.edgeMeta.set(edgeKey(x, y), meta);
+    o.edgeMeta.set(edgeKey(x, y), sig ? { ...meta, sig } : meta);
   }
 }
 
@@ -54,7 +56,7 @@ async function addScoutEdges(o: RouteOverlay, thera: boolean, turnur: boolean, e
       whType: c.whType || undefined,
       eol:    c.remainingHours <= 4,
       frig:   /frig/i.test(c.maxShipSize),
-    });
+    }, c.outSignature, c.inSignature);
     added = true;
   }
   return added;
@@ -72,6 +74,7 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[], skipEol: bool
   const { rows } = await db.query<{
     a: number; b: number; whType: string | null;
     critical: boolean; eol: boolean; frig: boolean; mapName: string;
+    sourceSig: string | null; targetSig: string | null;
     lifetimeExpiresAt: Date | null; eolAt: Date | null; createdAt: Date; graceHours: number;
   }>(
     `SELECT s.eve_system_id AS a, t.eve_system_id AS b,
@@ -80,6 +83,8 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[], skipEol: bool
             (c.time_status = 'eol' OR (c.eol_at IS NOT NULL AND c.eol_at <= NOW())) AS eol,
             (c.size = 'small') AS frig,
             m.name AS "mapName",
+            NULLIF(ss.sig_id, '') AS "sourceSig",
+            NULLIF(ts.sig_id, '') AS "targetSig",
             c.lifetime_expires_at AS "lifetimeExpiresAt",
             c.eol_at              AS "eolAt",
             c.created_at          AS "createdAt",
@@ -88,6 +93,8 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[], skipEol: bool
        JOIN map_systems s ON s.id = c.source_id
        JOIN map_systems t ON t.id = c.target_id
        JOIN maps m ON m.id = c.map_id
+       LEFT JOIN map_signatures ss ON ss.id = c.source_signature_id
+       LEFT JOIN map_signatures ts ON ts.id = c.target_signature_id
       WHERE c.map_id = ANY($1::uuid[])
         AND c.broken = FALSE
         AND c.connection_type = 'standard'
@@ -108,7 +115,7 @@ async function addWormholeEdges(o: RouteOverlay, mapIds: string[], skipEol: bool
       eol: r.eol,
       frig: r.frig,
       mapName: r.mapName,
-    });
+    }, r.sourceSig, r.targetSig);
   }
   return added > 0;
 }

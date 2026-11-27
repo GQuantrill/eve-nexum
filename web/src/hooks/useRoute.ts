@@ -20,6 +20,8 @@ export interface EdgeMeta {
   /** Which of the user's maps contributed this hop — the closest-systems pane
    *  unions them all, so a hole can come from a map that isn't on screen. */
   mapName?:  string;
+  /** The signature to warp to in the system the hop leaves, when known. */
+  sig?:      string;
 }
 
 export interface RoutePathNode {

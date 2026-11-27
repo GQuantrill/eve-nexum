@@ -2421,7 +2421,15 @@
     "viaMap": "auf {{map}}",
     "fromPinned": "Sprünge ab {{system}} (auf der Karte gewählt)",
     "clearPinned": "Meinen Standort nutzen",
-    "originSkipped": "Von {{name}} aus ist keine Route möglich, daher zählen die Sprünge ab deinem eigenen Standort."
+    "originSkipped": "Von {{name}} aus ist keine Route möglich, daher zählen die Sprünge ab deinem eigenen Standort.",
+    "copyRoute": "Route als Text kopieren",
+    "copied": "Route kopiert",
+    "copyFailed": "Route konnte nicht kopiert werden",
+    "copyWormhole": "Wurmloch",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "kritisch",
+    "copyFrig": "Fregatte"
   },
   "routeToast": {
     "destinationSet": "Ziel festgelegt auf {{system}}",

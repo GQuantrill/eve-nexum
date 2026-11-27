@@ -2421,7 +2421,15 @@
     "viaMap": "{{map}}에서",
     "fromPinned": "{{system}}에서의 점프 (지도에서 선택)",
     "clearPinned": "내 위치 사용",
-    "originSkipped": "{{name}}에서는 경로를 계산할 수 없어 내 위치에서 점프 수를 계산합니다."
+    "originSkipped": "{{name}}에서는 경로를 계산할 수 없어 내 위치에서 점프 수를 계산합니다.",
+    "copyRoute": "경로를 텍스트로 복사",
+    "copied": "경로를 복사했습니다",
+    "copyFailed": "경로를 복사하지 못했습니다",
+    "copyWormhole": "웜홀",
+    "copyAnsiblex": "Ansiblex",
+    "copyEol": "EOL",
+    "copyCrit": "임계",
+    "copyFrig": "프리깃"
   },
   "routeToast": {
     "destinationSet": "목적지가 {{system}}(으)로 설정됨",
