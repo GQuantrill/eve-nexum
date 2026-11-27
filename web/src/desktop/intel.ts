@@ -5,7 +5,7 @@ import { playIntelSound, DEFAULT_INTEL_SOUND } from './intelSounds';
 import { NOTIFY, notifyOn, INTEL_SOUND_NAME_KEY } from '../utils/notificationPrefs';
 import { api } from '../api/client';
 import { readUserSetting } from '../hooks/useUserSetting';
-import { sanitiseWatched, WATCH_KEY } from '../utils/pilotWatch';
+import { sanitiseWatched, WATCH_KEY, type WatchedPilot } from '../utils/pilotWatch';
 
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
 // logs) and sends each new line here. A line naming a system on the open map
@@ -177,10 +177,11 @@ export function namesPilot(text: string, name: string): boolean {
 
 /** Record each watched pilot named in a live line beside a known system. The
  *  reporter themselves is skipped, and so are "clr" lines. */
-function recordWatched(lines: IntelLine[]): void {
-  const watched = sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
+function recordWatched(lines: IntelLine[], only?: WatchedPilot[], withTime = false): Promise<unknown>[] {
+  const watched = only ?? sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
   const mapId = useMapStore.getState().activeMapId;
-  if (watched.length === 0 || !mapId) return;
+  const posts: Promise<unknown>[] = [];
+  if (watched.length === 0 || !mapId) return posts;
   for (const line of lines) {
     if (CLEAR.test(line.text)) continue;
     const pilots = watched.filter((w) =>
@@ -191,12 +192,30 @@ function recordWatched(lines: IntelLine[]): void {
     const sys = candidateNames(line.text).filter((n) => !inNames.has(n)).map((n) => known.get(n))
       .find((v): v is { eveSystemId: number; name: string } => !!v);
     if (!sys) continue;
-    void api('/api/pilots/sightings', {
+    posts.push(api('/api/pilots/sightings', {
       method: 'POST',
-      body: JSON.stringify({ mapId, eveSystemId: sys.eveSystemId, pilots: pilots.slice(0, 20) }),
-    }).catch(() => { /* read-only map, offline: not worth a toast */ });
+      body: JSON.stringify({
+        mapId, eveSystemId: sys.eveSystemId, pilots: pilots.slice(0, 20),
+        ...(withTime ? { seenAt: line.at } : {}),
+      }),
+    }).catch(() => { /* read-only map, offline: not worth a toast */ }));
   }
+  return posts;
 }
+
+/**
+ * A pilot just added to the watch list: look back over the intel already in
+ * the feed, so a report posted moments before they were watched still counts
+ * (each at the time it was posted; the server ignores one it already has).
+ * Lines arrive being checked against the watch list as it was then, so
+ * without this, watching someone who was just reported shows them unseen.
+ */
+export async function recordWatchedFromFeed(pilots: WatchedPilot[]): Promise<void> {
+  if (!recording || pilots.length === 0) return;
+  const cutoff = Date.now() - SIGHTING_MS;
+  await Promise.all(recordWatched(feed.lines.filter((l) => l.at >= cutoff), pilots, true));
+}
+const SIGHTING_MS = 30 * 86_400_000;
 
 function queueLookup(line: IntelLine, report: boolean): void {
   queued.push({ line, report });

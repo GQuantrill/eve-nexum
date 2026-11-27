@@ -7,6 +7,7 @@ import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useStandings } from '../../hooks/useStandings';
 import { usePilotSightings, refreshPilotSightings } from '../../hooks/usePilotSightings';
+import { recordWatchedFromFeed } from '../../desktop/intel';
 import { timeAgo } from '../../i18n/format';
 import { FireIcon, StarIcon, XIcon } from '../../icons';
 import type { HeatMetric } from '../../utils/heatmap';
@@ -93,6 +94,8 @@ export function PilotTracker() {
       }
     } else if (watched.length < MAX_WATCHED) {
       setWatched([...watched, { id: p.id, name: p.name }]);
+      // Intel already in the feed that names them (desktop app; a no-op elsewhere).
+      void recordWatchedFromFeed([{ id: p.id, name: p.name }]).then(() => refreshPilotSightings());
     }
   };
 
