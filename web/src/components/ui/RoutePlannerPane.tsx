@@ -354,16 +354,6 @@ export function RoutePlannerPane() {
             <span className="route-planner__mode">
               {t(routeMode === 'secure' ? 'a0.modeSecure' : 'a0.modeShortest')}
             </span>
-            <button
-              type="button"
-              className={`sys-btn route-planner__highlight${highlightOn && onMap ? ' route-planner__highlight--on' : ''}`}
-              aria-pressed={highlightOn && !!onMap}
-              disabled={!onMap}
-              onClick={() => setHighlightOn((v) => !v)}
-              data-tooltip={onMap ? t('routePlanner.highlightHint') : t('routePlanner.highlightNone')}
-            >
-              {highlightOn && onMap ? t('routePlanner.highlightOff') : t('routePlanner.highlight')}
-            </button>
           </div>
           <RouteSquares route={route} />
           {canSetAutopilot(route) && (
@@ -389,6 +379,16 @@ export function RoutePlannerPane() {
               </button>
             </div>
           )}
+          <button
+            type="button"
+            className={`sys-btn${highlightOn && onMap ? ' route-planner__highlight--on' : ''}`}
+            aria-pressed={highlightOn && !!onMap}
+            disabled={!onMap}
+            onClick={() => setHighlightOn((v) => !v)}
+            data-tooltip={onMap ? t('routePlanner.highlightHint') : t('routePlanner.highlightNone')}
+          >
+            {highlightOn && onMap ? t('routePlanner.highlightOff') : t('routePlanner.highlight')}
+          </button>
         </div>
       ) : (
         <div className="scout-pane__empty">{t('routePlanner.noRoute')}</div>

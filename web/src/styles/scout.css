@@ -664,14 +664,7 @@
   > .sys-btn { flex: 1; }
 }
 
-/* Route Planner: Highlight on map, at the end of the jumps line. The line
-   wraps rather than squeezing "8 jumps" onto two lines. */
-.route-planner__jumps { flex-wrap: wrap; white-space: nowrap; }
-.route-planner__highlight {
-  margin-left: auto;
-  align-self: center;
-  font-size: calc(12px * var(--font-scale, 1));
-}
+/* Route Planner: Highlight on map while it's on. */
 .route-planner__highlight--on {
   background: var(--accent-fill);
   color: var(--accent-pale);
