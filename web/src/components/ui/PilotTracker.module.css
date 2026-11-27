@@ -154,3 +154,32 @@
   font: inherit;
   font-size: 12px;
 }
+
+/* Pilots already seen on your maps, under the Add box: click to watch. */
+.suggestions {
+  list-style: none;
+  margin: -4px 0 0;
+  padding: 2px 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-raised);
+  max-height: 220px;
+  overflow-y: auto;
+}
+.suggestion {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 0;
+  background: none;
+  color: var(--text-default);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.suggestion:hover { background: var(--surface-sunken); }
+.suggestionName { color: var(--text-bright); font-weight: 600; white-space: nowrap; flex-shrink: 0; }

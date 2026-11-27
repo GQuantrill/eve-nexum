@@ -3327,6 +3327,7 @@
     "heatPick": "Escolha um piloto no painel Intel",
     "markOnMap": "Marcar no mapa",
     "markOnMapHint": "Marcar cada sistema onde um piloto vigiado foi visto",
-    "seenHere": "Pilotos vigiados vistos aqui: {{list}}"
+    "seenHere": "Pilotos vigiados vistos aqui: {{list}}",
+    "suggestions": "Pilotos vistos nos seus mapas"
   }
 }

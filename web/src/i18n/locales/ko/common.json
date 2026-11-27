@@ -3319,6 +3319,7 @@
     "heatPick": "인텔 패널에서 파일럿을 선택하세요",
     "markOnMap": "지도에 표시",
     "markOnMapHint": "주시 중인 파일럿이 목격된 모든 성계에 표시",
-    "seenHere": "여기서 목격된 주시 파일럿: {{list}}"
+    "seenHere": "여기서 목격된 주시 파일럿: {{list}}",
+    "suggestions": "내 지도에서 목격된 파일럿"
   }
 }

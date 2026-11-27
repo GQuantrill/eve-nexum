@@ -3319,6 +3319,7 @@
     "heatPick": "请在情报面板中选择飞行员",
     "markOnMap": "在地图上标记",
     "markOnMapHint": "在每个见过关注飞行员的星系上做标记",
-    "seenHere": "在此见过的关注飞行员：{{list}}"
+    "seenHere": "在此见过的关注飞行员：{{list}}",
+    "suggestions": "在你的地图上出现过的飞行员"
   }
 }

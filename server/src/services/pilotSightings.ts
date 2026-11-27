@@ -79,6 +79,37 @@ export interface Sighting {
 
 /** Sightings of these pilots on these maps in the last SIGHTING_DAYS, newest
  *  first. The caller passes only maps the requester can see. */
+export interface KnownPilot { characterId: number; name: string; systemName: string | null; seenAt: string }
+
+/**
+ * Pilots seen on these maps in the last 30 days whose name contains `q`
+ * (case-insensitive), newest sighting first: suggestions for the watch list's
+ * Add box. `q` is matched literally (LIKE wildcards escaped).
+ */
+export async function searchKnownPilots(q: string, mapIds: string[], limit = 10): Promise<KnownPilot[]> {
+  if (mapIds.length === 0) return [];
+  const pattern = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+  const { rows } = await db.query<{
+    character_id: number; character_name: string; system_name: string | null; seen_at: Date;
+  }>(
+    `SELECT * FROM (
+       SELECT DISTINCT ON (s.character_id) s.character_id, s.character_name, ss.name AS system_name, s.seen_at
+         FROM pilot_sightings s
+         LEFT JOIN solar_systems ss ON ss.id = s.eve_system_id
+        WHERE s.map_id = ANY($1::uuid[])
+          AND s.seen_at > NOW() - make_interval(days => $2)
+          AND s.character_name ILIKE $3
+        ORDER BY s.character_id, s.seen_at DESC
+     ) k
+     ORDER BY k.seen_at DESC
+     LIMIT $4`,
+    [mapIds, SIGHTING_DAYS, pattern, limit],
+  );
+  return rows.map((r) => ({
+    characterId: r.character_id, name: r.character_name, systemName: r.system_name, seenAt: r.seen_at.toISOString(),
+  }));
+}
+
 export async function listSightings(characterIds: number[], mapIds: string[]): Promise<Sighting[]> {
   if (characterIds.length === 0 || mapIds.length === 0) return [];
   const { rows } = await db.query<{

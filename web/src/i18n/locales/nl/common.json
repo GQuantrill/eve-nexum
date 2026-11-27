@@ -3327,6 +3327,7 @@
     "heatPick": "Kies een piloot in het Intel-paneel",
     "markOnMap": "Op kaart markeren",
     "markOnMapHint": "Elk systeem markeren waarin een gevolgde piloot is gezien",
-    "seenHere": "Gevolgde piloten hier gezien: {{list}}"
+    "seenHere": "Gevolgde piloten hier gezien: {{list}}",
+    "suggestions": "Piloten gezien op je kaarten"
   }
 }

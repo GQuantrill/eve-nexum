@@ -3327,6 +3327,7 @@
     "heatPick": "Pick a pilot in the Intel panel",
     "markOnMap": "Mark on map",
     "markOnMapHint": "Put a marker on every system a watched pilot was seen in",
-    "seenHere": "Watched pilots seen here: {{list}}"
+    "seenHere": "Watched pilots seen here: {{list}}",
+    "suggestions": "Pilots seen on your maps"
   }
 }

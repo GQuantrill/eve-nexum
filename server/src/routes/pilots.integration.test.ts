@@ -149,6 +149,18 @@ describe.skipIf(!dbReady)('pilot sightings (integration)', () => {
     }
   });
 
+  it('suggests pilots seen on visible maps by part of their name', async () => {
+    await request(makeApp(member)).post('/api/dscan').send({ text: 'Bob Pilot\nAlice', mapId, systemId: sysId });
+    const known = (u: U, q: string) => request(makeApp(u)).get(`/api/pilots/known?q=${encodeURIComponent(q)}`);
+    const res = await known(readonly, 'lic');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([expect.objectContaining({ name: 'Alice', systemName: 'Jita' })]);
+    expect((await known(outsider, 'lic')).body).toEqual([]);
+    // Wildcards are matched as text, not patterns.
+    expect((await known(member, '%_')).body).toEqual([]);
+    expect((await known(member, 'a')).status).toBe(400);
+  });
+
   it('refuses a malformed intel sighting', async () => {
     const bad = [
       { mapId, eveSystemId: 'x', pilots: [{ id: 1, name: 'Alice' }] },
