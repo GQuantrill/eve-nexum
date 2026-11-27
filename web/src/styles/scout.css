@@ -612,8 +612,10 @@
 .route-planner__chip > button:first-child:hover { color: var(--accent-light); }
 .route-planner__chip-ends { color: var(--text-faint); }
 .route-planner__chip .icon-btn { padding: 0 7px; border-left: 1px solid var(--border); }
-.route-planner__save { display: flex; gap: 6px; align-items: center; }
-.route-planner__save > input { flex: 1; min-width: 0; }
+/* The name box takes the buttons' padding, and the row stretches both to one
+   height, so it lines up with Set Destination above. */
+.route-planner__save { display: flex; gap: 6px; align-items: stretch; }
+.route-planner__save > input { flex: 1; min-width: 0; padding-block: var(--sp-3); }
 
 /* The bulk-copy button sits on its own line beneath the sort control. Full
    width so the label has room: it carries a count and a system name, which is
