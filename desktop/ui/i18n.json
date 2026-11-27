@@ -100,7 +100,7 @@
     "overlayHere": "in {system}",
     "overlayInSystem": "here",
     "overlayJumps": "{n}j",
-    "soundsMoved": "Intel sounds, the voice and their volume are set in Nexum itself: Notifications and Announcer in the map sidebar."
+    "soundsMoved": "Intel alerts within your proximity range (Nexum: Map Options > Proximity Alerts). Sounds, the voice and their volume are set in Nexum too: Notifications and Announcer in the map sidebar."
   },
   "de": {
     "show": "Nexum anzeigen",
@@ -203,7 +203,7 @@
     "overlayHere": "in {system}",
     "overlayInSystem": "hier",
     "overlayJumps": "{n}S",
-    "soundsMoved": "Intel-Töne, die Stimme und ihre Lautstärke stellst du in Nexum selbst ein: Benachrichtigungen und Sprachansage in der Kartenseitenleiste."
+    "soundsMoved": "Intel löst innerhalb deiner Näherungsreichweite Warnungen aus (Nexum: Kartenoptionen > Näherungswarnungen). Töne, Stimme und Lautstärke stellst du ebenfalls in Nexum ein: Benachrichtigungen und Sprachansage in der Kartenseitenleiste."
   },
   "nl": {
     "show": "Nexum tonen",
@@ -306,7 +306,7 @@
     "overlayHere": "in {system}",
     "overlayInSystem": "hier",
     "overlayJumps": "{n}s",
-    "soundsMoved": "Intelgeluiden, de stem en hun volume stel je in Nexum zelf in: Meldingen en Omroeper in de zijbalk van de kaart."
+    "soundsMoved": "Intel geeft meldingen binnen je nabijheidsbereik (Nexum: Kaartopties > Nabijheidsmeldingen). Geluiden, de stem en hun volume stel je ook in Nexum in: Meldingen en Omroeper in de zijbalk van de kaart."
   },
   "fr": {
     "show": "Afficher Nexum",
@@ -409,7 +409,7 @@
     "overlayHere": "à {system}",
     "overlayInSystem": "ici",
     "overlayJumps": "{n}s",
-    "soundsMoved": "Les sons de l'intel, la voix et leur volume se règlent dans Nexum : Notifications et Annonces vocales dans la barre latérale de la carte."
+    "soundsMoved": "L'intel déclenche une alerte dans votre portée de proximité (Nexum : Options de carte > Alertes de proximité). Les sons, la voix et leur volume se règlent aussi dans Nexum : Notifications et Annonces vocales dans la barre latérale de la carte."
   },
   "es": {
     "show": "Mostrar Nexum",
@@ -512,7 +512,7 @@
     "overlayHere": "en {system}",
     "overlayInSystem": "aquí",
     "overlayJumps": "{n}s",
-    "soundsMoved": "Los sonidos de intel, la voz y su volumen se ajustan en Nexum: Notificaciones y Anuncios de voz en la barra lateral del mapa."
+    "soundsMoved": "El intel avisa dentro de tu alcance de proximidad (Nexum: Opciones de mapa > Alertas de proximidad). Los sonidos, la voz y su volumen también se ajustan en Nexum: Notificaciones y Anuncios de voz en la barra lateral del mapa."
   },
   "pt": {
     "show": "Mostrar Nexum",
@@ -615,7 +615,7 @@
     "overlayHere": "em {system}",
     "overlayInSystem": "aqui",
     "overlayJumps": "{n}s",
-    "soundsMoved": "Os sons de intel, a voz e o volume são definidos no próprio Nexum: Notificações e Anúncios de voz na barra lateral do mapa."
+    "soundsMoved": "O intel alerta dentro do seu alcance de proximidade (Nexum: Opções de mapa > Alertas de proximidade). Os sons, a voz e o volume também são definidos no Nexum: Notificações e Anúncios de voz na barra lateral do mapa."
   },
   "zh": {
     "show": "显示 Nexum",
@@ -718,7 +718,7 @@
     "overlayHere": "位于 {system}",
     "overlayInSystem": "此处",
     "overlayJumps": "{n}跳",
-    "soundsMoved": "情报提示音、语音及其音量在 Nexum 中设置：地图侧边栏的“通知”和“语音播报”。"
+    "soundsMoved": "情报在你的接近范围内时发出提醒（Nexum：地图选项 > 接近警报）。提示音、语音及其音量也在 Nexum 中设置：地图侧边栏的“通知”和“语音播报”。"
   },
   "ko": {
     "show": "Nexum 보기",
@@ -821,7 +821,7 @@
     "overlayHere": "{system}에 있음",
     "overlayInSystem": "여기",
     "overlayJumps": "{n}점프",
-    "soundsMoved": "인텔 소리, 목소리, 볼륨은 Nexum에서 설정합니다: 지도 사이드바의 알림과 음성 안내."
+    "soundsMoved": "인텔은 근접 범위 안에서 경보를 울립니다(Nexum: 지도 옵션 > 근접 경보). 소리, 목소리, 볼륨도 Nexum에서 설정합니다: 지도 사이드바의 알림과 음성 안내."
   },
   "ja": {
     "show": "Nexum を表示",
@@ -924,7 +924,7 @@
     "overlayHere": "{system} にいます",
     "overlayInSystem": "ここ",
     "overlayJumps": "{n}J",
-    "soundsMoved": "インテルの通知音、音声、音量は Nexum 本体で設定します：マップのサイドバーの「通知」と「音声アナウンス」。"
+    "soundsMoved": "インテルは近接範囲内でアラートを出します（Nexum：マップオプション > 近接アラート）。通知音、音声、音量も Nexum で設定します：マップのサイドバーの「通知」と「音声アナウンス」。"
   },
   "ru": {
     "show": "Показать Nexum",
@@ -1027,6 +1027,6 @@
     "overlayHere": "в {system}",
     "overlayInSystem": "здесь",
     "overlayJumps": "{n} пр.",
-    "soundsMoved": "Звуки интела, голос и их громкость настраиваются в самом Nexum: «Уведомления» и «Голосовые оповещения» на боковой панели карты."
+    "soundsMoved": "Интел оповещает в пределах радиуса близости (Nexum: Параметры карты > Оповещения о близости). Звуки, голос и их громкость тоже настраиваются в Nexum: «Уведомления» и «Голосовые оповещения» на боковой панели карты."
   }
 }

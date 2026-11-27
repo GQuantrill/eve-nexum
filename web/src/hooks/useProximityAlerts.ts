@@ -192,14 +192,11 @@ export function useProximityAlerts(): {
     }
   }, [nearestFixed, threshold, nameMap, targetIds.length]);
 
-  // Intel, once per report (a fresh sighting of the same system alerts again):
-  // - "Threat reported" (notification, taskbar flash) within the proximity
-  //   alert range;
-  // - sound and voice within the pilot's intel range (desktop settings): any
-  //   system on the open map, or within a number of jumps. On the map, the
-  //   sound has already played as the line arrived (desktop/intel.ts).
-  //   Whether there is a sound, which one, and the voice are the pilot's
-  //   Notifications and Announcer settings, at the one alert volume.
+  // Intel, once per report (a fresh sighting of the same system alerts again),
+  // within the proximity alert range, the one range for every alert: the
+  // notification and taskbar flash, the sound and the voice, each per the
+  // pilot's Notifications and Announcer settings. Distance needs the pilot's
+  // location; without it intel only pulses on the map.
   const alertedRef = useRef(new Set<string>());
   const located = location.system?.eveSystemId != null;
   useEffect(() => {
@@ -207,18 +204,14 @@ export function useProximityAlerts(): {
       const key = `${r.eveSystemId}:${r.at}`;
       if (alertedRef.current.has(key)) continue;
       const route = routes[r.eveSystemId];
-      // Wait for the distance while it's being looked up. Without a location
-      // there is none: only "anything on the map" can still alert.
+      // Wait for the distance while it's being looked up.
       if (!route && located) continue;
       alertedRef.current.add(key);
       const jumps = route?.jumps ?? null;
-      if (jumps !== null && jumps <= threshold) {
-        if (notifyOn(NOTIFY.intelDesktop)) fireIntelNotification(r.name, jumps);
-        desktopAttention();
-      }
-      const inRange = r.range === null ? r.onMap : jumps !== null && jumps <= r.range;
-      if (!inRange) continue;
-      if (r.range !== null && notifyOn(NOTIFY.intelSound)) playIntelSound(intelSoundName());
+      if (jumps === null || jumps > threshold) continue;
+      if (notifyOn(NOTIFY.intelDesktop)) fireIntelNotification(r.name, jumps);
+      desktopAttention();
+      if (notifyOn(NOTIFY.intelSound)) playIntelSound(intelSoundName());
       if (announcerEnabled() && readUserSetting<boolean>(ANN.intel, true)) speakIntel(r.name, jumps);
     }
   }, [intel, routes, threshold, located]);
