@@ -741,10 +741,6 @@
     "allMaps": "Calculer sur toutes mes cartes",
     "allMapsHint": "Les distances peuvent emprunter les chaînes de trous de ver de toutes les cartes que vous pouvez voir, pas seulement celle ouverte. Désactivez ceci pour ne router que par la carte à l'écran.",
     "suggest": {
-      "button": "Suggestions",
-      "buttonHint": "Les hubs commerciaux, acheteurs de blue loot, A0, stations et autres les plus proches, à ajouter à cette liste",
-      "title": "Suggestions",
-      "hint": "Les plus proches de chaque type depuis votre position, avec le même itinéraire que cette liste. Ajouter place un système dans votre liste.",
       "failed": "Impossible de charger les suggestions. Réessayez dans un instant.",
       "loading": "Recherche des systèmes les plus proches...",
       "quietHint": "Aucun kill de joueur dans la dernière heure.",
@@ -768,8 +764,7 @@
         "quiet": "Systèmes calmes"
       },
       "services": {
-        "cloning": "Baie de clonage",
-        "jumpClone": "Installation de clones de saut",
+        "cloning": "Baie de clonage (clones de saut)",
         "repair": "Réparation",
         "fitting": "Équipement",
         "market": "Marché",
@@ -2517,7 +2512,8 @@
     "intel": "Intel",
     "popOut": "Ouvrir dans sa propre fenêtre",
     "poppedOut": "Ouvert dans sa propre fenêtre.",
-    "bringBack": "Ramener ici"
+    "bringBack": "Ramener ici",
+    "useful": "Systèmes utiles"
   },
   "sigType": {
     "combat": "Combat",
@@ -3253,5 +3249,24 @@
       "active": "Un lien est actif (créé {{time}}). Il n'est affiché qu'à sa création ; créez-en un nouveau si besoin.",
       "none": "Aucun lien pour l'instant."
     }
+  },
+  "useful": {
+    "hint": "Tapez pour n'afficher que les groupes, systèmes ou structures correspondants. Les distances partent de votre point de départ.",
+    "chooseGroups": "Choisir les groupes",
+    "chooseGroupsHint": "Choisissez les groupes affichés par ce panneau. Faites glisser un groupe par sa poignée pour le réordonner.",
+    "allHidden": "Tous les groupes sont masqués. Utilisez l'engrenage pour en afficher.",
+    "addToClosest": "Ajouter aux Systèmes les plus proches",
+    "removeFromClosest": "Retirer des Systèmes les plus proches",
+    "moreHere_one": "+{{count}} autre ici",
+    "moreHere_other": "+{{count}} autres ici",
+    "noStructureKind": "Aucune structure de votre corporation n'est de ce type.",
+    "structureKinds": {
+      "all": "Tout amarrage",
+      "citadel": "Citadelles",
+      "engineering": "Complexes d'ingénierie",
+      "refinery": "Raffineries"
+    },
+    "filter": "Filtrer...",
+    "noMatch": "Aucun résultat."
   }
 }

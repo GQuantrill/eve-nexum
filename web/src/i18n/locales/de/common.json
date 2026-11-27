@@ -741,10 +741,6 @@
     "allMaps": "Über alle meine Karten routen",
     "allMapsHint": "Entfernungen dürfen die Wurmlochketten jeder für dich sichtbaren Karte nutzen, nicht nur der geöffneten. Schalte dies aus, um nur über die Karte auf dem Bildschirm zu routen.",
     "suggest": {
-      "button": "Vorschläge",
-      "buttonHint": "Die nächsten Handelszentren, Blue-Loot-Käufer, A0-Systeme, Stationen und mehr für diese Liste",
-      "title": "Vorschläge",
-      "hint": "Jeweils das Nächste von deinem Standort aus, so geroutet wie diese Liste. Hinzufügen setzt ein System auf deine Liste.",
       "failed": "Vorschläge konnten nicht geladen werden. Versuch es gleich noch einmal.",
       "loading": "Suche die nächsten Systeme...",
       "quietHint": "Keine Spieler-Kills in der letzten Stunde.",
@@ -768,8 +764,7 @@
         "quiet": "Ruhige Systeme"
       },
       "services": {
-        "cloning": "Klonbank",
-        "jumpClone": "Sprungklon-Einrichtung",
+        "cloning": "Klonbank (Sprungklone)",
         "repair": "Reparatur",
         "fitting": "Ausrüstung",
         "market": "Markt",
@@ -2517,7 +2512,8 @@
     "intel": "Intel",
     "popOut": "In eigenem Fenster öffnen",
     "poppedOut": "In eigenem Fenster geöffnet.",
-    "bringBack": "Zurückholen"
+    "bringBack": "Zurückholen",
+    "useful": "Nützliche Systeme"
   },
   "sigType": {
     "combat": "Kampf",
@@ -3253,5 +3249,24 @@
       "active": "Ein Link ist aktiv (erstellt {{time}}). Er wird nur beim Erstellen angezeigt; erstelle bei Bedarf einen neuen.",
       "none": "Noch kein Link."
     }
+  },
+  "useful": {
+    "hint": "Tippe, um nur passende Gruppen, Systeme oder Strukturen zu zeigen. Entfernungen gelten ab deinem Routenstart.",
+    "chooseGroups": "Gruppen wählen",
+    "chooseGroupsHint": "Wähle, welche Gruppen dieses Panel zeigt. Ziehe eine Gruppe am Griff, um sie umzusortieren.",
+    "allHidden": "Alle Gruppen sind ausgeblendet. Blende über das Zahnrad welche ein.",
+    "addToClosest": "Zu Nächste Systeme hinzufügen",
+    "removeFromClosest": "Aus Nächste Systeme entfernen",
+    "moreHere_one": "+{{count}} weitere hier",
+    "moreHere_other": "+{{count}} weitere hier",
+    "noStructureKind": "Keine Struktur deiner Corp ist von dieser Art.",
+    "structureKinds": {
+      "all": "Alle andockbaren",
+      "citadel": "Zitadellen",
+      "engineering": "Engineering Complexes",
+      "refinery": "Raffinerien"
+    },
+    "filter": "Filtern...",
+    "noMatch": "Keine Treffer."
   }
 }

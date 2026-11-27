@@ -741,10 +741,6 @@
     "allMaps": "Calcular em todos os meus mapas",
     "allMapsHint": "As distâncias podem usar as cadeias de buracos de minhoca de qualquer mapa que consiga ver, não apenas o aberto. Desligue para traçar rotas só pelo mapa no ecrã.",
     "suggest": {
-      "button": "Sugestões",
-      "buttonHint": "Os centros comerciais, compradores de blue loot, A0, estações e mais próximos para adicionar a esta lista",
-      "title": "Sugestões",
-      "hint": "O mais próximo de cada tipo a partir de onde você está, com a mesma rota desta lista. Adicionar coloca um sistema na sua lista.",
       "failed": "Não foi possível carregar as sugestões. Tente novamente em instantes.",
       "loading": "Procurando os sistemas mais próximos...",
       "quietHint": "Nenhum abate de jogador na última hora.",
@@ -768,8 +764,7 @@
         "quiet": "Sistemas tranquilos"
       },
       "services": {
-        "cloning": "Baia de clonagem",
-        "jumpClone": "Instalação de clones de salto",
+        "cloning": "Baia de clonagem (clones de salto)",
         "repair": "Reparo",
         "fitting": "Equipamento",
         "market": "Mercado",
@@ -2517,7 +2512,8 @@
     "intel": "Intel",
     "popOut": "Abrir em janela própria",
     "poppedOut": "Aberto em janela própria.",
-    "bringBack": "Trazer de volta"
+    "bringBack": "Trazer de volta",
+    "useful": "Sistemas úteis"
   },
   "sigType": {
     "combat": "Combate",
@@ -3253,5 +3249,24 @@
       "active": "Há um link ativo (criado {{time}}). Só é mostrado ao ser criado; crie um novo se voltar a precisar dele.",
       "none": "Ainda não há link."
     }
+  },
+  "useful": {
+    "hint": "Escreve para mostrar só os grupos, sistemas ou estruturas que correspondem. As distâncias contam a partir do início da rota.",
+    "chooseGroups": "Escolher grupos",
+    "chooseGroupsHint": "Escolhe que grupos este painel mostra. Arrasta um grupo pela pega para o reordenar.",
+    "allHidden": "Todos os grupos estão ocultos. Usa a engrenagem para mostrar alguns.",
+    "addToClosest": "Adicionar a Sistemas mais próximos",
+    "removeFromClosest": "Remover de Sistemas mais próximos",
+    "moreHere_one": "+{{count}} mais aqui",
+    "moreHere_other": "+{{count}} mais aqui",
+    "noStructureKind": "Nenhuma estrutura da tua corporação é deste tipo.",
+    "structureKinds": {
+      "all": "Qualquer com atracagem",
+      "citadel": "Cidadelas",
+      "engineering": "Complexos de engenharia",
+      "refinery": "Refinarias"
+    },
+    "filter": "Filtrar...",
+    "noMatch": "Nada corresponde."
   }
 }

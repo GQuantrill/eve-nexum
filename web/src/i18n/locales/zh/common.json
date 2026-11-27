@@ -741,10 +741,6 @@
     "allMaps": "跨所有地图计算路线",
     "allMapsHint": "距离可以使用你能看到的任何地图上的虫洞链，而不仅是当前打开的地图。关闭后将只通过屏幕上的地图计算路线。",
     "suggest": {
-      "button": "建议",
-      "buttonHint": "将最近的交易中心、蓝色战利品收购点、A0 星系、空间站等加入此列表",
-      "title": "建议",
-      "hint": "从你所在位置出发每类最近的几个，航线与此列表相同。点击添加即可把星系放入列表。",
       "failed": "无法加载建议，请稍后再试。",
       "loading": "正在查找最近的星系……",
       "quietHint": "过去一小时内没有玩家击杀。",
@@ -768,8 +764,7 @@
         "quiet": "安静星系"
       },
       "services": {
-        "cloning": "克隆舱",
-        "jumpClone": "跳跃克隆设施",
+        "cloning": "克隆舱（跳跃克隆）",
         "repair": "维修",
         "fitting": "装配",
         "market": "市场",
@@ -2515,7 +2510,8 @@
     "intel": "情报",
     "popOut": "在独立窗口中打开",
     "poppedOut": "已在独立窗口中打开。",
-    "bringBack": "放回此处"
+    "bringBack": "放回此处",
+    "useful": "实用星系"
   },
   "sigType": {
     "combat": "战斗",
@@ -3249,5 +3245,23 @@
       "active": "链接已开启（生成于 {{time}}）。链接只在生成时显示，如需再次使用请生成新链接。",
       "none": "尚无链接。"
     }
+  },
+  "useful": {
+    "hint": "输入文字，只显示匹配的分组、星系或建筑。距离从你的路线起点算起。",
+    "chooseGroups": "选择分组",
+    "chooseGroupsHint": "选择此面板显示哪些分组。拖动分组的手柄可调整顺序。",
+    "allHidden": "所有分组都已隐藏。点击齿轮显示一些。",
+    "addToClosest": "添加到最近星系",
+    "removeFromClosest": "从最近星系移除",
+    "moreHere_other": "此处另有 {{count}} 个",
+    "noStructureKind": "你的军团没有这一类的建筑。",
+    "structureKinds": {
+      "all": "所有可停靠",
+      "citadel": "堡垒",
+      "engineering": "工程复合体",
+      "refinery": "精炼厂"
+    },
+    "filter": "筛选...",
+    "noMatch": "没有匹配项。"
   }
 }

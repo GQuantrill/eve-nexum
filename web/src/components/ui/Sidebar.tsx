@@ -9,6 +9,7 @@ import { ScoutConnectionsPane } from './ScoutConnectionsPane';
 import { PilotsOnlinePane } from './PilotsOnlinePane';
 import { ClonesPane } from './ClonesPane';
 import { A0Pane } from './A0Pane';
+import { UsefulSystemsPane } from './UsefulSystemsPane';
 import { ClosestSystemsPane } from './ClosestSystemsPane';
 import { FleetPane } from './FleetPane';
 import { WatchlistBlock } from './WatchlistBlock';
@@ -41,9 +42,9 @@ function loadWidth(): number {
 }
 
 type Side    = 'left' | 'right';
-type PanelId = 'watchlist' | 'intel' | 'routePlanner' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'fleet' | 'pilotsOnline' | 'clones';
+type PanelId = 'watchlist' | 'intel' | 'routePlanner' | 'chains' | 'thera' | 'turnur' | 'a0' | 'closest' | 'useful' | 'fleet' | 'pilotsOnline' | 'clones';
 
-const DEFAULT_ORDER: PanelId[] = ['watchlist', 'intel', 'routePlanner', 'chains', 'closest', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
+const DEFAULT_ORDER: PanelId[] = ['watchlist', 'intel', 'routePlanner', 'chains', 'closest', 'useful', 'thera', 'turnur', 'fleet', 'pilotsOnline', 'clones', 'a0'];
 const VALID_PANEL_IDS: ReadonlySet<PanelId> = new Set(DEFAULT_ORDER);
 
 // The panels form a single vertical column, so a drag should only ever move a
@@ -73,6 +74,7 @@ function cardFor(id: PanelId): ReactNode {
     case 'turnur': return <ScoutConnectionsPane scoutSystem="Turnur" />;
     case 'a0': return <A0Pane />;
     case 'closest': return <ClosestSystemsPane />;
+    case 'useful': return <UsefulSystemsPane />;
     case 'fleet': return <FleetPane />;
     case 'pilotsOnline': return <PilotsOnlinePane />;
     case 'clones': return <ClonesPane />;
@@ -90,6 +92,7 @@ function usePanelTitles(): Record<PanelId, string> {
     turnur:  t('sidebar.turnur'),
     a0:      t('sidebar.a0'),
     closest: t('sidebar.closest'),
+    useful:  t('sidebar.useful'),
     fleet:   t('sidebar.fleet'),
     pilotsOnline: t('pilotsOnline.title'),
     clones: t('clones.title'),

@@ -741,10 +741,6 @@
     "allMaps": "Over al mijn kaarten routeren",
     "allMapsHint": "Afstanden mogen de wormgatketens gebruiken van elke kaart die je kunt zien, niet alleen de geopende. Zet dit uit om alleen via de kaart op het scherm te routeren.",
     "suggest": {
-      "button": "Suggesties",
-      "buttonHint": "De dichtstbijzijnde handelshubs, blue-loot-kopers, A0's, stations en meer om aan deze lijst toe te voegen",
-      "title": "Suggesties",
-      "hint": "Steeds de dichtstbijzijnde vanaf waar je bent, gerouteerd zoals deze lijst. Toevoegen zet een systeem op je lijst.",
       "failed": "Suggesties laden mislukt. Probeer het zo opnieuw.",
       "loading": "Dichtstbijzijnde systemen zoeken...",
       "quietHint": "Geen spelerkills in het afgelopen uur.",
@@ -768,8 +764,7 @@
         "quiet": "Rustige systemen"
       },
       "services": {
-        "cloning": "Kloonbank",
-        "jumpClone": "Jump clone-faciliteit",
+        "cloning": "Kloonbank (jump clones)",
         "repair": "Reparatie",
         "fitting": "Fitting",
         "market": "Markt",
@@ -2517,7 +2512,8 @@
     "intel": "Intel",
     "popOut": "Openen in eigen venster",
     "poppedOut": "Geopend in een eigen venster.",
-    "bringBack": "Terughalen"
+    "bringBack": "Terughalen",
+    "useful": "Nuttige systemen"
   },
   "sigType": {
     "combat": "Gevecht",
@@ -3253,5 +3249,24 @@
       "active": "Er staat een link aan (gemaakt {{time}}). Hij wordt alleen bij het maken getoond; maak een nieuwe als je hem weer nodig hebt.",
       "none": "Nog geen link."
     }
+  },
+  "useful": {
+    "hint": "Typ om alleen passende groepen, systemen of structuren te tonen. Afstanden gelden vanaf je routestart.",
+    "chooseGroups": "Groepen kiezen",
+    "chooseGroupsHint": "Kies welke groepen dit paneel toont. Sleep een groep aan de greep om de volgorde te wijzigen.",
+    "allHidden": "Alle groepen zijn verborgen. Gebruik het tandwiel om er enkele te tonen.",
+    "addToClosest": "Toevoegen aan Dichtstbijzijnde systemen",
+    "removeFromClosest": "Verwijderen uit Dichtstbijzijnde systemen",
+    "moreHere_one": "+{{count}} meer hier",
+    "moreHere_other": "+{{count}} meer hier",
+    "noStructureKind": "Geen van de structuren van je corp is van dit type.",
+    "structureKinds": {
+      "all": "Alles om te docken",
+      "citadel": "Citadels",
+      "engineering": "Engineering complexes",
+      "refinery": "Raffinaderijen"
+    },
+    "filter": "Filteren...",
+    "noMatch": "Niets gevonden."
   }
 }

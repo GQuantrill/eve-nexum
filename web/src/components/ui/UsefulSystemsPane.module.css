@@ -1,0 +1,97 @@
+/* Useful Systems: groups that fold and drag, each with its nearest few. */
+.pane {
+  gap: 4px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter {
+  flex: 1;
+  min-width: 0;
+  padding-block: var(--sp-3);
+}
+
+.group {
+  position: relative;
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+  background: var(--surface-panel);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.fold {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chevron {
+  display: inline-block;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+
+.chevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+.title {
+  overflow: hidden;
+  color: var(--text-bright);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.drag {
+  padding: 0 2px;
+  border: none;
+  background: none;
+  color: var(--text-faint);
+  cursor: grab;
+  touch-action: none;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 4px;
+}
+
+.note,
+.empty {
+  margin: 2px 0;
+  color: var(--text-faint);
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.sec {
+  font-variant-numeric: tabular-nums;
+  font-size: calc(12px * var(--font-scale, 1));
+}
+
+.detail {
+  color: var(--text-dim);
+  font-size: calc(11px * var(--font-scale, 1));
+}

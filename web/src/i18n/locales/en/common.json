@@ -741,10 +741,6 @@
     "allMaps": "Route across all my maps",
     "allMapsHint": "Distances may use the wormhole chains of every map you can see, not just the open one. Turn this off to route only through the map on screen.",
     "suggest": {
-      "button": "Suggestions",
-      "buttonHint": "The closest trade hubs, blue loot buyers, A0s, stations and more, to add to this list",
-      "title": "Suggestions",
-      "hint": "The closest of each, from where you are, routed the way this list is. Add puts a system on your list.",
       "failed": "Couldn't load suggestions. Try again in a moment.",
       "loading": "Finding the closest systems...",
       "quietHint": "No player kills in the last hour.",
@@ -768,8 +764,7 @@
         "quiet": "Quiet systems"
       },
       "services": {
-        "cloning": "Clone bay",
-        "jumpClone": "Jump clone facility",
+        "cloning": "Clone bay (jump clones)",
         "repair": "Repair",
         "fitting": "Fitting",
         "market": "Market",
@@ -2517,7 +2512,8 @@
     "intel": "Intel",
     "popOut": "Open in its own window",
     "poppedOut": "Opened in its own window.",
-    "bringBack": "Bring back"
+    "bringBack": "Bring back",
+    "useful": "Useful Systems"
   },
   "sigType": {
     "combat": "Combat",
@@ -3253,5 +3249,24 @@
       "active": "A link is on (made {{time}}). It's only shown when made, so make a new one if you need it again.",
       "none": "No link yet."
     }
+  },
+  "useful": {
+    "hint": "Type to show only the groups, systems or structures that match. Distances are from where you route.",
+    "chooseGroups": "Choose groups",
+    "chooseGroupsHint": "Pick which groups this panel shows. Drag a group by its handle to reorder it.",
+    "allHidden": "Every group is hidden. Use the cog to show some.",
+    "addToClosest": "Add to Closest Systems",
+    "removeFromClosest": "Remove from Closest Systems",
+    "moreHere_one": "+{{count}} more here",
+    "moreHere_other": "+{{count}} more here",
+    "noStructureKind": "None of your corp's structures are of this kind.",
+    "structureKinds": {
+      "all": "Any dockable",
+      "citadel": "Citadels",
+      "engineering": "Engineering complexes",
+      "refinery": "Refineries"
+    },
+    "filter": "Filter...",
+    "noMatch": "Nothing matches."
   }
 }
