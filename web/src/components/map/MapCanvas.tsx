@@ -1517,7 +1517,6 @@ export function MapCanvas() {
       }] : [];
 
       const waypointItems = !multiSelected && sys?.eveSystemId ? [
-        { separator: true as const },
         {
           label: t('waypoint.setDestination'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#3ddc84" />,
@@ -1529,6 +1528,8 @@ export function MapCanvas() {
           action: () => { addWaypoint(sys.eveSystemId!, sys.name).catch(() => {}); },
         },
         ...sendToItem(sys.eveSystemId, sys.name),
+      ] : [];
+      const jumpRangeItems = !multiSelected && sys?.eveSystemId ? [
         {
           label: t('ctxMenu.jumpRangeFrom'),
           icon: <MapPinSimpleIcon size={16} weight="regular" color="#b57bff" />,
@@ -1542,7 +1543,6 @@ export function MapCanvas() {
       ] : [];
 
       const multiItems = multiSelected ? [
-        { separator: true as const },
         {
           label: t("ctxMenu.lockSelected", { count: selectedNodes.length }),
           icon: <LockIcon size={16} weight="regular" color="#f5c518" />,
@@ -1837,47 +1837,51 @@ export function MapCanvas() {
         submenu: adjacentSubmenu(),
       }] : [];
 
-      return [
-        {
-          label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
-          icon:  sys?.locked
-            ? <LockOpenIcon size={16} weight="regular" color="#f5c518" />
-            : <LockIcon     size={16} weight="regular" color="#f5c518" />,
-          action: () => lockSystem(contextMenu.nodeId!),
+      const lockItem: ContextMenuItem = {
+        label: sys?.locked ? t('ctxMenu.unlockSystem') : t('ctxMenu.lockSystem'),
+        icon:  sys?.locked
+          ? <LockOpenIcon size={16} weight="regular" color="#f5c518" />
+          : <LockIcon     size={16} weight="regular" color="#f5c518" />,
+        action: () => lockSystem(contextMenu.nodeId!),
+      };
+      const keepItem: ContextMenuItem = {
+        label: sys?.keep ? t('ctxMenu.unkeepSystem') : t('ctxMenu.keepSystem'),
+        icon:  <PushPinIcon size={16} weight={sys?.keep ? 'fill' : 'regular'} color="#5a9af8" />,
+        action: () => { if (sys) updateSystem(sys.id, { keep: !sys.keep }); },
+      };
+      const removeItem: ContextMenuItem[] = !sys?.locked ? [{
+        label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
+        icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
+        action: () => {
+          if (multiSelected) {
+            selectedNodes
+              .filter((n) => !systems.find((s) => s.id === n.id)?.locked)
+              .forEach((n) => removeSystem(n.id));
+          } else {
+            removeSystem(contextMenu.nodeId!);
+          }
         },
-        {
-          label: sys?.keep ? t('ctxMenu.unkeepSystem') : t('ctxMenu.keepSystem'),
-          icon:  <PushPinIcon size={16} weight={sys?.keep ? 'fill' : 'regular'} color="#5a9af8" />,
-          action: () => { if (sys) updateSystem(sys.id, { keep: !sys.keep }); },
-        },
-        ...(!sys?.locked ? [{
-          label: multiSelected ? t('ctxMenu.removeSystems', { count: selectedNodes.filter((n) => !systems.find((s) => s.id === n.id)?.locked).length }) : t('ctxMenu.removeSystem'),
-          icon: <XIcon size={16} weight="regular" color="#e25a5a" />,
-          action: () => {
-            if (multiSelected) {
-              selectedNodes
-                .filter((n) => !systems.find((s) => s.id === n.id)?.locked)
-                .forEach((n) => removeSystem(n.id));
-            } else {
-              removeSystem(contextMenu.nodeId!);
-            }
-          },
-        }] : []),
-        ...connectItem,
-        ...addConnectedItem,
-        ...homeItem,
-        ...routeFromItem,
-        ...copyNameItem,
-        ...copySystemsItem,
-        ...chainItem,
-        ...aliasItem,
-        ...tagItem,
-        ...intelItem,
-        ...labelItem,
-        ...adjacentItem,
-        ...multiItems,
-        ...waypointItems,
+      }] : [];
+
+      // In groups, a divider between each; a group with nothing to offer
+      // (multi-select, w-space, no eve id...) is left out with its divider.
+      const groups: ContextMenuItem[][] = [
+        // The system's standing on the map
+        [...homeItem, lockItem, keepItem, ...multiItems],
+        // Linking it to others
+        [...connectItem, ...addConnectedItem, ...adjacentItem],
+        // Naming and marking it
+        [...aliasItem, ...chainItem, ...tagItem, ...intelItem, ...labelItem],
+        // Taking it elsewhere
+        [...copyNameItem, ...copySystemsItem],
+        // Travel
+        [...waypointItems, ...routeFromItem, ...jumpRangeItems],
+        // Removing it
+        removeItem,
       ];
+      return groups
+        .filter((g) => g.length > 0)
+        .flatMap((g, i) => (i === 0 ? g : [{ separator: true as const }, ...g]));
     }
 
     // Systems a pilot is in: you, anyone else viewing this map, your alts and
