@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api, ApiError } from '../../api/client';
 import { useMapStore } from '../../store/mapStore';
@@ -7,6 +7,7 @@ import { useCanEditContent } from '../../hooks/useCanEditContent';
 import { useCharacterLocation } from '../../hooks/useCharacterLocation';
 import { useStandings } from '../../hooks/useStandings';
 import { usePilotSightings, refreshPilotSightings } from '../../hooks/usePilotSightings';
+import { recordWatchedFromFeed } from '../../desktop/intel';
 import { timeAgo } from '../../i18n/format';
 import { FireIcon, StarIcon, XIcon } from '../../icons';
 import type { HeatMetric } from '../../utils/heatmap';
@@ -41,6 +42,8 @@ const toneOf = (v: number): Tone =>
   v > 5 ? 'friendly' : v > 0 ? 'good' : v < -5 ? 'hostile' : v < 0 ? 'bad' : 'neutral';
 const TONE_RANK: Record<Tone, number> = { hostile: 0, bad: 1, neutral: 2, good: 3, friendly: 4 };
 
+interface KnownPilot { characterId: number; name: string; systemName: string | null; seenAt: string }
+
 interface PasteResult { system: string; eveSystemId: number; data: LocalData }
 
 export function PilotTracker() {
@@ -70,6 +73,23 @@ export function PilotTracker() {
   const [result, setResult] = useState<PasteResult | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [addName, setAddName] = useState('');
+  // Pilots already seen on the maps you can see whose name contains what's
+  // typed: click one to watch them.
+  // Kept with the text they're for, so stale ones never show.
+  const [found, setFound] = useState<{ q: string; rows: KnownPilot[] }>({ q: '', rows: [] });
+  const [addFocused, setAddFocused] = useState(false);
+  const addQuery = addName.trim();
+  useEffect(() => {
+    if (addQuery.length < 2) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      api<KnownPilot[]>(`/api/pilots/known?q=${encodeURIComponent(addQuery)}`)
+        .then((rows) => { if (live) setFound({ q: addQuery, rows }); })
+        .catch(() => { if (live) setFound({ q: addQuery, rows: [] }); });
+    }, 250);
+    return () => { live = false; clearTimeout(timer); };
+  }, [addQuery]);
+  const suggestions = found.q === addQuery && addQuery.length >= 2 ? found.rows : [];
   const [addError, setAddError] = useState<string | null>(null);
 
   // Where a paste is recorded: the selected system, else where you are, if
@@ -93,6 +113,8 @@ export function PilotTracker() {
       }
     } else if (watched.length < MAX_WATCHED) {
       setWatched([...watched, { id: p.id, name: p.name }]);
+      // Intel already in the feed that names them (desktop app; a no-op elsewhere).
+      void recordWatchedFromFeed([{ id: p.id, name: p.name }]).then(() => refreshPilotSightings());
     }
   };
 
@@ -146,6 +168,8 @@ export function PilotTracker() {
       setBusy(false);
     }
   };
+
+  const unwatchedSuggestions = suggestions.filter((k) => !isWatched(k.characterId));
 
   const addByName = async () => {
     const q = addName.trim();
@@ -314,9 +338,32 @@ export function PilotTracker() {
         {watched.length < MAX_WATCHED && (
           <form className={styles.add} onSubmit={(e) => { e.preventDefault(); void addByName(); }}>
             <input className={styles.addInput} value={addName} onChange={(e) => setAddName(e.target.value)}
+              onFocus={() => setAddFocused(true)} onBlur={() => setAddFocused(false)}
+              onKeyDown={(e) => { if (e.key === 'Escape') setFound({ q: '', rows: [] }); }}
               placeholder={t('pilots.addPlaceholder')} aria-label={t('pilots.addPlaceholder')} spellCheck={false} />
             <button type="submit" className="btn btn--ghost" disabled={!addName.trim()}>{t('pilots.add')}</button>
           </form>
+        )}
+        {addFocused && unwatchedSuggestions.length > 0 && (
+          <ul className={styles.suggestions} aria-label={t('pilots.suggestions')}>
+            {unwatchedSuggestions.map((k) => (
+              <li key={k.characterId}>
+                {/* mousedown, not click: the input's blur would hide the list first. */}
+                <button type="button" className={styles.suggestion}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    toggleWatch({ id: k.characterId, name: k.name });
+                    setAddName('');
+                    setAddError(null);
+                  }}>
+                  <span className={styles.suggestionName}>{k.name}</span>
+                  <span className={styles.org}>
+                    {[k.systemName, timeAgo(t, new Date(k.seenAt))].filter(Boolean).join(', ')}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
         {addError && <p className={styles.error} role="alert">{addError}</p>}
       </section>

@@ -88,7 +88,7 @@ describe.skipIf(!dbReady)('pilot sightings (integration)', () => {
   });
 
   const sightings = (u: U, query = '') =>
-    request(makeApp(u)).get(`/api/pilots/sightings?ids=90000001,90000002${query}`);
+    request(makeApp(u)).get(`/api/pilots/sightings?ids=90000001,90000002,90000003${query}`);
 
   it('records every pilot of a local list pinned to a system', async () => {
     const pin = await request(makeApp(member)).post('/api/dscan').send({ text: 'Bob Pilot\nAlice', mapId, systemId: sysId });
@@ -126,6 +126,39 @@ describe.skipIf(!dbReady)('pilot sightings (integration)', () => {
     expect(ok.status).toBe(200);
     expect(ok.body.added).toBe(1);
     expect((await sightings(member)).body[0]).toMatchObject({ systemName: 'Amarr', source: 'intel', name: 'Alice' });
+  });
+
+  it('records intel at the time it was posted, once however often it is sent', async () => {
+    const at = Date.now() - 3 * 3_600_000;
+    const line = { mapId, eveSystemId: 30002187, pilots: [{ id: 90000003, name: 'Bob' }], seenAt: at };
+    const first = await request(makeApp(member)).post('/api/pilots/sightings').send(line);
+    expect(first.body.added).toBe(1);
+    // Watching again looks back over the same feed: nothing new.
+    expect((await request(makeApp(member)).post('/api/pilots/sightings').send(line)).body.added).toBe(0);
+    const row = (await sightings(member)).body.find((r: { name: string }) => r.name === 'Bob');
+    expect(Math.abs(new Date(row.seenAt).getTime() - at)).toBeLessThan(1000);
+    // A sighting now, hours later, still counts.
+    const now = await request(makeApp(member)).post('/api/pilots/sightings').send({ ...line, seenAt: undefined });
+    expect(now.body.added).toBe(1);
+  });
+
+  it('refuses a posted time outside the 30 days kept or in the future', async () => {
+    const base = { mapId, eveSystemId: JITA, pilots: [{ id: 90000003, name: 'Bob' }] };
+    for (const seenAt of [Date.now() - 31 * 86_400_000, Date.now() + 3_600_000, 'yesterday']) {
+      expect((await request(makeApp(member)).post('/api/pilots/sightings').send({ ...base, seenAt })).status).toBe(400);
+    }
+  });
+
+  it('suggests pilots seen on visible maps by part of their name', async () => {
+    await request(makeApp(member)).post('/api/dscan').send({ text: 'Bob Pilot\nAlice', mapId, systemId: sysId });
+    const known = (u: U, q: string) => request(makeApp(u)).get(`/api/pilots/known?q=${encodeURIComponent(q)}`);
+    const res = await known(readonly, 'lic');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([expect.objectContaining({ name: 'Alice', systemName: 'Jita' })]);
+    expect((await known(outsider, 'lic')).body).toEqual([]);
+    // Wildcards are matched as text, not patterns.
+    expect((await known(member, '%_')).body).toEqual([]);
+    expect((await known(member, 'a')).status).toBe(400);
   });
 
   it('refuses a malformed intel sighting', async () => {

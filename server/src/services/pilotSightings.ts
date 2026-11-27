@@ -32,6 +32,8 @@ export async function recordSightings(p: {
   pilots: SightedPilot[];
   source: SightingSource;
   seenBy: number | null;
+  /** When they were seen (an intel line's own time), or now. */
+  seenAt?: Date;
 }): Promise<number> {
   const byId = new Map<number, SightedPilot>();
   for (const x of p.pilots) if (Number.isInteger(x.id) && x.id > 0 && !byId.has(x.id)) byId.set(x.id, x);
@@ -39,13 +41,17 @@ export async function recordSightings(p: {
   if (pilots.length === 0) return 0;
   const { rowCount } = await db.query(
     `INSERT INTO pilot_sightings
-            (map_id, eve_system_id, character_id, character_name, corp_id, alliance_id, source, seen_by)
-     SELECT $1, $2, p.id, p.name, p.corp, p.alliance, $3, $4
+            (map_id, eve_system_id, character_id, character_name, corp_id, alliance_id, source, seen_by, seen_at)
+     SELECT $1, $2, p.id, p.name, p.corp, p.alliance, $3, $4, COALESCE($10::timestamptz, NOW())
        FROM unnest($5::int[], $6::text[], $7::int[], $8::int[]) AS p(id, name, corp, alliance)
       WHERE NOT EXISTS (
+        -- One per pilot, system and map within REPEAT_MINUTES either side, so
+        -- an intel line recorded again (watching a pilot looks back over the
+        -- feed) adds nothing.
         SELECT 1 FROM pilot_sightings s
          WHERE s.character_id = p.id AND s.map_id = $1 AND s.eve_system_id = $2
-           AND s.seen_at > NOW() - make_interval(mins => $9))`,
+           AND s.seen_at BETWEEN COALESCE($10::timestamptz, NOW()) - make_interval(mins => $9)
+                             AND COALESCE($10::timestamptz, NOW()) + make_interval(mins => $9))`,
     [
       p.mapId, p.eveSystemId, p.source, p.seenBy,
       pilots.map((x) => x.id),
@@ -53,6 +59,7 @@ export async function recordSightings(p: {
       pilots.map((x) => x.corpId ?? null),
       pilots.map((x) => x.allianceId ?? null),
       REPEAT_MINUTES,
+      p.seenAt ?? null,
     ],
   );
   return rowCount ?? 0;
@@ -72,6 +79,37 @@ export interface Sighting {
 
 /** Sightings of these pilots on these maps in the last SIGHTING_DAYS, newest
  *  first. The caller passes only maps the requester can see. */
+export interface KnownPilot { characterId: number; name: string; systemName: string | null; seenAt: string }
+
+/**
+ * Pilots seen on these maps in the last 30 days whose name contains `q`
+ * (case-insensitive), newest sighting first: suggestions for the watch list's
+ * Add box. `q` is matched literally (LIKE wildcards escaped).
+ */
+export async function searchKnownPilots(q: string, mapIds: string[], limit = 10): Promise<KnownPilot[]> {
+  if (mapIds.length === 0) return [];
+  const pattern = `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+  const { rows } = await db.query<{
+    character_id: number; character_name: string; system_name: string | null; seen_at: Date;
+  }>(
+    `SELECT * FROM (
+       SELECT DISTINCT ON (s.character_id) s.character_id, s.character_name, ss.name AS system_name, s.seen_at
+         FROM pilot_sightings s
+         LEFT JOIN solar_systems ss ON ss.id = s.eve_system_id
+        WHERE s.map_id = ANY($1::uuid[])
+          AND s.seen_at > NOW() - make_interval(days => $2)
+          AND s.character_name ILIKE $3
+        ORDER BY s.character_id, s.seen_at DESC
+     ) k
+     ORDER BY k.seen_at DESC
+     LIMIT $4`,
+    [mapIds, SIGHTING_DAYS, pattern, limit],
+  );
+  return rows.map((r) => ({
+    characterId: r.character_id, name: r.character_name, systemName: r.system_name, seenAt: r.seen_at.toISOString(),
+  }));
+}
+
 export async function listSightings(characterIds: number[], mapIds: string[]): Promise<Sighting[]> {
   if (characterIds.length === 0 || mapIds.length === 0) return [];
   const { rows } = await db.query<{

@@ -1965,7 +1965,8 @@
       "evIntel": "New intel",
       "desktopAlwaysOn": "Always on in the desktop app; intel is read in this voice too. Mute it here.",
       "voiceOn": "Voice",
-      "voiceVolume": "Voice volume — {{pct}}%"
+      "voiceVolume": "Voice volume — {{pct}}%",
+      "evWatchedAnyRange": "Watched pilots in intel, at any range"
     },
     "bookmarkHelp": "On a wormhole signature row, click the copy icon to copy a paste-ready bookmark name, then paste it into the in-game bookmark. Build the name with these tokens:",
     "browserNotifications": "Browser Notifications",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, reported",
       "intelSpeakHere": "{{system}}, in your system",
       "intelSpeak_one": "{{system}}, {{count}} jump",
-      "intelSpeak_other": "{{system}}, {{count}} jumps"
+      "intelSpeak_other": "{{system}}, {{count}} jumps",
+      "watchedSpeak": "Watched pilot, {{pilots}}"
     },
     "resetLayout": "Reset toolbar layout",
     "role": "Role: {{role}}",
@@ -3327,6 +3329,7 @@
     "heatPick": "Pick a pilot in the Intel panel",
     "markOnMap": "Mark on map",
     "markOnMapHint": "Put a marker on every system a watched pilot was seen in",
-    "seenHere": "Watched pilots seen here: {{list}}"
+    "seenHere": "Watched pilots seen here: {{list}}",
+    "suggestions": "Pilots seen on your maps"
   }
 }

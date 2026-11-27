@@ -1965,7 +1965,8 @@
       "evIntel": "Neue Intel",
       "desktopAlwaysOn": "In der Desktop-App immer an; auch Intel wird mit dieser Stimme vorgelesen. Hier stummschalten.",
       "voiceOn": "Stimme",
-      "voiceVolume": "Lautstärke der Stimme — {{pct}} %"
+      "voiceVolume": "Lautstärke der Stimme — {{pct}} %",
+      "evWatchedAnyRange": "Beobachtete Piloten in Intel, in jeder Entfernung"
     },
     "bookmarkHelp": "Klicke in der Zeile einer Wurmloch-Signatur auf das Kopiersymbol, um einen fertigen Lesezeichennamen zu kopieren, und füge ihn in das Ingame-Lesezeichen ein. Erstelle den Namen mit diesen Tokens:",
     "browserNotifications": "Browser-Benachrichtigungen",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, gemeldet",
       "intelSpeakHere": "{{system}}, in deinem System",
       "intelSpeak_one": "{{system}}, {{count}} Sprung",
-      "intelSpeak_other": "{{system}}, {{count}} Sprünge"
+      "intelSpeak_other": "{{system}}, {{count}} Sprünge",
+      "watchedSpeak": "Beobachteter Pilot, {{pilots}}"
     },
     "resetLayout": "Symbolleisten-Layout zurücksetzen",
     "role": "Rolle: {{role}}",
@@ -3327,6 +3329,7 @@
     "heatPick": "Wähle einen Piloten im Intel-Panel",
     "markOnMap": "Auf Karte markieren",
     "markOnMapHint": "Jedes System markieren, in dem ein beobachteter Pilot gesehen wurde",
-    "seenHere": "Hier gesehene beobachtete Piloten: {{list}}"
+    "seenHere": "Hier gesehene beobachtete Piloten: {{list}}",
+    "suggestions": "Auf deinen Karten gesehene Piloten"
   }
 }

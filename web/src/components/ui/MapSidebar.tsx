@@ -1794,7 +1794,7 @@ export function MapSidebar() {
                 { value: "2", label: t("mapSidebar.proximityLe", { count: 2 }) },
                 { value: "3", label: t("mapSidebar.proximityLe", { count: 3 }) },
                 { value: "4", label: t("mapSidebar.proximityLe", { count: 4 }) },
-                { value: "5", label: t("mapSidebar.proximityLe", { count: 5 }) },
+                ...[5, 6, 7, 8, 9, 10].map((n) => ({ value: String(n), label: t("mapSidebar.proximityLe", { count: n }) })),
               ]}
             />
           </div>

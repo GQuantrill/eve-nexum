@@ -1965,7 +1965,8 @@
       "evIntel": "새 인텔",
       "desktopAlwaysOn": "데스크톱 앱에서는 항상 켜져 있으며, 인텔도 이 목소리로 읽습니다. 여기서 음소거하세요.",
       "voiceOn": "음성",
-      "voiceVolume": "음성 볼륨 — {{pct}}%"
+      "voiceVolume": "음성 볼륨 — {{pct}}%",
+      "evWatchedAnyRange": "인텔의 감시 파일럿 (거리 무관)"
     },
     "bookmarkHelp": "웜홀 시그니처 행에서 복사 아이콘을 클릭하면 붙여넣기용 북마크 이름이 복사됩니다. 게임 내 북마크에 붙여넣으세요. 다음 토큰으로 이름을 구성합니다:",
     "browserNotifications": "브라우저 알림",
@@ -2779,7 +2780,8 @@
       "intelSpeakReported": "{{system}}, 보고됨",
       "intelSpeakHere": "{{system}}, 현재 성계",
       "intelSpeak_one": "{{system}}, {{count}}점프",
-      "intelSpeak_other": "{{system}}, {{count}}점프"
+      "intelSpeak_other": "{{system}}, {{count}}점프",
+      "watchedSpeak": "감시 파일럿, {{pilots}}"
     },
     "resetLayout": "툴바 레이아웃 초기화",
     "role": "권한: {{role}}",
@@ -3319,6 +3321,7 @@
     "heatPick": "인텔 패널에서 파일럿을 선택하세요",
     "markOnMap": "지도에 표시",
     "markOnMapHint": "주시 중인 파일럿이 목격된 모든 성계에 표시",
-    "seenHere": "여기서 목격된 주시 파일럿: {{list}}"
+    "seenHere": "여기서 목격된 주시 파일럿: {{list}}",
+    "suggestions": "내 지도에서 목격된 파일럿"
   }
 }

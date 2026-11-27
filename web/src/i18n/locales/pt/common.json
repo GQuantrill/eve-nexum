@@ -1965,7 +1965,8 @@
       "evIntel": "Novo intel",
       "desktopAlwaysOn": "Sempre ligada na app de desktop; o intel também é lido com esta voz. Silencie-a aqui.",
       "voiceOn": "Voz",
-      "voiceVolume": "Volume da voz — {{pct}}%"
+      "voiceVolume": "Volume da voz — {{pct}}%",
+      "evWatchedAnyRange": "Pilotos vigiados no intel, a qualquer distância"
     },
     "bookmarkHelp": "Na linha de uma assinatura de buraco de minhoca, clique no ícone de copiar para copiar um nome de marcador pronto e cole-o no marcador do jogo. Monte o nome com estes tokens:",
     "browserNotifications": "Notificações do navegador",
@@ -2781,7 +2782,8 @@
       "intelSpeakReported": "{{system}}, reportado",
       "intelSpeakHere": "{{system}}, no seu sistema",
       "intelSpeak_one": "{{system}}, {{count}} salto",
-      "intelSpeak_other": "{{system}}, {{count}} saltos"
+      "intelSpeak_other": "{{system}}, {{count}} saltos",
+      "watchedSpeak": "Piloto vigiado, {{pilots}}"
     },
     "resetLayout": "Repor disposição da barra de ferramentas",
     "role": "Função: {{role}}",
@@ -3327,6 +3329,7 @@
     "heatPick": "Escolha um piloto no painel Intel",
     "markOnMap": "Marcar no mapa",
     "markOnMapHint": "Marcar cada sistema onde um piloto vigiado foi visto",
-    "seenHere": "Pilotos vigiados vistos aqui: {{list}}"
+    "seenHere": "Pilotos vigiados vistos aqui: {{list}}",
+    "suggestions": "Pilotos vistos nos seus mapas"
   }
 }

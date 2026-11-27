@@ -28,6 +28,8 @@ export const ANN = {
   newChain:   'nexum.announcer.ev.newChain',
   // Desktop app only: a new intel report within the pilot's intel range.
   intel:      'nexum.announcer.ev.intel',
+  /** Intel naming a watched pilot, read out however far away it is. */
+  watchedAnyRange: 'nexum.announcer.ev.watchedAnyRange',
 } as const;
 
 /**

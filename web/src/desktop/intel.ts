@@ -1,11 +1,10 @@
 import { useSyncExternalStore } from 'react';
 import { onDesktopEvent, desktopInvoke, isDesktop } from './bridge';
 import { useMapStore } from '../store/mapStore';
-import { playIntelSound, DEFAULT_INTEL_SOUND } from './intelSounds';
-import { NOTIFY, notifyOn, INTEL_SOUND_NAME_KEY } from '../utils/notificationPrefs';
+import { playIntelSound } from './intelSounds';
 import { api } from '../api/client';
 import { readUserSetting } from '../hooks/useUserSetting';
-import { sanitiseWatched, WATCH_KEY } from '../utils/pilotWatch';
+import { sanitiseWatched, WATCH_KEY, type WatchedPilot } from '../utils/pilotWatch';
 
 // Desktop only: the app follows the pilot's chosen intel channels (EVE chat
 // logs) and sends each new line here. A line naming a system on the open map
@@ -25,16 +24,14 @@ const SECONDS = [5, 10, 15, 30];
 const CLEAR = /(^|[^a-z0-9])(clr|clear)([^a-z0-9]|$)/i;
 
 // The app also sends its own (older) sound and speech settings with each line
-// (sound, soundName, speak, speakVolume...). They're ignored: whether intel
-// makes a sound, which, and the voice are Nexum's Notifications and Announcer
-// settings now, so sound is managed in one place.
+// (sound, soundName, speak, speakVolume, alertRange...). They're ignored:
+// intel alerts within the proximity alert range, and whether it makes a sound,
+// which, and the voice are Nexum's Notifications and Announcer settings, so
+// alerts are managed in one place.
 export interface IntelLine {
   channel: string; sender: string; text: string; at: number;
   /** Older app versions don't send these: 5 s, normal. */
   pulseSecs?: number; pulse?: IntelPulse;
-  /** Sound and voice only within this many jumps of the pilot; null (or an
-   *  older app that doesn't send it) = for any system on the open map. */
-  alertRange?: number | null;
 }
 
 // ── Which systems are pulsing ───────────────────────────────────────────────
@@ -88,11 +85,8 @@ const BATCH_MAX = 60;
 
 export interface IntelReport {
   eveSystemId: number; name: string; at: number;
-  /** Sound and voice only within this many jumps; null = for any system on
-   *  the open map (see onMap). */
-  range: number | null;
-  /** The system is on the open map. */
-  onMap: boolean;
+  /** Watched pilots the line names (they can be announced at any range). */
+  pilots: string[];
 }
 
 let reports = new Map<number, IntelReport>();
@@ -143,18 +137,23 @@ async function flush(): Promise<void> {
     } catch { /* rate-limited or offline: try these words again next time */ }
   }
   const next = new Map(reports);
-  const onMap = new Set(useMapStore.getState().map.systems.map((s) => s.name.toLowerCase()));
+  const watched = sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
   for (const { line } of items.filter((q) => q.report)) {
     const clear = CLEAR.test(line.text);
+    const sender = line.sender.trim().toLowerCase();
+    const pilots = watched
+      .filter((w) => w.name.toLowerCase() !== sender && namesPilot(line.text, w.name))
+      .map((w) => w.name);
+    const inPilotNames = new Set(pilots.flatMap((p) => candidateNames(p)));
     for (const n of candidateNames(line.text)) {
+      if (inPilotNames.has(n)) continue;   // a pilot's name, not a system
       const sys = known.get(n);
       if (!sys) continue;
       if (clear) next.delete(sys.eveSystemId);
       else next.set(sys.eveSystemId, {
         ...sys,
         at: line.at,
-        range: typeof line.alertRange === 'number' ? line.alertRange : null,
-        onMap: onMap.has(sys.name.toLowerCase()),
+        pilots,
       });
     }
   }
@@ -177,10 +176,11 @@ export function namesPilot(text: string, name: string): boolean {
 
 /** Record each watched pilot named in a live line beside a known system. The
  *  reporter themselves is skipped, and so are "clr" lines. */
-function recordWatched(lines: IntelLine[]): void {
-  const watched = sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
+function recordWatched(lines: IntelLine[], only?: WatchedPilot[], withTime = false): Promise<unknown>[] {
+  const watched = only ?? sanitiseWatched(readUserSetting<unknown>(WATCH_KEY, []));
   const mapId = useMapStore.getState().activeMapId;
-  if (watched.length === 0 || !mapId) return;
+  const posts: Promise<unknown>[] = [];
+  if (watched.length === 0 || !mapId) return posts;
   for (const line of lines) {
     if (CLEAR.test(line.text)) continue;
     const pilots = watched.filter((w) =>
@@ -191,12 +191,30 @@ function recordWatched(lines: IntelLine[]): void {
     const sys = candidateNames(line.text).filter((n) => !inNames.has(n)).map((n) => known.get(n))
       .find((v): v is { eveSystemId: number; name: string } => !!v);
     if (!sys) continue;
-    void api('/api/pilots/sightings', {
+    posts.push(api('/api/pilots/sightings', {
       method: 'POST',
-      body: JSON.stringify({ mapId, eveSystemId: sys.eveSystemId, pilots: pilots.slice(0, 20) }),
-    }).catch(() => { /* read-only map, offline: not worth a toast */ });
+      body: JSON.stringify({
+        mapId, eveSystemId: sys.eveSystemId, pilots: pilots.slice(0, 20),
+        ...(withTime ? { seenAt: line.at } : {}),
+      }),
+    }).catch(() => { /* read-only map, offline: not worth a toast */ }));
   }
+  return posts;
 }
+
+/**
+ * A pilot just added to the watch list: look back over the intel already in
+ * the feed, so a report posted moments before they were watched still counts
+ * (each at the time it was posted; the server ignores one it already has).
+ * Lines arrive being checked against the watch list as it was then, so
+ * without this, watching someone who was just reported shows them unseen.
+ */
+export async function recordWatchedFromFeed(pilots: WatchedPilot[]): Promise<void> {
+  if (!recording || pilots.length === 0) return;
+  const cutoff = Date.now() - SIGHTING_MS;
+  await Promise.all(recordWatched(feed.lines.filter((l) => l.at >= cutoff), pilots, true));
+}
+const SIGHTING_MS = 30 * 86_400_000;
 
 function queueLookup(line: IntelLine, report: boolean): void {
   queued.push({ line, report });
@@ -286,11 +304,6 @@ export function startIntel(quiet = false): () => void {
     const level = PULSES.includes(line.pulse as IntelPulse) ? line.pulse! : 'normal';
     const secs = SECONDS.includes(line.pulseSecs ?? 0) ? line.pulseSecs! : 5;
     if (level !== 'off') ids.forEach((id) => pulse(id, secs * 1000, level));
-    // With a jump range set, the proximity alerts play it once the distance
-    // is known (hooks/useProximityAlerts).
-    if (notifyOn(NOTIFY.intelSound) && typeof line.alertRange !== 'number') {
-      playIntelSound(readUserSetting<string>(INTEL_SOUND_NAME_KEY, DEFAULT_INTEL_SOUND));
-    }
   });
   return () => { off(); offChannels(); offPreview(); clearInterval(expiry); if (!quiet) recording = false; };
 }

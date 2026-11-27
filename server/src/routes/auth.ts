@@ -947,6 +947,7 @@ const SETTINGS_ALLOWLIST = new Set<string>([
   'nexum.announcer.ev.kills',
   'nexum.announcer.ev.newChain',
   'nexum.announcer.ev.intel',
+  'nexum.announcer.ev.watchedAnyRange',
   // The voice's own mute and volume, apart from the alert sounds'.
   'nexum.announcer.voiceOn',
   'nexum.announcer.volume',

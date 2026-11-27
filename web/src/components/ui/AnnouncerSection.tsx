@@ -154,6 +154,7 @@ export function AnnouncerSection() {
             {t("mapSidebar.announcer.announce")}
           </div>
           {desktop && <EventToggle settingKey={ANN.intel} label={t("mapSidebar.announcer.evIntel")} />}
+          {desktop && <EventToggle settingKey={ANN.watchedAnyRange} label={t("mapSidebar.announcer.evWatchedAnyRange")} />}
           <EventToggle settingKey={ANN.connect} label={t("mapSidebar.announcer.evConnect")} />
           <EventToggle settingKey={ANN.incursions} label={t("mapSidebar.announcer.evIncursions")} />
           <EventToggle settingKey={ANN.lawless} label={t("mapSidebar.announcer.evLawless")} />
