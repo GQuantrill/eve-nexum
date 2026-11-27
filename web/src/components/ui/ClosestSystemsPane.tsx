@@ -7,13 +7,13 @@ import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } 
 import { CSS } from '@dnd-kit/utilities';
 import { MapPinSimpleIcon, PathIcon, XIcon, PlusIcon, HouseIcon, TrashIcon, LightbulbIcon } from '../../icons';
 import { ClosestSuggestionsModal } from './ClosestSuggestionsModal';
-import { useRoute, type RouteEntry } from '../../hooks/useRoute';
+import { useRouteResult, type RouteEntry } from '../../hooks/useRoute';
 import { useEsiSearch } from '../../hooks/useEsiSearch';
 import { useSearchKeys } from '../../hooks/useSearchKeys';
 import { useMapStore } from '../../store/mapStore';
 import { useAllMapHomes } from '../../hooks/useMapHomes';
 import { useUserSetting } from '../../hooks/useUserSetting';
-import { RouteSquares } from './routeUi';
+import { RouteSquares, RouteOriginNote } from './routeUi';
 import { setWaypoint, canSetAutopilot } from '../../utils/routeActions';
 import { useSystemAlias } from '../../hooks/useSystemAlias';
 import { useRouteOrigin } from '../../hooks/useRouteOrigin';
@@ -167,7 +167,6 @@ function Row({ item, route, isOpen, onToggle, onRemove, routeMode }: RowProps) {
 export function ClosestSystemsPane() {
   const { t } = useTranslation();
   const aliasName = useSystemAlias();
-  const origin    = useRouteOrigin();
   const routeMode = useMapStore((s) => s.routeMode);
   // Home rows span every map the user can see, not just the active tab — this
   // pane is a per-user tool. Deduped by eve id.
@@ -178,6 +177,9 @@ export function ClosestSystemsPane() {
   const list = useMemo(() => sanitiseList(listRaw), [listRaw]);
   const [hiddenHomeArr, setHiddenHomeArr] = useUserSetting<number[]>(HIDDEN_HOME_KEY, []);
   const [allMaps, setAllMaps] = useUserSetting<boolean>(ALL_MAPS_KEY, true);
+  // The start follows the same scope as the route: with every map's chains in
+  // play, a hole on any of them is somewhere to start from.
+  const origin    = useRouteOrigin(allMaps ? 'all' : 'active');
   const hiddenHome = useMemo(() => new Set(hiddenHomeArr), [hiddenHomeArr]);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [adding, setAdding]     = useState(false);
@@ -239,7 +241,10 @@ export function ClosestSystemsPane() {
   // they're actually in routes regardless of which tab is active; 'active'
   // restricts it to the open map, for when a hop from a map you aren't looking
   // at is more confusing than helpful.
-  const routes    = useRoute(origin.systemId, targetIds, allMaps ? 'all' : 'active');
+  const { routes, settled } = useRouteResult(origin.systemId, targetIds, allMaps ? 'all' : 'active');
+  // Starting in a hole that none of the chains in play contains: the server
+  // can't place it, so nothing comes back. Say so rather than show bare rows.
+  const holeNotMapped = origin.inWormhole && settled && targetIds.length > 0 && Object.keys(routes).length === 0;
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
@@ -299,7 +304,9 @@ export function ClosestSystemsPane() {
   if (!canRoute) {
     return (
       <div className="scout-pane__empty">
-        {t('closest.signIn')}
+        {origin.blocked === 'wormholeOptionOff' ? t('closest.inWormhole')
+          : origin.blocked === 'notOnMap' ? t('closest.notOnMap')
+          : t('closest.signIn')}
       </div>
     );
   }
@@ -314,11 +321,8 @@ export function ClosestSystemsPane() {
 
   return (
     <div className="scout-pane">
-      {origin.characterName && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromCharacter', { character: origin.characterName, system: aliasName(origin.name) })}</div>
-      ) : origin.fromLastKnown && origin.name ? (
-        <div className="scout-pane__note scout-pane__note--lastknown">{t('route.fromLastKnown', { system: aliasName(origin.name) })}</div>
-      ) : null}
+      <RouteOriginNote origin={origin} />
+      {holeNotMapped && <div className="scout-pane__note">{t('closest.holeNotMapped')}</div>}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => String(i.id))} strategy={verticalListSortingStrategy}>
           {items.map((i) => (

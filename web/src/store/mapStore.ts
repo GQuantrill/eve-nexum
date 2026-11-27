@@ -33,6 +33,14 @@ export interface RouteOriginOverride {
   systemClass:   string | null;   // for the k-space gate in useRouteOrigin
 }
 
+/** A mapped system picked with "Route from here": route panes count jumps from
+ *  it, whoever is where. Wins over every character origin until cleared. */
+export interface RouteFromSystem {
+  eveSystemId: number;
+  systemName:  string;
+  systemClass: string | null;
+}
+
 // Debounce position saves — fires max once per 500 ms per system
 const moveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
@@ -303,6 +311,8 @@ interface MapStore {
   // active character. null = use the active character's live location.
   routeOrigin: RouteOriginOverride | null;
   setRouteOrigin: (o: RouteOriginOverride | null) => void;
+  routeFromSystem: RouteFromSystem | null;
+  setRouteFromSystem: (o: RouteFromSystem | null) => void;
 
   // Undo
   undoStack: UndoCommand[];
@@ -712,6 +722,8 @@ export const useMapStore = create<MapStore>()((set, get) => {
     centerRequestNodeId: null,
     routeHighlight: null,
     routeOrigin: null,
+    routeFromSystem: null,
+    setRouteFromSystem: (o) => set({ routeFromSystem: o }),
     sigRev: {},
     bumpSigRev: (systemId) =>
       set((s) => ({ sigRev: { ...s.sigRev, [systemId]: (s.sigRev[systemId] ?? 0) + 1 } })),

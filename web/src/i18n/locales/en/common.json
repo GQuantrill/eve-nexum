@@ -784,7 +784,10 @@
         "incursion": "No incursions reachable from here.",
         "generic": "None reachable from here."
       }
-    }
+    },
+    "inWormhole": "You're in a wormhole, which has no stargates. Turn on \"Include wormhole chain\" in the Route settings to count jumps out through your mapped chain, or right-click an exit on the map and pick \"Route from here\".",
+    "notOnMap": "Your system isn't on the open map. Open the map with your chain, or turn on \"Route across all my maps\".",
+    "holeNotMapped": "Your system isn't on any map you can see, so nothing can be reached from it. Map your chain, or right-click an exit and pick \"Route from here\"."
   },
   "commandPalette": {
     "placeholder": "Search systems and maps…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "Your browser won't let nexum read the clipboard. Press Ctrl+V (Cmd+V on a Mac) on the map instead.",
     "pasteNoSystems": "No copied systems on the clipboard. Right-click systems and choose Copy systems first.",
     "exportSystems": "Export systems ({{count}})…",
-    "importSystems": "Import systems…"
+    "importSystems": "Import systems…",
+    "routeFromHere": "Route from here",
+    "stopRouteFromHere": "Stop routing from here"
   },
   "customIntel": {
     "title": "Custom Intel",
@@ -2413,7 +2418,10 @@
     "riskCritical": "Critical mass",
     "riskFrig": "Frigate hole",
     "jspaceNoWaypoint": "Wormhole systems can't be set as an autopilot destination.",
-    "viaMap": "on {{map}}"
+    "viaMap": "on {{map}}",
+    "fromPinned": "Jumps from {{system}} (picked on the map)",
+    "clearPinned": "Use my location",
+    "originSkipped": "Can't route from {{name}}, so jumps are from your own location."
   },
   "routeToast": {
     "destinationSet": "Destination set to {{system}}",

@@ -784,7 +784,10 @@
         "incursion": "Von hier ist keine Incursion erreichbar.",
         "generic": "Von hier ist nichts erreichbar."
       }
-    }
+    },
+    "inWormhole": "Du bist in einem Wurmloch, dort gibt es keine Stargates. Aktiviere „Wurmlochkette einbeziehen“ in den Routen-Einstellungen, um Sprünge über deine kartierte Kette zu zählen, oder klicke auf der Karte mit rechts auf einen Ausgang und wähle „Route von hier“.",
+    "notOnMap": "Dein System ist nicht auf der geöffneten Karte. Öffne die Karte mit deiner Kette oder aktiviere „Über alle meine Karten routen“.",
+    "holeNotMapped": "Dein System ist auf keiner Karte, die du sehen kannst, daher ist von dort nichts erreichbar. Kartiere deine Kette oder klicke mit rechts auf einen Ausgang und wähle „Route von hier“."
   },
   "commandPalette": {
     "placeholder": "Systeme und Karten suchen…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "Dein Browser lässt nexum die Zwischenablage nicht lesen. Drücke stattdessen Strg+V (Cmd+V auf dem Mac) auf der Karte.",
     "pasteNoSystems": "Keine kopierten Systeme in der Zwischenablage. Rechtsklicke zuerst auf Systeme und wähle Systeme kopieren.",
     "exportSystems": "Systeme exportieren ({{count}})…",
-    "importSystems": "Systeme importieren…"
+    "importSystems": "Systeme importieren…",
+    "routeFromHere": "Route von hier",
+    "stopRouteFromHere": "Nicht mehr von hier routen"
   },
   "customIntel": {
     "title": "Eigene Intel",
@@ -2413,7 +2418,10 @@
     "riskFrig": "Fregatten-Loch",
     "jspaceNoWaypoint": "Wurmloch-Systeme können nicht als Autopilot-Ziel gesetzt werden.",
     "viaAnsiblex": "Ansiblex-Sprungtor",
-    "viaMap": "auf {{map}}"
+    "viaMap": "auf {{map}}",
+    "fromPinned": "Sprünge ab {{system}} (auf der Karte gewählt)",
+    "clearPinned": "Meinen Standort nutzen",
+    "originSkipped": "Von {{name}} aus ist keine Route möglich, daher zählen die Sprünge ab deinem eigenen Standort."
   },
   "routeToast": {
     "destinationSet": "Ziel festgelegt auf {{system}}",

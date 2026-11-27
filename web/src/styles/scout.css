@@ -628,3 +628,12 @@
   justify-content: center;
   white-space: nowrap;
 }
+
+/* "Jumps from <system>" for a system picked with Route from here: the name,
+   and a button to go back to the pilot's own location. */
+.scout-pane__note--pinned {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}

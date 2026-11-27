@@ -784,7 +784,10 @@
         "incursion": "Nenhuma incursão alcançável daqui.",
         "generic": "Nada alcançável daqui."
       }
-    }
+    },
+    "inWormhole": "Estás num buraco de minhoca, que não tem portais estelares. Ativa «Incluir cadeia de buracos de minhoca» nas definições de rota para contar saltos pela tua cadeia mapeada, ou clica com o botão direito numa saída do mapa e escolhe «Rota a partir daqui».",
+    "notOnMap": "O teu sistema não está no mapa aberto. Abre o mapa com a tua cadeia ou ativa «Calcular em todos os meus mapas».",
+    "holeNotMapped": "O teu sistema não está em nenhum mapa que possas ver, por isso nada é alcançável a partir dele. Mapeia a tua cadeia ou clica com o botão direito numa saída e escolhe «Rota a partir daqui»."
   },
   "commandPalette": {
     "placeholder": "Procurar sistemas e mapas…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "O seu navegador não deixa o nexum ler a área de transferência. Prima Ctrl+V (Cmd+V no Mac) no mapa.",
     "pasteNoSystems": "Não há sistemas copiados na área de transferência. Clique primeiro com o botão direito em sistemas e escolha Copiar sistemas.",
     "exportSystems": "Exportar sistemas ({{count}})…",
-    "importSystems": "Importar sistemas…"
+    "importSystems": "Importar sistemas…",
+    "routeFromHere": "Rota a partir daqui",
+    "stopRouteFromHere": "Deixar de calcular a partir daqui"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2413,7 +2418,10 @@
     "riskFrig": "Buraco de fragata",
     "jspaceNoWaypoint": "Sistemas de buraco de minhoca não podem ser definidos como destino do piloto automático.",
     "viaAnsiblex": "Portão de salto Ansiblex",
-    "viaMap": "em {{map}}"
+    "viaMap": "em {{map}}",
+    "fromPinned": "Saltos a partir de {{system}} (escolhido no mapa)",
+    "clearPinned": "Usar a minha localização",
+    "originSkipped": "Não é possível calcular rota a partir de {{name}}, por isso os saltos são a partir da tua localização."
   },
   "routeToast": {
     "destinationSet": "Destino definido para {{system}}",

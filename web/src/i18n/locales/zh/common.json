@@ -784,7 +784,10 @@
         "incursion": "从这里无法到达任何入侵。",
         "generic": "从这里无法到达。"
       }
-    }
+    },
+    "inWormhole": "你在虫洞中，那里没有星门。在路线设置中开启“包含虫洞链”，即可通过已绘制的链计算跳跃数；或在地图上右键点击一个出口，选择“从这里规划路线”。",
+    "notOnMap": "你所在的星系不在当前打开的地图上。请打开含有你的链的地图，或开启“跨所有地图计算路线”。",
+    "holeNotMapped": "你所在的星系不在你能看到的任何地图上，因此从这里无法到达任何地方。请绘制你的链，或右键点击一个出口并选择“从这里规划路线”。"
   },
   "commandPalette": {
     "placeholder": "搜索星系和地图…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "你的浏览器不允许 nexum 读取剪贴板。请改为在地图上按 Ctrl+V（Mac 上为 Cmd+V）。",
     "pasteNoSystems": "剪贴板上没有复制的星系。请先右键点击星系并选择“复制星系”。",
     "exportSystems": "导出星系（{{count}}）…",
-    "importSystems": "导入星系…"
+    "importSystems": "导入星系…",
+    "routeFromHere": "从这里规划路线",
+    "stopRouteFromHere": "停止从这里规划路线"
   },
   "customIntel": {
     "title": "自定义情报",
@@ -2413,7 +2418,10 @@
     "riskFrig": "护卫舰洞",
     "jspaceNoWaypoint": "虫洞星系无法设为自动驾驶目的地。",
     "viaAnsiblex": "Ansiblex 跳跃门",
-    "viaMap": "来自 {{map}}"
+    "viaMap": "来自 {{map}}",
+    "fromPinned": "从 {{system}} 起的跳跃数（在地图上选定）",
+    "clearPinned": "使用我的位置",
+    "originSkipped": "无法从 {{name}} 规划路线，因此跳跃数从你自己的位置计算。"
   },
   "routeToast": {
     "destinationSet": "目的地已设为 {{system}}",

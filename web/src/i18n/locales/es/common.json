@@ -784,7 +784,10 @@
         "incursion": "Ninguna incursión alcanzable desde aquí.",
         "generic": "Nada alcanzable desde aquí."
       }
-    }
+    },
+    "inWormhole": "Estás en un agujero de gusano, que no tiene puertas estelares. Activa «Incluir cadena de agujeros de gusano» en los ajustes de ruta para contar saltos a través de tu cadena mapeada, o haz clic derecho en una salida del mapa y elige «Ruta desde aquí».",
+    "notOnMap": "Tu sistema no está en el mapa abierto. Abre el mapa con tu cadena o activa «Calcular en todos mis mapas».",
+    "holeNotMapped": "Tu sistema no está en ningún mapa que puedas ver, así que no se puede llegar a nada desde él. Mapea tu cadena o haz clic derecho en una salida y elige «Ruta desde aquí»."
   },
   "commandPalette": {
     "placeholder": "Buscar sistemas y mapas…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "Tu navegador no deja que nexum lea el portapapeles. Pulsa Ctrl+V (Cmd+V en Mac) sobre el mapa.",
     "pasteNoSystems": "No hay sistemas copiados en el portapapeles. Primero haz clic derecho en sistemas y elige Copiar sistemas.",
     "exportSystems": "Exportar sistemas ({{count}})…",
-    "importSystems": "Importar sistemas…"
+    "importSystems": "Importar sistemas…",
+    "routeFromHere": "Ruta desde aquí",
+    "stopRouteFromHere": "Dejar de calcular desde aquí"
   },
   "customIntel": {
     "title": "Intel personalizada",
@@ -2413,7 +2418,10 @@
     "riskFrig": "Agujero de fragata",
     "jspaceNoWaypoint": "Los sistemas de agujero de gusano no se pueden establecer como destino del piloto automático.",
     "viaAnsiblex": "Puerta de salto Ansiblex",
-    "viaMap": "en {{map}}"
+    "viaMap": "en {{map}}",
+    "fromPinned": "Saltos desde {{system}} (elegido en el mapa)",
+    "clearPinned": "Usar mi ubicación",
+    "originSkipped": "No se puede calcular una ruta desde {{name}}, así que los saltos son desde tu ubicación."
   },
   "routeToast": {
     "destinationSet": "Destino establecido en {{system}}",

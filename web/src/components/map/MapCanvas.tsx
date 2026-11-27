@@ -44,6 +44,7 @@ import {
   UploadSimpleIcon,
   UsersThreeIcon,
   PushPinIcon,
+  NavigationArrowIcon,
 } from '../../icons';
 import { PREDEFINED_LABELS } from '../../data/labels';
 
@@ -269,6 +270,8 @@ export function MapCanvas() {
   const currentSystemId      = useMapStore((s) => s.currentSystemId);
   const routeOrigin          = useMapStore((s) => s.routeOrigin);
   const setRouteOrigin       = useMapStore((s) => s.setRouteOrigin);
+  const routeFromSystem      = useMapStore((s) => s.routeFromSystem);
+  const setRouteFromSystem   = useMapStore((s) => s.setRouteFromSystem);
   const requestCenterOnEveSystem = useMapStore((s) => s.requestCenterOnEveSystem);
   const accountLocations     = useAccountLocations();
   // Who's viewing this map and where — read by the bulk-remove sweeps so they
@@ -1594,6 +1597,23 @@ export function MapCanvas() {
             },
       ] : [];
 
+      // "Route from here": route panes (Closest Systems, A0, scout exits...)
+      // count jumps from this system rather than from a character, e.g. an
+      // exit nobody is sitting in. Until cleared; single selection only.
+      const routeFromItem = !multiSelected && sys?.eveSystemId != null ? [
+        routeFromSystem?.eveSystemId === sys.eveSystemId
+          ? {
+              label: t('ctxMenu.stopRouteFromHere'),
+              icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
+              action: () => setRouteFromSystem(null),
+            }
+          : {
+              label: t('ctxMenu.routeFromHere'),
+              icon:  <NavigationArrowIcon size={16} weight="regular" color="#5a9af8" />,
+              action: () => setRouteFromSystem({ eveSystemId: sys.eveSystemId!, systemName: sys.name, systemClass: sys.systemClass }),
+            },
+      ] : [];
+
       // Display-only alias — rename the node on this map. Toggles to "Clear alias"
       // (restoring the real name) once one is set. The real name is untouched.
       // Chain number by hand: to fix one, or number a system reached before
@@ -1846,6 +1866,7 @@ export function MapCanvas() {
         ...connectItem,
         ...addConnectedItem,
         ...homeItem,
+        ...routeFromItem,
         ...copyNameItem,
         ...copySystemsItem,
         ...chainItem,

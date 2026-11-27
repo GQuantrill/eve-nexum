@@ -784,7 +784,10 @@
         "incursion": "Aucune incursion accessible d'ici.",
         "generic": "Rien d'accessible d'ici."
       }
-    }
+    },
+    "inWormhole": "Vous êtes dans un trou de ver, sans portail stellaire. Activez « Inclure la chaîne de trous de ver » dans les réglages d'itinéraire pour compter les sauts via votre chaîne cartographiée, ou faites un clic droit sur une sortie de la carte et choisissez « Itinéraire depuis ici ».",
+    "notOnMap": "Votre système n'est pas sur la carte ouverte. Ouvrez la carte de votre chaîne ou activez « Calculer sur toutes mes cartes ».",
+    "holeNotMapped": "Votre système n'est sur aucune carte visible, donc rien n'est accessible depuis là. Cartographiez votre chaîne, ou faites un clic droit sur une sortie et choisissez « Itinéraire depuis ici »."
   },
   "commandPalette": {
     "placeholder": "Rechercher systèmes et cartes…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "Votre navigateur n'autorise pas nexum à lire le presse-papiers. Appuyez plutôt sur Ctrl+V (Cmd+V sur Mac) sur la carte.",
     "pasteNoSystems": "Aucun système copié dans le presse-papiers. Faites d'abord un clic droit sur des systèmes et choisissez Copier les systèmes.",
     "exportSystems": "Exporter les systèmes ({{count}})…",
-    "importSystems": "Importer des systèmes…"
+    "importSystems": "Importer des systèmes…",
+    "routeFromHere": "Itinéraire depuis ici",
+    "stopRouteFromHere": "Ne plus calculer depuis ici"
   },
   "customIntel": {
     "title": "Intel personnalisée",
@@ -2413,7 +2418,10 @@
     "riskFrig": "Trou frégate",
     "jspaceNoWaypoint": "Les systèmes de trou de ver ne peuvent pas être définis comme destination du pilote automatique.",
     "viaAnsiblex": "Porte de saut Ansiblex",
-    "viaMap": "sur {{map}}"
+    "viaMap": "sur {{map}}",
+    "fromPinned": "Sauts depuis {{system}} (choisi sur la carte)",
+    "clearPinned": "Utiliser ma position",
+    "originSkipped": "Impossible de calculer un itinéraire depuis {{name}}, les sauts partent donc de votre position."
   },
   "routeToast": {
     "destinationSet": "Destination définie sur {{system}}",

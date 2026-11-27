@@ -784,7 +784,10 @@
         "incursion": "여기서 갈 수 있는 인커전이 없습니다.",
         "generic": "여기서 갈 수 있는 곳이 없습니다."
       }
-    }
+    },
+    "inWormhole": "웜홀 안에 있어 스타게이트가 없습니다. 경로 설정에서 \"웜홀 체인 포함\"을 켜면 매핑된 체인을 통해 점프 수를 계산합니다. 또는 지도에서 출구를 오른쪽 클릭하고 \"여기서 경로 계산\"을 선택하세요.",
+    "notOnMap": "현재 열린 지도에 내 성계가 없습니다. 체인이 있는 지도를 열거나 \"모든 지도에서 경로 계산\"을 켜세요.",
+    "holeNotMapped": "볼 수 있는 어떤 지도에도 내 성계가 없어 이곳에서 도달할 수 있는 곳이 없습니다. 체인을 매핑하거나 출구를 오른쪽 클릭하고 \"여기서 경로 계산\"을 선택하세요."
   },
   "commandPalette": {
     "placeholder": "성계와 지도 검색…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "브라우저가 nexum의 클립보드 읽기를 허용하지 않습니다. 대신 지도에서 Ctrl+V(Mac은 Cmd+V)를 누르세요.",
     "pasteNoSystems": "클립보드에 복사한 성계가 없습니다. 먼저 성계를 우클릭하고 성계 복사를 선택하세요.",
     "exportSystems": "성계 내보내기 ({{count}})…",
-    "importSystems": "성계 가져오기…"
+    "importSystems": "성계 가져오기…",
+    "routeFromHere": "여기서 경로 계산",
+    "stopRouteFromHere": "여기서 경로 계산 중지"
   },
   "customIntel": {
     "title": "사용자 지정 인텔",
@@ -2413,7 +2418,10 @@
     "riskFrig": "프리깃 홀",
     "jspaceNoWaypoint": "웜홀 시스템은 자동 조종 목적지로 설정할 수 없습니다.",
     "viaAnsiblex": "Ansiblex 점프 게이트",
-    "viaMap": "{{map}}에서"
+    "viaMap": "{{map}}에서",
+    "fromPinned": "{{system}}에서의 점프 (지도에서 선택)",
+    "clearPinned": "내 위치 사용",
+    "originSkipped": "{{name}}에서는 경로를 계산할 수 없어 내 위치에서 점프 수를 계산합니다."
   },
   "routeToast": {
     "destinationSet": "목적지가 {{system}}(으)로 설정됨",

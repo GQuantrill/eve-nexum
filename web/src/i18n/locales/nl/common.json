@@ -784,7 +784,10 @@
         "incursion": "Vanaf hier is geen incursion bereikbaar.",
         "generic": "Niets bereikbaar vanaf hier."
       }
-    }
+    },
+    "inWormhole": "Je zit in een wormgat, en daar zijn geen stargates. Zet \"Wormgatketen meenemen\" aan in de route-instellingen om sprongen via je gemapte keten te tellen, of klik met rechts op een uitgang op de kaart en kies \"Route vanaf hier\".",
+    "notOnMap": "Je systeem staat niet op de geopende kaart. Open de kaart met je keten, of zet \"Over al mijn kaarten routeren\" aan.",
+    "holeNotMapped": "Je systeem staat op geen enkele kaart die je kunt zien, dus vanaf daar is niets bereikbaar. Map je keten, of klik met rechts op een uitgang en kies \"Route vanaf hier\"."
   },
   "commandPalette": {
     "placeholder": "Zoek systemen en kaarten…",
@@ -1030,7 +1033,9 @@
     "pasteUseKeys": "Je browser laat nexum het klembord niet lezen. Druk in plaats daarvan op Ctrl+V (Cmd+V op een Mac) op de kaart.",
     "pasteNoSystems": "Geen gekopieerde systemen op het klembord. Klik eerst met rechts op systemen en kies Systemen kopiëren.",
     "exportSystems": "Systemen exporteren ({{count}})…",
-    "importSystems": "Systemen importeren…"
+    "importSystems": "Systemen importeren…",
+    "routeFromHere": "Route vanaf hier",
+    "stopRouteFromHere": "Niet meer vanaf hier routeren"
   },
   "customIntel": {
     "title": "Eigen intel",
@@ -2413,7 +2418,10 @@
     "riskCritical": "Kritieke massa",
     "riskFrig": "Frigate hole",
     "jspaceNoWaypoint": "Wormgatsystemen kunnen niet als autopilot-bestemming worden ingesteld.",
-    "viaMap": "op {{map}}"
+    "viaMap": "op {{map}}",
+    "fromPinned": "Sprongen vanaf {{system}} (gekozen op de kaart)",
+    "clearPinned": "Mijn locatie gebruiken",
+    "originSkipped": "Vanaf {{name}} kan niet worden gerouteerd, dus de sprongen zijn vanaf je eigen locatie."
   },
   "routeToast": {
     "destinationSet": "Bestemming ingesteld op {{system}}",
