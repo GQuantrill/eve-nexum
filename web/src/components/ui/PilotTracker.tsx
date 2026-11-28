@@ -55,6 +55,22 @@ const pilotNames = new Map<string, { id: number; name: string } | null>();
 
 interface PasteResult { system: string; eveSystemId: number; data: LocalData }
 
+// What the tracker shows survives it being unmounted (the Intel panel
+// collapsed, or moved) for as long as the page is open: the last paste's
+// result, the paste box and its draft, and which pilot is opened up.
+const kept = new Map<string, unknown>();
+function useKept<T>(key: string, initial: T): [T, (v: T | ((prev: T) => T)) => void] {
+  const [value, setValue] = useState<T>(() => (kept.has(key) ? kept.get(key) as T : initial));
+  const set = (v: T | ((prev: T) => T)) => {
+    setValue((prev) => {
+      const next = typeof v === 'function' ? (v as (p: T) => T)(prev) : v;
+      kept.set(key, next);
+      return next;
+    });
+  };
+  return [value, set];
+}
+
 export function PilotTracker() {
   const { t } = useTranslation();
   const canEdit = useCanEditContent();
@@ -75,12 +91,14 @@ export function PilotTracker() {
   const [mapFilterRaw, setMapFilter] = useUserSetting<string>(MAP_FILTER_KEY, '');
   const mapFilter = typeof mapFilterRaw === 'string' && maps.some((m) => m.id === mapFilterRaw) ? mapFilterRaw : '';
 
-  const [pasteOpen, setPasteOpen] = useState(false);
-  const [text, setText] = useState('');
+  // Kept outside the component (see useKept) so collapsing the Intel panel,
+  // which unmounts it, doesn't lose the paste, its result or a draft.
+  const [pasteOpen, setPasteOpen] = useKept('pasteOpen', false);
+  const [text, setText] = useKept('text', '');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<PasteResult | null>(null);
-  const [expanded, setExpanded] = useState<number | null>(null);
+  const [result, setResult] = useKept<PasteResult | null>('result', null);
+  const [expanded, setExpanded] = useKept<number | null>('expanded', null);
   const [addName, setAddName] = useState('');
   // Pilots already seen on the maps you can see whose name contains what's
   // typed: click one to watch them.
