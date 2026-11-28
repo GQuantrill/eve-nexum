@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useMapStore, getPlacementCell, registerPlacementFix } from '../store/mapStore';
-import { useCharacterLocation, useCharacterLocationCheckedAt } from './useCharacterLocation';
+import { useCharacterLocation, useCharacterLocationCheckedAt, useCharacterLocationOwner } from './useCharacterLocation';
 import { useCanTrackJumps } from './useCanEdit';
 import { useAuth } from '../context/AuthContext';
 import { readUserSetting } from './useUserSetting';
@@ -412,6 +412,12 @@ export function applyTrackedJump(
  * this hook just runs map-mutation side-effects whenever the location data
  * advances and a map is active.
  */
+/** Whether a location read belongs to the character being followed. Not
+ *  before the first read, and not the previous character's lingering one. */
+export function isFollowedLocation(owner: number | null, followed: number | null): boolean {
+  return owner != null && owner === followed;
+}
+
 export function useLocationTracking(enabled: boolean) {
   const location = useCharacterLocation();
   // When the location was last READ successfully, not when it last changed. The
@@ -422,6 +428,9 @@ export function useLocationTracking(enabled: boolean) {
   // change to it must reset the jump refs below, so the new character's system
   // isn't linked back to the previous character's as a bogus connection.
   const followedId = useMapStore((s) => s.routeOrigin?.charId ?? null) ?? user?.id ?? null;
+  // Whose location `location` actually is. Just after switching character it's
+  // still the previous one's until the new read lands.
+  const locationOwner = useCharacterLocationOwner();
   // Who may grow the map by flying: editors, and contributors recording their
   // own movement (the server verifies they really are where the add says).
   const canEdit  = useCanTrackJumps();
@@ -476,6 +485,12 @@ export function useLocationTracking(enabled: boolean) {
       lastCheckedAt.current = null;
       lastDocked.current = false;
     }
+
+    // Still the previous character's location (the switch's first read hasn't
+    // landed): take nothing from it. Recording it would make the followed
+    // character's real system look like a jump from the other character's,
+    // and auto-add a connection between them.
+    if (!isFollowedLocation(locationOwner, followedId)) return;
 
     const system = location.system;
     if (!location.online || !system) {
@@ -619,5 +634,5 @@ export function useLocationTracking(enabled: boolean) {
       lastSelectedEveId.current = system.eveSystemId;
       selectSystem(mapSystemId, { fromJump: true });
     }
-  }, [enabled, location, checkedAt, canEdit, followedId]);
+  }, [enabled, location, checkedAt, canEdit, followedId, locationOwner]);
 }
