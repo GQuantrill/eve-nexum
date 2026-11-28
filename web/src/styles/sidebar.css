@@ -288,6 +288,16 @@
   }
 }
 
+/* On the map: a button that centres on the threat's system. */
+.toolbar__proximity--clickable {
+  font-family: inherit;
+  cursor: pointer;
+}
+.toolbar__proximity--clickable:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+}
+
 .toolbar__proximity-icon {
   font-size: calc(14px * var(--font-scale, 1));
 }
@@ -2700,6 +2710,15 @@ select.sig-toolbar-btn option {
 .sig-whstate__size .sig-size-opt__long { display: none; }
 .sig-whstate__size--unset .sig-size-opt b { color: var(--text-faint); font-weight: 400; }
 .sig-size-opt { display: inline-flex; gap: 8px; align-items: baseline; }
+/* In the open list the short values share one width, so the full names
+   line up; the cell itself keeps just the value at its own width. */
+.sig-size-opt b { display: inline-block; min-width: 4.5ch; }
+/* Each cell is as wide as its widest value (XL, <50%, <24h) whatever it
+   shows, so picking one never shifts the column. */
+.sig-whstate__size .sig-size-opt b { text-align: center; }
+.sig-whstate__size--size .sig-size-opt b { min-width: 2.5ch; }
+.sig-whstate__size--mass .sig-size-opt b { min-width: 4.5ch; }
+.sig-whstate__size--life .sig-size-opt b { min-width: 4.5ch; }
 .sig-whstate__chip:hover { border-color: var(--border-accent); }
 
 .sig-whstate__chip--mass-destabilized {
@@ -2729,6 +2748,17 @@ select.sig-toolbar-btn option {
   border-color: var(--cv-conn-expired);
   color: var(--cv-conn-expired);
 }
+
+/* The mass and life dropdowns: the short value in the edge's colours, in the
+   cell and in the open list alike. */
+.sig-whstate__v--mass-destabilized { color: var(--cv-conn-1h); }
+.sig-whstate__v--mass-critical     { color: var(--cv-conn-expired); }
+.sig-whstate__v--time-lessThan24h  { color: var(--cv-conn-eol); }
+.sig-whstate__v--time-lessThan4h   { color: var(--cv-conn-4h); }
+.sig-whstate__v--time-lessThan1h,
+.sig-whstate__v--time-expired      { color: var(--cv-conn-expired); }
+.sig-whstate__v--mass-none,
+.sig-whstate__v--time-none         { color: var(--text-faint); font-weight: 400; }
 
 /* Panel-visibility chooser, shared by the sidebar and the system panel. */
 .panel-visibility__hint {

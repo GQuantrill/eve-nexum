@@ -142,6 +142,8 @@ const noopSubscribe = (): (() => void) => () => {};
 const getSnapshot = () => moduleCache?.data ?? EMPTY;
 const getEmpty = () => EMPTY;
 const getFetchedAt = () => moduleCache?.fetchedAt ?? null;
+const getOwner = () => moduleCache?.charId ?? null;
+const getNoOwner = () => null;
 const getNoFetchedAt = () => null;
 
 const xTabKey = (charId: number): string => `location:${charId}`;
@@ -336,5 +338,22 @@ export function useCharacterLocationCheckedAt(): number | null {
     enabled ? subscribe : noopSubscribe,
     enabled ? getFetchedAt : getNoFetchedAt,
     getNoFetchedAt,
+  );
+}
+
+/**
+ * Whose location {@link useCharacterLocation} is returning (users.id), or null
+ * before the first read. Right after the tab switches character, the previous
+ * character's location lingers until the new one arrives: anything that treats
+ * a change of system as a jump must check this matches the character it
+ * follows, or it links one character's system to the other's.
+ */
+export function useCharacterLocationOwner(): number | null {
+  const { isShareMode } = useShareMode();
+  const enabled = !isShareMode;
+  return useSyncExternalStore(
+    enabled ? subscribe : noopSubscribe,
+    enabled ? getOwner : getNoOwner,
+    getNoOwner,
   );
 }

@@ -68,6 +68,7 @@ import { OrgLogos } from './OrgLogos';
 import { charPortrait, typeIcon } from '../../utils/eveImages';
 import { DISCORD_INVITE_URL } from '../../data/links';
 import { countPersonalMaps } from '../../utils/personalMaps';
+import { systemDisplayName } from '../../utils/systemName';
 
 interface EveStatus {
   players:    number;
@@ -492,15 +493,35 @@ export function Toolbar() {
           nearestThreat.kind === 'hostile-sov' ? { label: t('toolbar.proximity.hostileSov'), Icon: XCircleIcon } :
           nearestThreat.kind === 'intel'       ? { label: t('toolbar.proximity.intel'),      Icon: MegaphoneIcon } :
           { label: t('toolbar.proximity.threat'), Icon: QuestionIcon };
-        return (
-          <span
-            className="toolbar__proximity toolbar__proximity--alert tooltip-right"
-            data-tooltip={t('toolbar.proximity.closest', { label: label.toLowerCase() })}
-          >
+        const content = (
+          <>
             <span className="toolbar__proximity-icon"><Icon size={14} weight="bold" /></span>
             <span className="toolbar__proximity-text">
               {nearestThreat.jumps === 0 ? 'IN' : jumps(t, nearestThreat.jumps)} - {label}
             </span>
+          </>
+        );
+        // The threat's system on the open map: click to centre on it and
+        // select it. Otherwise just the warning.
+        const node = mapSystems.find((s) => s.eveSystemId === nearestThreat.systemId);
+        return node ? (
+          <button
+            type="button"
+            className="toolbar__proximity toolbar__proximity--alert toolbar__proximity--clickable tooltip-right"
+            data-tooltip={t('toolbar.centerOnSystem', { system: systemDisplayName(node) })}
+            onClick={() => {
+              useMapStore.getState().selectSystem(node.id);
+              requestCenterOnEveSystem(nearestThreat.systemId);
+            }}
+          >
+            {content}
+          </button>
+        ) : (
+          <span
+            className="toolbar__proximity toolbar__proximity--alert tooltip-right"
+            data-tooltip={t('toolbar.proximity.closest', { label: label.toLowerCase() })}
+          >
+            {content}
           </span>
         );
       })()

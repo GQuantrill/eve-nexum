@@ -171,6 +171,28 @@ function GhostTypeCell({ sig, isShareMode, onChange }: {
  * appears. Two chips rather than two columns — the table is crowded enough.
  */
 const MASS_CYCLE: Array<MassStatus | ''> = ['', 'destabilized', 'critical'];
+// Mass and life pick from a list like size does: the cell shows the short
+// form (EVE's own wording, coloured like the map's edge), the open list adds
+// the full one.
+const MASS_SHORT: Record<string, string> = { '': '\u2013', destabilized: '<50%', critical: '<10%' };
+const MASS_LONG = {
+  '': 'ctxMenu.massStable', destabilized: 'ctxMenu.massDestab', critical: 'ctxMenu.massCrit',
+} as const;
+const LIFE_SHORT: Record<string, string> = {
+  '': '\u2013', lessThan24h: '<24h', lessThan4h: '<4h', lessThan1h: '<1h', expired: '!',
+};
+const LIFE_LONG = {
+  '': 'signatures.whSizeUnknown', lessThan24h: 'ctxMenu.life1d', lessThan4h: 'ctxMenu.life4h',
+  lessThan1h: 'ctxMenu.life1h', expired: 'ctxMenu.lifeExpired',
+} as const;
+const opt = (value: string, tone: string, short: string, long: string) => ({
+  value, text: long, label: (
+    <span className="sig-size-opt">
+      <b className={`sig-whstate__v--${tone}`}>{short}</b>
+      <span className="sig-size-opt__long">{long}</span>
+    </span>
+  ),
+});
 
 function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
   sig:         Signature;
@@ -229,12 +251,15 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
     );
   }
 
-  const cycle = <T,>(list: T[], current: T): T => list[(list.indexOf(current) + 1) % list.length];
+  // The choices on offer; anything else (stable, fresh, an old 'eol') shows
+  // as not noted, as the cycling chips did.
+  const massValue = MASS_CYCLE.includes(state.massStatus) ? state.massStatus : '';
+  const lifeValue = LIFE_CYCLE.includes(state.timeStatus) ? state.timeStatus : '';
 
   return (
     <span className="sig-whstate">
       <Select
-        className={`sig-whstate__size${size ? '' : ' sig-whstate__size--unset'}`}
+        className={`sig-whstate__size sig-whstate__size--size${size ? '' : ' sig-whstate__size--unset'}`}
         value={size}
         ariaLabel={t('signatures.whStateSize')}
         title={sizeTitle}
@@ -255,24 +280,22 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
           ) })),
         ]}
       />
-      <button
-        type="button"
-        className={`sig-whstate__chip sig-whstate__chip--mass-${state.massStatus || 'none'}`}
-        onClick={() => onChange({ massStatus: cycle(MASS_CYCLE, state.massStatus) })}
+      <Select
+        className="sig-whstate__size sig-whstate__size--mass"
+        value={massValue}
+        ariaLabel={t('signatures.whStateMass')}
         title={t('signatures.whStateMass')}
-        aria-label={t('signatures.whStateMass')}
-      >
-        {massLabel}
-      </button>
-      <button
-        type="button"
-        className={`sig-whstate__chip sig-whstate__chip--time-${state.timeStatus || 'none'}`}
-        onClick={() => onChange({ timeStatus: cycle(LIFE_CYCLE, state.timeStatus) })}
+        onChange={(v) => onChange({ massStatus: v as MassStatus | '' })}
+        options={MASS_CYCLE.map((m) => opt(m, `mass-${m || 'none'}`, MASS_SHORT[m], t(MASS_LONG[m as keyof typeof MASS_LONG])))}
+      />
+      <Select
+        className="sig-whstate__size sig-whstate__size--life"
+        value={lifeValue}
+        ariaLabel={t('signatures.whStateLife')}
         title={t('signatures.whStateLife')}
-        aria-label={t('signatures.whStateLife')}
-      >
-        {timeLabel}
-      </button>
+        onChange={(v) => onChange({ timeStatus: v as TimeStatus | '' })}
+        options={LIFE_CYCLE.map((l) => opt(l, `time-${l || 'none'}`, LIFE_SHORT[l], t(LIFE_LONG[l as keyof typeof LIFE_LONG])))}
+      />
     </span>
   );
 }
