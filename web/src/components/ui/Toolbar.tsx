@@ -509,6 +509,10 @@ export function Toolbar() {
             type="button"
             className="toolbar__proximity toolbar__proximity--alert toolbar__proximity--clickable tooltip-right"
             data-tooltip={t('toolbar.centerOnSystem', { system: systemDisplayName(node) })}
+            // Own the pointer so a click that moves a little isn't read as a
+            // reorder of the toolbar item (which swallows the click). The grip
+            // still drags it.
+            onPointerDown={(e) => e.stopPropagation()}
             onClick={() => {
               useMapStore.getState().selectSystem(node.id);
               requestCenterOnEveSystem(nearestThreat.systemId);
