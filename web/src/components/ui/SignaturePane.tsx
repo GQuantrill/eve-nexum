@@ -34,6 +34,7 @@ import { parseSigClipboard, pasteUpdatesFor, forScannedSystem, type ParsedSig } 
 import { reevaluateConnectionsForSystem } from '../../utils/whAutoDetect';
 import { CLASS_COLORS } from '../../data/wormholes';
 import { alertInboundK162 } from '../../utils/k162Alert';
+import { dragColumn, edgeTarget } from '../../utils/columnResize';
 import {
   formatBookmarkName, DEFAULT_BOOKMARK_FORMAT, formatSiteBookmarkName, DEFAULT_SITE_BOOKMARK_FORMAT,
   K162_BOOKMARK_FORMAT_KEY, wormholeBookmarkFormat,
@@ -302,6 +303,9 @@ function WhStateCell({ sig, conn, whTypes, isShareMode, onChange }: {
 
 type SortCol = 'sigId' | 'sigType' | 'whType' | 'whLeadsTo' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'whtype' | 'leadsto' | 'whstate' | 'name' | 'safe' | 'notes' | 'created' | 'updated';
+
+// Resizable columns, left to right as drawn.
+const RESIZE_ORDER: readonly ColKey[] = ['id', 'type', 'whtype', 'whstate', 'leadsto', 'name', 'safe', 'notes', 'created', 'updated'];
 
 const DEFAULT_WIDTHS: Record<ColKey, number> = {
   id:      72,
@@ -839,12 +843,13 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     [colWidths, isShareMode, isColShown],
   );
 
-  // Name and Notes share any width the pane has beyond the columns' own
-  // widths. Their <col>s get no width (the table's min-width still covers
-  // theirs), so every other column stays the width it was set to instead of
-  // all of them stretching in step: that doubled the Group column in icon
-  // mode, leaving a wide empty cell around a small icon.
-  const colW = (c: ColKey) => (c === 'name' || c === 'notes' ? undefined : colWidths[c]);
+  // Name (or Notes when Name is hidden) takes any width the pane has beyond
+  // the other columns'. Its <col> gets no width (the table's min-width still
+  // covers its own), so every other column stays exactly the width it was set
+  // to: a drag then starts from what's on screen, and the Group column doesn't
+  // double in icon mode. See utils/columnResize.
+  const filler: ColKey | null = isColShown('name') ? 'name' : isColShown('notes') ? 'notes' : null;
+  const colW = (c: ColKey) => (c === filler ? undefined : colWidths[c]);
 
   // Bumped when another client changes this system's sigs (live sync).
   const sigRev = useMapStore((s) => s.sigRev[systemId] ?? 0);
@@ -1328,28 +1333,23 @@ export function SignaturePane({ systemId }: { systemId: string }) {
     });
   }, [sigs, sortCol, sortDir, typeFilter]);
 
-  const startResize = (col: ColKey, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const startX = e.clientX;
-    const startWidth = colWidths[col];
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-
-    const onMove = (ev: MouseEvent) => {
-      const newWidth = Math.max(40, (startWidth + ev.clientX - startX) / uiZoom);
-      setColWidths((prev) => ({ ...prev, [col]: Math.round(newWidth) }));
-    };
-
-    const onUp = () => {
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-    };
-
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+  // A drag on a header's right edge (see utils/columnResize for which column
+  // it resizes). Widths are saved at 100% text size.
+  const resizer = (at: ColKey) => {
+    const target = edgeTarget(RESIZE_ORDER.filter(isColShown), filler, at);
+    if (!target) return null;
+    return (
+      <div
+        className="sig-th__resize"
+        onMouseDown={(e) => {
+          const th = e.currentTarget.closest('th');
+          const el = target.sign === 1 ? th : th?.nextElementSibling;
+          if (!el) return;
+          dragColumn(e, el, target.sign, (px) =>
+            setColWidths((prev) => ({ ...prev, [target.col]: Math.round(px / uiZoom) })));
+        }}
+      />
+    );
   };
 
   const sortInd = (col: SortCol) =>
@@ -1576,30 +1576,30 @@ export function SignaturePane({ systemId }: { systemId: string }) {
               )}
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigId')}>
                 {t('signatures.colId')}{sortInd('sigId')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
+                {resizer('id')}
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('sigType')}
                 data-tooltip={typeIcons ? t('signatures.colType') : undefined}>
                 {/* The word doesn't fit over an icon-wide column. */}
                 {!typeIcons && t('signatures.colType')}{sortInd('sigType')}
-                {!typeIcons && <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />}
+                {!typeIcons && resizer('type')}
               </th>
               {isColShown('whtype') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('whType')}>
                   {t('signatures.colWh')}{sortInd('whType')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('whtype', e)} />
+                  {resizer('whtype')}
                 </th>
               )}
               {isColShown('whstate') && (
                 <th className="sig-th" title={t('signatures.colWhStateHint')}>
                   {t('signatures.colWhState')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('whstate', e)} />
+                  {resizer('whstate')}
                 </th>
               )}
               {isColShown('leadsto') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('whLeadsTo')}>
                   {t('signatures.colLeadsTo')}{sortInd('whLeadsTo')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('leadsto', e)} />
+                  {resizer('leadsto')}
                 </th>
               )}
               {/* Bookmark column — no title; the copy button aligns for every row. */}
@@ -1607,31 +1607,31 @@ export function SignaturePane({ systemId }: { systemId: string }) {
               {isColShown('name') && (
                 <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
                   {t('signatures.colName')}{sortInd('name')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
+                  {resizer('name')}
                 </th>
               )}
               {isColShown('safe') && (
                 <th className="sig-th" title={t('signatures.safeHint')}>
                   {t('signatures.colSafe')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('safe', e)} />
+                  {resizer('safe')}
                 </th>
               )}
               {isColShown('notes') && (
                 <th className="sig-th">
                   {t('signatures.colNotes')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
+                  {resizer('notes')}
                 </th>
               )}
               {isColShown('created') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
                   {t('signatures.colAge')}{sortInd('createdAt')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
+                  {resizer('created')}
                 </th>
               )}
               {isColShown('updated') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
                   {t('signatures.colUpdated')}{sortInd('updatedAt')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
+                  {resizer('updated')}
                 </th>
               )}
               {!isShareMode && <th className="sig-cell--actions" />}
