@@ -76,7 +76,9 @@ Recorded so we come back to them:
   ~/Games/* (Lutris), then ~/Documents. Under Wayland the app runs through
   XWayland (GDK_BACKEND=x11) so always-on-top and the global shortcut work;
   NEXUM_WAYLAND=1 keeps native Wayland. GTK overlay scrollbars are turned
-  off (they covered the sidebar's switches). Known limits: no tray where the desktop has none (GNOME without an
+  off (they covered the sidebar's switches), and so is WebKit's DMA-BUF
+  renderer (WEBKIT_DISABLE_DMABUF_RENDERER=1; on some setups it left the
+  window white). Setting any of these yourself overrides. Known limits: no tray where the desktop has none (GNOME without an
   extension), and no spoken intel where WebKitGTK has no speech (the
   option is hidden then).
 

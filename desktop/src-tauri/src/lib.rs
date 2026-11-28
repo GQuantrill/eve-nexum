@@ -448,6 +448,10 @@ pub(crate) fn tr(key: &str) -> String {
 ///   keeps native Wayland.
 /// - GTK's overlay scrollbars float over the page and cover controls at its
 ///   right edge (the sidebar's switches): use classic scrollbars.
+/// - WebKit's DMA-BUF renderer: on some setups (seen on Debian, KDE Wayland,
+///   AMD) GTK can't set up GL for it ("GTK failed to initialize GL") and the
+///   window later goes white for good, with Reload not bringing it back. The
+///   older renderer has neither problem and is plenty for a map page.
 /// A variable the pilot set themselves is left alone.
 #[cfg(target_os = "linux")]
 fn linux_env() {
@@ -457,6 +461,9 @@ fn linux_env() {
     }
     if !set("GTK_OVERLAY_SCROLLING") {
         std::env::set_var("GTK_OVERLAY_SCROLLING", "0");
+    }
+    if !set("WEBKIT_DISABLE_DMABUF_RENDERER") {
+        std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
     }
 }
 
