@@ -17,6 +17,7 @@ import { NotesEditor } from './NotesEditor';
 import { Select } from './Select';
 import { XIcon, ColumnsIcon } from '../../icons';
 import { toast } from '../../utils/toastStore';
+import { dragColumn, edgeTarget } from '../../utils/columnResize';
 import { duration, DASH } from '../../i18n/format';
 
 // Cosmic anomalies don't need scanning — the probe scanner lists them at 100%
@@ -31,6 +32,9 @@ const ANOM_TYPE_LABELS: Record<AnomType, string> = {
 
 type SortCol = 'anomId' | 'anomType' | 'name' | 'createdAt' | 'updatedAt';
 type ColKey  = 'id' | 'type' | 'name' | 'notes' | 'created' | 'updated';
+
+// Resizable columns, left to right as drawn.
+const RESIZE_ORDER: readonly ColKey[] = ['id', 'type', 'name', 'notes', 'created', 'updated'];
 
 const DEFAULT_WIDTHS: Record<ColKey, number> = {
   id:      72,
@@ -439,28 +443,26 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
     });
   }, [anoms, sortCol, sortDir, typeFilter]);
 
-  const startResize = (col: ColKey, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const startX = e.clientX;
-    const startWidth = colWidths[col];
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-
-    const onMove = (ev: MouseEvent) => {
-      const newWidth = Math.max(40, startWidth + ev.clientX - startX);
-      setColWidths((prev) => ({ ...prev, [col]: newWidth }));
-    };
-
-    const onUp = () => {
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-    };
-
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+  // Name takes any width the pane has beyond the other columns' (its <col>
+  // has no width; the table's min-width still covers its own), so the others
+  // stay exactly as set and a drag starts from what's on screen. Before, all
+  // of them stretched and a drag seemed stuck. See utils/columnResize.
+  const tableMinWidth = RESIZE_ORDER.reduce((a, c) => a + (isColVisible(c) ? colWidths[c] : 0), 0) + 24 + 28;
+  const resizer = (at: ColKey) => {
+    const target = edgeTarget(RESIZE_ORDER.filter(isColVisible), 'name', at);
+    if (!target) return null;
+    return (
+      <div
+        className="sig-th__resize"
+        onMouseDown={(e) => {
+          const th = e.currentTarget.closest('th');
+          const el = target.sign === 1 ? th : th?.nextElementSibling;
+          if (!el) return;
+          dragColumn(e, el, target.sign, (px) =>
+            setColWidths((prev) => ({ ...prev, [target.col]: px })));
+        }}
+      />
+    );
   };
 
   const sortInd = (col: SortCol) =>
@@ -579,12 +581,12 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
         <div className="sig-pane__empty">{t('anomalies.noMatchFilter')}</div>
       ) : (
         <div className="sig-table-wrap">
-        <table className="sig-table">
+        <table className="sig-table" style={{ minWidth: tableMinWidth }}>
           <colgroup>
             <col className="sig-col--check" />
             <col style={{ width: colWidths.id }} />
             <col style={{ width: colWidths.type }} />
-            <col style={{ width: colWidths.name }} />
+            <col />
             {isColVisible('notes')   && <col style={{ width: colWidths.notes }} />}
             {isColVisible('created') && <col style={{ width: colWidths.created }} />}
             {isColVisible('updated') && <col style={{ width: colWidths.updated }} />}
@@ -603,32 +605,32 @@ export function AnomalyPane({ systemId }: { systemId: string }) {
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('anomId')}>
                 {t('anomalies.colId')}{sortInd('anomId')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('id', e)} />
+                {resizer('id')}
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('anomType')}>
                 {t('anomalies.colType')}{sortInd('anomType')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('type', e)} />
+                {resizer('type')}
               </th>
               <th className="sig-th sig-th--sortable" onClick={() => handleSort('name')}>
                 {t('anomalies.colName')}{sortInd('name')}
-                <div className="sig-th__resize" onMouseDown={(e) => startResize('name', e)} />
+                {resizer('name')}
               </th>
               {isColVisible('notes') && (
                 <th className="sig-th">
                   {t('anomalies.colNotes')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('notes', e)} />
+                  {resizer('notes')}
                 </th>
               )}
               {isColVisible('created') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('createdAt')}>
                   {t('anomalies.colAge')}{sortInd('createdAt')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('created', e)} />
+                  {resizer('created')}
                 </th>
               )}
               {isColVisible('updated') && (
                 <th className="sig-th sig-th--sortable sig-th--time" onClick={() => handleSort('updatedAt')}>
                   {t('anomalies.colUpdated')}{sortInd('updatedAt')}
-                  <div className="sig-th__resize" onMouseDown={(e) => startResize('updated', e)} />
+                  {resizer('updated')}
                 </th>
               )}
               <th className="sig-cell--actions" />

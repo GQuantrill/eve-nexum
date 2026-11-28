@@ -2196,6 +2196,22 @@ button.chain-exits-menu__exit:hover { background: var(--surface-hover); }
   background: color-mix(in srgb, var(--accent-alt) 40%, transparent);
 }
 
+/* A visible divider on each draggable column edge, so it's clear the columns
+   can be resized. Brighter while hovered. */
+.sig-th__resize::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background: var(--border-strong);
+}
+.sig-th__resize:hover::after,
+.sig-th__resize:active::after {
+  background: var(--accent-alt);
+}
+
 .sig-checkbox {
   accent-color: var(--accent);
   cursor: pointer;
